@@ -1,0 +1,16 @@
+##using sudo for run command
+## add ip
+ip addr add 192.168.1.20/24 dev enp2s0f1
+
+## show ip
+ip addr show
+
+## show macaddres network ip
+arp
+
+## command capture package
+tcpdump
+or
+sudo wireshark
+## remove ip in arp table
+arp -d 192.168.1.30
