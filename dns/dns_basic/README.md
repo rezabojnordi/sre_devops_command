@@ -1,0 +1,561 @@
+#  Basic DNS server configuration
+
+#### Key Knowledge Areas:
+BIND 9.x configuration files, terms and utilities
+Defining the location of the BIND zone files in BIND configuration files
+Reloading modified configuration and zone files
+Awareness of dnsmasq, djbdns and PowerDNS as alternate name servers
+
+#### The following is a partial list of the used files, terms and utilities:
+* /etc/named.conf
+* /var/named/
+* /usr/sbin/rndc
+* kill
+* host
+* dig
+
+#### Whats is DNS?
+
+Thirty years ago, when we wanted to visit a website we had to know the IP address of that site. That’s because computers are and were only able to communicate using numbers. As we are human and we are not robots It is very hard to remember. We needed a way to translate computer-readable information into human-readable. First the idea of using host files seemed great but weren't useful as time passed and internet growth.
+In the early 1980’s, Paul Mockapetris came up with a system that automatically mapped IP addresses to domain names. and the DNS was born. so The Domain Name System ( DNS) converts human readable domain names (like: www.google.com) into Internet Protocol (IP) addresses (like: 172.217.16.206).DNS still serves as the backbone of the modern Internet, today.
+
+#### DNS Structure
+
+The Domain Name System (DNS) is a hierarchical decentralized naming system for computers, services, or other resources connected to the Internet or a private network.
+
+
+<img src="pic/1.png" height="300" width="600" style="float:center" ></img>
+
+
+At the highest level "." is considered as root and at other lower levels there are Top Level Domains (TLD)s.
+When a query is received by the name server, first it looks at its cache, if the answer is found then name server answers query from its cache.
+if nothing is found in the cache, then it tries to mach smaller parts of query to return an answer to help client to send its query to another Name server.
+
+#### How does it work ?
+
+When we type www.google.com the system will look for www.google.com. Whenever we type some domain name, there is a hidden " . "(dot) at the end of the www.google.com that say to search the root server of namespace.
+
+
+<img src="pic/2.jpg" height="400" width="600" style="float:center" ></img>
+
+
+Then our router will contact our default DNS Service for DNS resolution. The DNS service will contact DNS Root Servers and ask for the IP address of server containing .com records. This address is sent back to your DNS service. The DNS service again reaches the Name Server containing addresses of .com domains and asks it for the address of http://google.com. Upon obtaining the IP address of the servers that host google.com, our DNS service will return the IP address to our computer which then fires up our browser to download the main webpage. Where root servers are defined?
+
+** root@server1:/etc/bind# cat db.root 
+
+DNS is consist of resource records which are stored in Zone files. lets talk about types of DNS Records.
+
+#### DNS Resource Records (RRs)
+Resource Records define data types in the Domain Name System (DNS).Resource Records are stored in binary format internally for use by DNS software. But resource records are sent across a network in text format while they perform zone transfers. Some common ones are A record which contains the IP address of the domain, AAAA record which holds the IPv6 information, and MX record which has mail servers of a domain.
+
+#### DNS Resource Records Types
+DNS servers might have different types of records, each type of records is used for a specific purpose , which can be queried by nslookup using --query=mx or --query=ns.
+
+#### A/AAA
+A Records are the most basic type of DNS record and are used to point a domain or subdomain to an IP address. A is an IPv4 adrress record and AAA is an IPv6 address record.
+
+#### CNAME
+Common Name record is used to point a domain or subdomain to another hostname
+
+#### MX
+the Mail Exchange (MX) record for mail delivery , required "priority" value as a part of their entry to indicate which mail sever should be used first
+
+#### NS
+The NS record specifies an authoritative name server for given host.
+
+#### SRV
+the Server Locator record to designate a host and port for certain services, such as LDAP, for a domain.
+
+#### SOA
+The  Start Of Authority record specifies core information about a DNS zone, including the primary name server, the email of the domain administrator, the domain serial number, and several timers relating to refreshing the zone
+
+Now that we have got familiar with Types of Records in DNS lets learn about one of DNS client tools :
+
+#### nslookup
+
+name server lookup(nslookup) is a network administration command-line tool available for many computer operating systems for querying the Domain Name System (DNS) to obtain domain name or IP address mapping or for any other specific DNS record. to find out IP Address of a Domain:
+
+** root@server1:~# nslookup google.com
+
+** root@server1:~# nslookup 172.217.16.174
+
+to query for MX records to find out list of mail servers and their priority:
+
+** root@server1:~# nslookup -query=mx google.com
+
+also to To query SOA (Start of Authority) record:
+
+** root@server1:~# nslookup -type=soa google.com
+
+and to query for all types of DNS records of a domain:
+
+** root@server1:~# nslookup -query=any google.com
+
+
+By default, nslookup will query the same DNS the system is configured to use for all network operations. We can specify a custom DNS to query:
+
+** root@server1:~# nslookup google.com 8.8.4.4
+
+to enable debugging modem, which is very useful for troubleshooting:
+
+** root@server1:~# nslookup -debug linux.com
+
+By default, domain name servers accept queries on port 53. If this is configured differently on the server we are trying to query, we can specify another port number using the -port= option nslookup -port=54 mycompanydns.com .
+it is good to know that nslookup command has an interactive mode also:
+
+** root@server1:~# nslookup 
+> yahoo.com
+
+use -timeout=10 to Change timeout interval to wait for a reply nslookup -timeout=10 google.com .
+How ever nslookup is somehow old and deprecated but it can be used to show ipv6 AAAA and PTR records too.nslookup is very useful and widely used by most of famous operation systems.
+
+#### Authoritative Answer vs Non-Authoritative Answer
+You may also noticed the keyword “Authoritative Answer” and “Non-Authoritative Answer” in the above output.
+Any answer that originates from the DNS Server which has the complete zone file information available for the domain is said to be authoritative answer.
+In many cases, DNS servers will not have the complete zone file information available for a given domain. Instead, it maintains a cache file which has the results of all queries performed in the past for which it has gotten authoritative response. When a DNS query is given, it searches the cache file, and return the information available as “Non-Authoritative Answer”.
+
+
+#### host
+
+host comman is another tool for performing DNS lookups. It is minimal and easy to use and like nslookup command, it can list and verify different types of DNS record like NS and MX records.
+
+** root@server1:~# host google.com
+
+* host -t ns google.com
+find domain name servers, it can be -t cname or  -t mx
+* host -C google.com
+find domain SOA record
+* host google.com 8.8.4.4
+Query specific DNS
+* host -a google.com
+All Information of Domain Records and Zones
+* host -4 google.com or host -6 google.com
+Use Either IPv4 or IPv6
+* host -T google.com
+By default, host uses UDP.  -T option makes it use a TCP
+* host -w 10 google.com
+Set Query Time Wait for Reply
+* host 172.217.16.174
+performs a reverse lookup on the IP address
+
+#### dig
+
+Dig stands for (Domain Information Groper) is a network administration command-line tool for querying DNS. It is useful for verifying and troubleshooting DNS problems and also to perform DNS lookups and displays the answers that are returned from the DNS, with no options dig find "A" record of a domain:
+
+** root@server1:~# dig google.com
+
+there are some stats about the query. We can turn off these stats using the +nostats option.
+
+** root@server1:~# dig google.com +nostat
+
+By default dig is quite verbose. One way to cut down the output is to use the +short option:
+
+** root@server1:~# dig google.com +short
+
+some other useful dig commands:
+
+* dig google.com MX
+Querying MX record for a domain
+* dig google.com SOA
+Querying SOA record for a domain
+* dig google.com TTL
+Querying TTL Record for Domain
+* dig @8.8.8.8 google.com
+Using another DNS server for querying
+* dig
+Shows dig command version and root DNS servers
+* dig google.com +nocomments +noquestion +noauthority +noadditional +nostats
+Querying only answer section
+* dig google.com ANY +noall +answer
+Querying ALL DNS Records Types
+
+dig command has lots of options, and its hard to type options every time.We can store options like +noall +answeroptions permanently in.digrc file under user’s home directory. This way , whenever dig command execute it will show only answer section of dig output.
+dig is part of the BIND domain name server software suite. dig command replaces older tool such as nslookup and the host.
+
+The Different DNS Servers
+There are many different DNS servers which have been developed and they have some differences with each other from different aspects. Some of famous DNS servers are:
+* bjdns , forked and now used as dbdns in debian
+* powerdns
+* dnsmasq
+* BIND
+* Microsoft DNS
+Lets Compare them:
+
+
+<img src="pic/3.png" height="400" width="700" style="float:center" ></img>
+
+
+There is no need to memorize all features of DNS servers for LPIC exam, just get familiar with names. Also we will discuss about some of features that we have mentioned here in the next lessons. Here we use Berkeley Internet Name Domain (BIND9) for lpic2 exam.
+
+#### Different Types of DNS queries
+As a client when we ask for the IP address of a web site we query a DNS Server, But thats is not all. As its impossible to store all domain names and records in the world in one DNS server, DNS servers asks each other for getting information, that make different types of DNS queries
+There are two types of DNS queries :
+
+* Recursive query
+* Iterative quries
+* Inverse queries
+
+<img src="pic/4.jpg" height="400" width="700" style="float:center" ></img>
+
+* Recursive name queries are generally made by a DNS client to a DNS server, or by a forwarder DNS server that is configured to pass unresolved name queries to another DNS server.
+* An iterative name query is one in which a DNS client allows the DNS server to return the best answer it can give based on its cache or zone data(Delegation). If the queried DNS server does not have an exact match for the queried name, the best possible information it can return is a referral (that is, a pointer to a DNS server authoritative for a lower level of the domain namespace). The DNS client can then query the DNS server for which it obtained a referral. It continues this process until it locates a DNS server that is authoritative for the queried name, or until an error or time-out condition is met.
+* Inverse/Reverse queries , usually we ask DNS server for the IP address(es) of a Domain Name, and DNS Server answer our query using A or AAA record if it has, but some times because of security issues or any other reason we know the IP address of a Host but we want to verify that, so we ask host name of an IP address that we have and DNS Server answers our Reverse Query using PTR record it has.
+
+
+#### DNS implementation types
+* Forwarding Name Server
+* Caching Name Server
+* Master/Slave Name servers
+
+#### Forwarding DNS vs caching DNS
+
+<img src="pic/5.jpg" height="400" width="700" style="float:center" ></img>
+
+* Forwarding:  just passes the DNS query to another DNS server ( our ISP's). Home routers use forwarding to pass DNS queries from our  network's clients to our ISP's DNS servers. For example, for foo.example.com, a forwarding DNS server would first check its cache (did it already ask this question before), and if the answer is not in its cache, it would ask its forwarder (our ISP's DNS server) for the answer, which would respond with either a cached response, or would perform recursion until it figured out the answer.
+
+
+
+<img src="pic/6.jpg" height="400" width="700" style="float:center" ></img>
+
+* Caching :  In this case our DNS server receiving the query and takes it upon itself to figure out the answer to that query by recursively querying authoritative DNS servers for that domain. For example, for foo.example.com, a recursor would first query the root servers for what DNS servers are responsible for the .com TLD, then it would ask those servers for example.com, then it would query the servers for example.com for foo.example.com, finally getting the answer to the original query.
+
+BIND Caching DNS Server
+Now lets setup BIND DNS and configure it to work as Caching DNS(Ubuntu 20.04):
+
+** root@server1:~# apt install bind9 bind9utils 
+
+Okey it creates files which it needs:
+
+root@server1:~# cd /etc/bind
+
+#### /etc/named.conf
+
+named.conf (or name daemon configuration file) is main BIND DNS server configuration file.Based on our linux distribution BIND configuration file(s) might look a little bit different. in cent OS there is a one big named.conf (CentOS7.1):
+
+as we use ubuntu for demonstration in this lesson Lets take a look at inside:
+
+** root@server1:/etc/bind# cat named.conf
+
+named.conf wrap up all the configuration files which BIND daemon need. It is kind of pointer which include required configuration files. For now there is nothing to change in named.conf , lets get into named.conf.options :
+
+```
+options {
+    directory "/var/cache/bind";
+
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+    // If your ISP provided one or more IP addresses for stable 
+    // nameservers, you probably want to use them as forwarders.  
+    // Uncomment the following block, and insert the addresses replacing 
+    // the all-0's placeholder.
+
+    // forwarders {
+    //     0.0.0.0;
+    // };
+
+    //========================================================================
+    // If BIND logs error messages about the root key being expired,
+    // you will need to update your keys.  See https://www.isc.org/bind-keys
+    //========================================================================
+    dnssec-validation auto;
+
+    auth-nxdomain no;    # conform to RFC1035
+    listen-on-v6 { any; };
+};
+
+```
+
+innamed.conf.options as its obvious, most of BIND options are defined. For example if we wanted to make it forwarder, just uncomment forwarders section, but to make our BIND Caching DNS Server add
+recursion yes; at the end this file. And then we need to restart bind service in order to our changes take effect:
+
+
+``` 
+root@server1:/etc/bind# systemctl restart bind9.service
+root@server1:/etc/bind# systemctl status bind9.service
+● bind9.service - BIND Domain Name Server
+   Loaded: loaded (/lib/systemd/system/bind9.service; enabled; vendor preset: en
+  Drop-In: /run/systemd/generator/bind9.service.d
+           └─50-insserv.conf-$named.conf
+   Active: active (running) since Wed 2018-02-28 00:13:52 PST; 11s ago
+     Docs: man:named(8)
+ Main PID: 84563 (named)
+   CGroup: /system.slice/bind9.service
+           └─84563 /usr/sbin/named -f -u bind
+
+Feb 28 00:13:52 server1 named[84563]: all zones loaded
+Feb 28 00:13:52 server1 named[84563]: running
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving './DNSKEY/IN
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving './NS/IN': 2
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving 'G.ROOT-SERV
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving 'E.ROOT-SERV
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving 'G.ROOT-SERV
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving 'E.ROOT-SERV
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving './DNSKEY/IN
+Feb 28 00:13:52 server1 named[84563]: network unreachable resolving './NS/IN': 2
+lines 1-20/20 (END)
+
+
+```
+
+
+darradaaa thats all, setting up BIND DNS server as a caching only server is finished.and check if its working:
+
+```
+root@server1:/etc/bind# dig @localhost google.com
+
+; <<>> DiG 9.10.3-P4-Ubuntu <<>> @localhost google.com
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 8395
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 4, ADDITIONAL: 9
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;google.com.            IN    A
+
+;; ANSWER SECTION:
+google.com.        300    IN    A    216.58.207.78
+
+;; AUTHORITY SECTION:
+google.com.        172797    IN    NS    ns4.google.com.
+google.com.        172797    IN    NS    ns2.google.com.
+google.com.        172797    IN    NS    ns3.google.com.
+google.com.        172797    IN    NS    ns1.google.com.
+
+;; ADDITIONAL SECTION:
+ns1.google.com.        172797    IN    A    216.239.32.10
+ns1.google.com.        172797    IN    AAAA    2001:4860:4802:32::a
+ns2.google.com.        172797    IN    A    216.239.34.10
+ns2.google.com.        172797    IN    AAAA    2001:4860:4802:34::a
+ns3.google.com.        172797    IN    A    216.239.36.10
+ns3.google.com.        172797    IN    AAAA    2001:4860:4802:36::a
+ns4.google.com.        172797    IN    A    216.239.38.10
+ns4.google.com.        172797    IN    AAAA    2001:4860:4802:38::a
+
+;; Query time: 1176 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Wed Feb 28 00:17:14 PST 2018
+;; MSG SIZE  rcvd: 303
+
+
+```
+
+
+Good job, its working but does it do caching? Lets query again to see the time:
+
+```
+root@server1:/etc/bind# dig @localhost google.com
+
+; <<>> DiG 9.10.3-P4-Ubuntu <<>> @localhost google.com
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 21081
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 4, ADDITIONAL: 9
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;google.com.            IN    A
+
+;; ANSWER SECTION:
+google.com.        177    IN    A    216.58.207.78
+
+;; AUTHORITY SECTION:
+google.com.        172674    IN    NS    ns4.google.com.
+google.com.        172674    IN    NS    ns2.google.com.
+google.com.        172674    IN    NS    ns3.google.com.
+google.com.        172674    IN    NS    ns1.google.com.
+
+;; ADDITIONAL SECTION:
+ns1.google.com.        172674    IN    A    216.239.32.10
+ns1.google.com.        172674    IN    AAAA    2001:4860:4802:32::a
+ns2.google.com.        172674    IN    A    216.239.34.10
+ns2.google.com.        172674    IN    AAAA    2001:4860:4802:34::a
+ns3.google.com.        172674    IN    A    216.239.36.10
+ns3.google.com.        172674    IN    AAAA    2001:4860:4802:36::a
+ns4.google.com.        172674    IN    A    216.239.38.10
+ns4.google.com.        172674    IN    AAAA    2001:4860:4802:38::a
+
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Wed Feb 28 00:19:17 PST 2018
+;; MSG SIZE  rcvd: 303
+
+```
+
+Yes, because query time is 0 msec :) . 177 and 172674 are TTL numbers and show how much our data would be valid in our cache and when it expires and then our DNS server has to require for the domain:
+
+
+```
+root@server1:/etc/bind# dig @localhost google.com
+
+; <<>> DiG 9.10.3-P4-Ubuntu <<>> @localhost google.com
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 37436
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 4, ADDITIONAL: 9
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;google.com.            IN    A
+
+;; ANSWER SECTION:
+google.com.        300    IN    A    216.58.207.78
+
+;; AUTHORITY SECTION:
+google.com.        172204    IN    NS    ns3.google.com.
+google.com.        172204    IN    NS    ns2.google.com.
+google.com.        172204    IN    NS    ns4.google.com.
+google.com.        172204    IN    NS    ns1.google.com.
+
+;; ADDITIONAL SECTION:
+ns1.google.com.        172204    IN    A    216.239.32.10
+ns1.google.com.        172204    IN    AAAA    2001:4860:4802:32::a
+ns2.google.com.        172204    IN    A    216.239.34.10
+ns2.google.com.        172204    IN    AAAA    2001:4860:4802:34::a
+ns3.google.com.        172204    IN    A    216.239.36.10
+ns3.google.com.        172204    IN    AAAA    2001:4860:4802:36::a
+ns4.google.com.        172204    IN    A    216.239.38.10
+ns4.google.com.        172204    IN    AAAA    2001:4860:4802:38::a
+
+;; Query time: 327 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Wed Feb 28 00:27:07 PST 2018
+;; MSG SIZE  rcvd: 303
+
+```
+
+
+as we saw, making recursion enabled in our DNS Server is very easy but do not forget security issues. Enabling recursion and make our DNS server publicly available make a target from us for different kind of attacks. So we use ACLs and other configurations to limit acceptable queries.
+
+
+#### BIND Forwarder DNS Server
+
+To make our Bind DNS Server a forwarder just edit forwarder section like this:
+
+```
+options {
+    directory "/var/cache/bind";
+
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+    // If your ISP provided one or more IP addresses for stable 
+    // nameservers, you probably want to use them as forwarders.  
+    // Uncomment the following block, and insert the addresses replacing 
+    // the all-0's placeholder.
+
+     forwarders {
+         8.8.8.8;
+     };
+     forward only;
+
+    //========================================================================
+    // If BIND logs error messages about the root key being expired,
+    // you will need to update your keys.  See https://www.isc.org/bind-keys
+    //========================================================================
+    dnssec-validation auto;
+
+    auth-nxdomain no;    # conform to RFC1035
+    listen-on-v6 { any; };
+};
+
+```
+
+#### /usr/sbin/rndc
+
+BIND includes a utility called rndc (Remote Name Daemon Control) which allows command line administration of the named daemon from the localhost or a remote host.
+In order to prevent unauthorized access to the named daemon, BIND uses a shared secret key authentication method to grant privileges to hosts. This means an identical key must be present in both /etc/named.conf and the rndc configuration file, /etc/rndc.conf.
+The name server control utility, rndc, sends named digitally signed commands over a TCP connection. The configuration file for rndc is ‘/etc/rndc.conf’. This configuration file stores configuration information such as the name server to connect to and which key to use for the digital signature. The rndc utility is started when named is started using the initialization script. An rndc.conf file can be generated with a random key with the rndc-confgen commandline utility. rndc related files are like this:
+
+
+<img src="pic/7.jpg" height="400" width="700" style="float:center" ></img>
+
+lets takea look at rndc.key file:
+
+```
+root@server1:/etc/bind# ls -al rndc*
+-rw-r----- 1 bind bind 77 Mar  5 22:20 rndc.key
+root@server1:/etc/bind# cat rndc.key 
+key "rndc-key" {
+    algorithm hmac-md5;
+    secret "JFLwN7Sd/sGbIdan+y/XtQ==";
+};
+root@server1:/etc/bind# rndc reload
+server reload successful
+
+```
+for demonstration lets remove and recreate rndc.key :
+
+```
+root@server1:/etc/bind# rm rndc.key 
+root@server1:/etc/bind# ls -al rndc*
+ls: cannot access 'rndc*': No such file or directory
+root@server1:/etc/bind# rndc reload
+rndc: neither /etc/bind/rndc.conf nor /etc/bind/rndc.key was found
+
+root@server1:/etc/bind# rndc-confgen -r /dev/urandom -a
+wrote key file "/etc/bind/rndc.key"
+root@server1:/etc/bind# ls -al rndc*
+-rw------- 1 root bind 77 Apr 17 23:48 rndc.key
+root@server1:/etc/bind# cat rndc.key 
+key "rndc-key" {
+    algorithm hmac-md5;
+    secret "sIfJgn3msN0RnyzNz6mixQ==";
+};
+
+```
+
+We have removed and recreate a rndc.key lets set rights:
+
+```
+root@server1:/etc/bind# chown bind.bind rndc.key 
+root@server1:/etc/bind# chmod 640 rndc.key
+
+```
+
+and check it:
+
+** root@server1:/etc/bind# systemctl start bind9.service 
+** root@server1:/etc/bind# systemctl status bind9.service
+
+for generating rndc.cong and requred key use  "rndc-confgen -r /dev/urandom>/etc/bind/rndc.conf command, after creating that we have to include the file , and use it but that is not our topic for now.
+Except rndc remote features of rndc we can use it locally. Like most of Services in Linux world, when we change a configuration file in BIND or change zones(as we see in next lessons) we need to restart bind service, but there a problem! By restarting bind service all caches would be cleared and that it not acceptable, so instead of that, we use rndc tool. rndc read configuration files and reflect zone changes but does not clear cahce.
+
+root@server1:/etc/bind# rndc reload
+server reload successful
+
+also it is possible to clear specific domain name from cache results with rndc flushname google.com . to flush every thing in the system rndc flush and many other features, but that is enough for now!
+
+#### Master/ Slave DNS
+
+<img src="pic/8.jpg" height="400" width="700" style="float:center" ></img>
+
+In Small environments having just one DNS server as a Master is enough but in Large environments we should find a way to provide availability. Having a second DNS Server as a Slave DNS Server is a solution.
+
+<img src="pic/9.jpg" height="400" width="700" style="float:center" ></img>
+
+Master DNS server (Primary Server) is the original zone data handler and Slave DNS server (Secondary Server) is just a backup server which is used to copy the same zone information’s from the master servers. Master Server will resolve the names for every hosts which we defined in the zone database . But the Slave server transfer Zone Data after a while from Master Server. When master Server become unavailable Slave Server answer queries. Do not forget that it is impossible to modify or change zone data in Slave Server.
+
+
+#### Zone transfers - AXFR and IXFR
+
+When a master nameserver is updated , the working contents of the zone held in memory that have changed need to be transferred to the other servers that are authoritative for that zone (the slave servers). This process is called 'zone transfer'.
+
+<img src="pic/10.jpg" height="400" width="700" style="float:center" ></img>
+
+
+There are two types of zone transfer - full (AXFR) and incremental (IXFR). A full zone transfer is of the entire zones. An Incremental zone transfer is a list of changes that, when applied, bring the slave zone up to date. The use of incremental zone transfers requires that both the provider and the recipient are maintaining a separate journal file of changes for each zone. The default is that slaves will request IXFR (unless otherwise configured) but they will always handle being given an AXFR instead, if no IXFR is available.
+The critical component that controls the decision on whether or not the zone has changed is the serial number that is maintained in the zone's SOA record. BIND assumes that if the serial number remains the same, then the zone is unchanged.
+Zone transfers are always initiated by the slave server (they are 'requested' or 'pulled'). Although there are mechanisms in place to alert slaves that they should check to see if a zone transfer is needed, the transfer itself is always started by the slave.
+to check AXFR transfer we can use dig AXFR example.com @10.10.0.4 .
+
+
