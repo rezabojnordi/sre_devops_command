@@ -41,9 +41,11 @@ When we type www.google.com the system will look for www.google.com. Whenever we
 
 Then our router will contact our default DNS Service for DNS resolution. The DNS service will contact DNS Root Servers and ask for the IP address of server containing .com records. This address is sent back to your DNS service. The DNS service again reaches the Name Server containing addresses of .com domains and asks it for the address of http://google.com. Upon obtaining the IP address of the servers that host google.com, our DNS service will return the IP address to our computer which then fires up our browser to download the main webpage. Where root servers are defined?
 
-** root@server1:/etc/bind# cat db.root 
+root@server1:/etc/bind# cat db.root 
 
-‍‍‍```
+```
+‍‍‍
+
 root@server1:/etc/bind# cat db.root 
 ;       This file holds the information on root name servers needed to
 ;       initialize cache of Internet domain name servers
