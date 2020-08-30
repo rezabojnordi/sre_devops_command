@@ -43,6 +43,100 @@ Then our router will contact our default DNS Service for DNS resolution. The DNS
 
 ** root@server1:/etc/bind# cat db.root 
 
+‍‍‍```
+root@server1:/etc/bind# cat db.root 
+;       This file holds the information on root name servers needed to
+;       initialize cache of Internet domain name servers
+;       (e.g. reference this file in the "cache  .  <file>"
+;       configuration file of BIND domain name servers).
+;
+;       This file is made available by InterNIC 
+;       under anonymous FTP as
+;           file                /domain/named.cache
+;           on server           FTP.INTERNIC.NET
+;       -OR-                    RS.INTERNIC.NET
+;
+;       last update:    February 17, 2016
+;       related version of root zone:   2016021701
+;
+; formerly NS.INTERNIC.NET
+;
+.                        3600000      NS    A.ROOT-SERVERS.NET.
+A.ROOT-SERVERS.NET.      3600000      A     198.41.0.4
+A.ROOT-SERVERS.NET.      3600000      AAAA  2001:503:ba3e::2:30
+;
+; FORMERLY NS1.ISI.EDU
+;
+.                        3600000      NS    B.ROOT-SERVERS.NET.
+B.ROOT-SERVERS.NET.      3600000      A     192.228.79.201
+B.ROOT-SERVERS.NET.      3600000      AAAA  2001:500:84::b
+;
+; FORMERLY C.PSI.NET
+;
+.                        3600000      NS    C.ROOT-SERVERS.NET.
+C.ROOT-SERVERS.NET.      3600000      A     192.33.4.12
+C.ROOT-SERVERS.NET.      3600000      AAAA  2001:500:2::c
+;
+; FORMERLY TERP.UMD.EDU
+;
+.                        3600000      NS    D.ROOT-SERVERS.NET.
+D.ROOT-SERVERS.NET.      3600000      A     199.7.91.13
+D.ROOT-SERVERS.NET.      3600000      AAAA  2001:500:2d::d
+;
+; FORMERLY NS.NASA.GOV
+;
+.                        3600000      NS    E.ROOT-SERVERS.NET.
+E.ROOT-SERVERS.NET.      3600000      A     192.203.230.10
+;
+; FORMERLY NS.ISC.ORG
+;
+.                        3600000      NS    F.ROOT-SERVERS.NET.
+F.ROOT-SERVERS.NET.      3600000      A     192.5.5.241
+F.ROOT-SERVERS.NET.      3600000      AAAA  2001:500:2f::f
+;
+; FORMERLY NS.NIC.DDN.MIL
+;
+.                        3600000      NS    G.ROOT-SERVERS.NET.
+G.ROOT-SERVERS.NET.      3600000      A     192.112.36.4
+;
+; FORMERLY AOS.ARL.ARMY.MIL
+;
+.                        3600000      NS    H.ROOT-SERVERS.NET.
+H.ROOT-SERVERS.NET.      3600000      A     198.97.190.53
+H.ROOT-SERVERS.NET.      3600000      AAAA  2001:500:1::53
+;
+; FORMERLY NIC.NORDU.NET
+;
+.                        3600000      NS    I.ROOT-SERVERS.NET.
+I.ROOT-SERVERS.NET.      3600000      A     192.36.148.17
+I.ROOT-SERVERS.NET.      3600000      AAAA  2001:7fe::53
+;
+; OPERATED BY VERISIGN, INC.
+;
+.                        3600000      NS    J.ROOT-SERVERS.NET.
+J.ROOT-SERVERS.NET.      3600000      A     192.58.128.30
+J.ROOT-SERVERS.NET.      3600000      AAAA  2001:503:c27::2:30
+;
+; OPERATED BY RIPE NCC
+;
+.                        3600000      NS    K.ROOT-SERVERS.NET.
+K.ROOT-SERVERS.NET.      3600000      A     193.0.14.129
+K.ROOT-SERVERS.NET.      3600000      AAAA  2001:7fd::1
+;
+; OPERATED BY ICANN
+;
+.                        3600000      NS    L.ROOT-SERVERS.NET.
+L.ROOT-SERVERS.NET.      3600000      A     199.7.83.42
+L.ROOT-SERVERS.NET.      3600000      AAAA  2001:500:3::42
+;
+; OPERATED BY WIDE
+;
+.                        3600000      NS    M.ROOT-SERVERS.NET.
+M.ROOT-SERVERS.NET.      3600000      A     202.12.27.33
+M.ROOT-SERVERS.NET.      3600000      AAAA  2001:dc3::35
+```
+
+
 DNS is consist of resource records which are stored in Zone files. lets talk about types of DNS Records.
 
 #### DNS Resource Records (RRs)
@@ -77,28 +171,163 @@ name server lookup(nslookup) is a network administration command-line tool avail
 
 ** root@server1:~# nslookup google.com
 
+```
+root@server1:~# nslookup google.com
+Server:        192.168.10.2
+Address:    192.168.10.2#53
+
+Non-authoritative answer:
+Name:    google.com
+Address: 172.217.16.174
+```
+
 ** root@server1:~# nslookup 172.217.16.174
 
+```
+root@server1:~# nslookup 172.217.16.174
+Server:        192.168.10.2
+Address:    192.168.10.2#53
+
+Non-authoritative answer:
+174.16.217.172.in-addr.arpa    name = fra15s11-in-f14.1e100.net.
+174.16.217.172.in-addr.arpa    name = fra15s11-in-f174.1e100.net.
+174.16.217.172.in-addr.arpa    name = fra15s11-in-f14.1e100.net.
+174.16.217.172.in-addr.arpa    name = fra15s11-in-f174.1e100.net
+
+```
 to query for MX records to find out list of mail servers and their priority:
 
 ** root@server1:~# nslookup -query=mx google.com
 
+```
+root@server1:~# nslookup -query=mx google.com
+Server:        192.168.10.2
+Address:    192.168.10.2#53
+
+Non-authoritative answer:
+google.com    mail exchanger = 40 alt3.aspmx.l.google.com.
+google.com    mail exchanger = 30 alt2.aspmx.l.google.com.
+google.com    mail exchanger = 20 alt1.aspmx.l.google.com.
+google.com    mail exchanger = 10 aspmx.l.google.com.
+google.com    mail exchanger = 50 alt4.aspmx.l.google.com.
+
+Authoritative answers can be found from:
+```
+
 also to To query SOA (Start of Authority) record:
 
 ** root@server1:~# nslookup -type=soa google.com
+```
+root@server1:~# nslookup -type=soa google.com
+Server:        192.168.10.2
+Address:    192.168.10.2#53
+
+Non-authoritative answer:
+google.com
+    origin = ns1.google.com
+    mail addr = dns-admin.google.com
+    serial = 187115749
+    refresh = 900
+    retry = 900
+    expire = 1800
+    minimum = 60
+
+Authoritative answers can be found from:
+```
+
+
 
 and to query for all types of DNS records of a domain:
 
 ** root@server1:~# nslookup -query=any google.com
 
+```
+root@server1:~# nslookup -query=any google.com
+Server:        192.168.10.2
+Address:    192.168.10.2#53
+
+Non-authoritative answer:
+Name:    google.com
+Address: 172.217.22.110
+google.com    has AAAA address 2a00:1450:4001:81d::200e
+google.com    rdata_257 = 0 issue "pki.goog"
+google.com
+    origin = ns1.google.com
+    mail addr = dns-admin.google.com
+    serial = 186975566
+    refresh = 900
+    retry = 900
+    expire = 1800
+    minimum = 60
+google.com    text = "v=spf1 include:_spf.google.com ~all"
+google.com    mail exchanger = 30 alt2.aspmx.l.google.com.
+google.com    text = "docusign=05958488-4752-4ef2-95eb-aa7ba8a3bd0e"
+google.com    nameserver = ns4.google.com.
+google.com    nameserver = ns3.google.com.
+google.com    mail exchanger = 40 alt3.aspmx.l.google.com.
+google.com    nameserver = ns2.google.com.
+google.com    mail exchanger = 50 alt4.aspmx.l.google.com.
+google.com    mail exchanger = 10 aspmx.l.google.com.
+google.com    mail exchanger = 20 alt1.aspmx.l.google.com.
+google.com    nameserver = ns1.google.com.
+
+Authoritative answers can be found from:
+```
 
 By default, nslookup will query the same DNS the system is configured to use for all network operations. We can specify a custom DNS to query:
 
 ** root@server1:~# nslookup google.com 8.8.4.4
 
+```
+root@server1:~# nslookup google.com 8.8.4.4
+Server:        8.8.4.4
+Address:    8.8.4.4#53
+
+Non-authoritative answer:
+Name:    google.com
+Address: 172.217.18.14
+
+```
+
 to enable debugging modem, which is very useful for troubleshooting:
 
 ** root@server1:~# nslookup -debug linux.com
+
+```
+root@server1:~# nslookup -debug linux.com
+Server:        192.168.10.2
+Address:    192.168.10.2#53
+
+------------
+    QUESTIONS:
+    linux.com, type = A, class = IN
+    ANSWERS:
+    ->  linux.com
+    internet address = 151.101.193.5
+    ttl = 5
+    ->  linux.com
+    internet address = 151.101.129.5
+    ttl = 5
+    ->  linux.com
+    internet address = 151.101.65.5
+    ttl = 5
+    ->  linux.com
+    internet address = 151.101.1.5
+    ttl = 5
+    AUTHORITY RECORDS:
+    ADDITIONAL RECORDS:
+------------
+Non-authoritative answer:
+Name:    linux.com
+Address: 151.101.193.5
+Name:    linux.com
+Address: 151.101.129.5
+Name:    linux.com
+Address: 151.101.65.5
+Name:    linux.com
+Address: 151.101.1.5
+
+```
 
 By default, domain name servers accept queries on port 53. If this is configured differently on the server we are trying to query, we can specify another port number using the -port= option nslookup -port=54 mycompanydns.com .
 it is good to know that nslookup command has an interactive mode also:
@@ -108,6 +337,39 @@ it is good to know that nslookup command has an interactive mode also:
 
 use -timeout=10 to Change timeout interval to wait for a reply nslookup -timeout=10 google.com .
 How ever nslookup is somehow old and deprecated but it can be used to show ipv6 AAAA and PTR records too.nslookup is very useful and widely used by most of famous operation systems.
+
+``` 
+root@server1:~# nslookup 
+> yahoo.com
+Server:        192.168.10.2
+Address:    192.168.10.2#53
+
+Non-authoritative answer:
+Name:    yahoo.com
+Address: 98.139.180.180
+Name:    yahoo.com
+Address: 98.138.252.38
+Name:    yahoo.com
+Address: 206.190.39.42
+> server 8.8.4.4
+Default server: 8.8.4.4
+Address: 8.8.4.4#53
+> linux.com
+Server:        8.8.4.4
+Address:    8.8.4.4#53
+
+Non-authoritative answer:
+Name:    linux.com
+Address: 151.101.129.5
+Name:    linux.com
+Address: 151.101.193.5
+Name:    linux.com
+Address: 151.101.65.5
+Name:    linux.com
+Address: 151.101.1.5
+> exit
+```
+
 
 #### Authoritative Answer vs Non-Authoritative Answer
 You may also noticed the keyword “Authoritative Answer” and “Non-Authoritative Answer” in the above output.
@@ -120,6 +382,17 @@ In many cases, DNS servers will not have the complete zone file information avai
 host comman is another tool for performing DNS lookups. It is minimal and easy to use and like nslookup command, it can list and verify different types of DNS record like NS and MX records.
 
 ** root@server1:~# host google.com
+```
+root@server1:~# host google.com
+google.com has address 172.217.16.206
+google.com has IPv6 address 2a00:1450:4001:824::200e
+google.com mail is handled by 40 alt3.aspmx.l.google.com.
+google.com mail is handled by 10 aspmx.l.google.com.
+google.com mail is handled by 30 alt2.aspmx.l.google.com.
+google.com mail is handled by 50 alt4.aspmx.l.google.com.
+google.com mail is handled by 20 alt1.aspmx.l.google.com.
+
+```
 
 * host -t ns google.com
 find domain name servers, it can be -t cname or  -t mx
@@ -144,14 +417,59 @@ Dig stands for (Domain Information Groper) is a network administration command-l
 
 ** root@server1:~# dig google.com
 
+```
+root@server1:~# dig google.com
+
+; <<>> DiG 9.10.3-P4-Ubuntu <<>> google.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 47904
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; MBZ: 0005 , udp: 512
+;; QUESTION SECTION:
+;google.com.            IN    A
+
+;; ANSWER SECTION:
+google.com.        5    IN    A    172.217.16.174
+
+;; Query time: 1041 msec
+;; SERVER: 192.168.10.2#53(192.168.10.2)
+;; WHEN: Tue Feb 27 00:01:27 PST 2018
+;; MSG SIZE  rcvd: 55
+```
+
 there are some stats about the query. We can turn off these stats using the +nostats option.
 
 ** root@server1:~# dig google.com +nostat
+```
+oot@server1:~# dig google.com +nostat
+
+; <<>> DiG 9.10.3-P4-Ubuntu <<>> google.com +nostat
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 8713
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; MBZ: 0005 , udp: 512
+;; QUESTION SECTION:
+;google.com.            IN    A
+
+;; ANSWER SECTION:
+google.com.        5    IN    A    172.217.22.78
+```
+
 
 By default dig is quite verbose. One way to cut down the output is to use the +short option:
 
 ** root@server1:~# dig google.com +short
 
+```
+root@server1:~# dig google.com +short
+216.58.207.46
+```
 some other useful dig commands:
 
 * dig google.com MX
