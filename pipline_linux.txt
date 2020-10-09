@@ -1,0 +1,24 @@
+echo "hello there 1223" | tr -c a-z A-Z  _
+
+echo "hello there 1223" | tr -s a-z A-Z _
+
+echo "hello there 1223" | tr -cs a-z A-Z _
+
+echo "hello there 1223" | tr -c a-z A-Z '\n'
+
+echo "hello there 1223" | tr -c a-z A-Z
+
+echo "hello there 1223" | sort
+
+echo "hello there 1223" | uniq -c
+
+echo "hello there 1223" | uniq -c |sort -nr
+
+
+
+
+
+
+
+
+
