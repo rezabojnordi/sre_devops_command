@@ -1,0 +1,4 @@
+PY = python
+
+variable_test:
+    ${PY} setup.py

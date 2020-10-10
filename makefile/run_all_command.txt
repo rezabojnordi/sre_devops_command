@@ -1,0 +1,9 @@
+all: add remove
+
+add:
+       #ls -al
+
+    @touch ./file--{1.2}.txt
+    #@echo "add...."
+remove:
+    @echo "remove .."
