@@ -1,0 +1,11 @@
+                                                                                                                 
+Unary Plus                                                                                                       
+                                                                                                                 
+awk 'BEGIN { a = -10; a = +a; print "a =", a }'                                                                  
+                                                                                                                 
+Unary Minus                                                                                                      
+                                                                                                                 
+awk 'BEGIN { a = -10; a = -a; print "a =", a }'                                                                  
+                                                                                                                 
+awk 'BEGIN {a = 20; b = 30; c = a - b; print "c = ",c }'
+

@@ -1,0 +1,1 @@
+awk 'BEGIN {print "Arguments =", ARGC}' One Two Three Four

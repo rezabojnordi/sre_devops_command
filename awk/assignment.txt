@@ -1,0 +1,14 @@
+awk 'BEGIN { name = "Jerry"; print "My name is", name }'
+
+
+awk 'BEGIN { cnt = 10; cnt += 10; print "Counter =", cnt }'
+
+awk 'BEGIN { cnt = 100; cnt -= 10; print "Counter =", cnt }'
+
+awk 'BEGIN { cnt = 100; cnt /= 5; print "Counter =", cnt }'
+
+awk 'BEGIN { cnt = 100; cnt %= 8; print "Counter =", cnt }'
+
+awk 'BEGIN { cnt = 2; cnt ^= 4; print "Counter =", cnt }'
+
+ awk 'BEGIN { cnt = 2; cnt **= 4; print "Counter =", cnt }'

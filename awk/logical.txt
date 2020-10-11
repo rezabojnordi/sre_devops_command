@@ -1,0 +1,15 @@
+and  expr1 && expr2
+
+awk 'BEGIN {
+   num = 5; if (num >= 0 && num <= 7) printf "%d is in octal format\n", num 
+}'
+
+
+or expr1 || expr2
+
+awk 'BEGIN {
+   ch = "\n"; if (ch == " " || ch == "\t" || ch == "\n") 
+   print "Current character is whitespace." 
+}'
+
+

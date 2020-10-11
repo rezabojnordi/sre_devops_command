@@ -1,0 +1,5 @@
+Printing Lines with More than 18 Characters
+Let us print only those lines that contain more than 18 characters.
+
+
+awk 'length($0) > 18' marks.txt

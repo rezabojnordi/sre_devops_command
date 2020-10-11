@@ -1,0 +1,2 @@
+awk --profile 'BEGIN{printf"---|Header|--\n"} {print} 
+END{printf"---|Footer|---\n"}' marks.txt > /dev/null 

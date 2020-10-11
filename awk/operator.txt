@@ -1,0 +1,31 @@
+
+Addition
+It is represented by plus (+) symbol which adds two or more numbers. The following example demonstrates this −
+
+
+
+awk 'BEGIN { a = 50; b = 20; print "(a + b) = ", (a + b) }'
+
+
+awk 'BEGIN { a = 50; b = 20; print "(a - b) = ", (a - b) }'
+
+awk 'BEGIN { a = 50; b = 20; print "(a * b) = ", (a * b) }'
+
+awk 'BEGIN { a = 50; b = 20; print "(a / b) = ", (a / b) }'
+
+awk 'BEGIN { a = 50; b = 20; print "(a % b) = ", (a % b) }'
+
+pre-increment
+
+awk 'BEGIN { a = 10; b = ++a; printf "a = %d, b = %d\n", a, b }'
+
+Pre-Decrement
+awk 'BEGIN { a = 10; b = --a; printf "a = %d, b = %d\n", a, b }'
+
+Post-Increment
+
+awk 'BEGIN { a = 10; b = a++; printf "a = %d, b = %d\n", a, b }'
+
+Post-Decrement
+
+awk 'BEGIN { a = 10; b = a--; printf "a = %d, b = %d\n", a, b }'

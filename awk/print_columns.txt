@@ -1,0 +1,4 @@
+Printing Column in Any Order
+You can print columns in any order. For instance, the following example prints the fourth column followed by the third column
+
+awk '/a/ {print $3 "\t" $4}' marks.txt

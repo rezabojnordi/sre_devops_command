@@ -1,0 +1,2 @@
+awk 'END {print FILENAME}' marks.txt
+

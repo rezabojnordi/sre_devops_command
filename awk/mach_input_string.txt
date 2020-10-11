@@ -1,0 +1,7 @@
+
+RLENGTH
+It represents the length of the string matched by match function. AWK's match function searches for a given string in the input-string.
+
+
+awk 'BEGIN { if (match("One Two Three", "re")) { print RLENGTH } }'
+

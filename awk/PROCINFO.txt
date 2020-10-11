@@ -1,0 +1,4 @@
+PROCINFO
+This is an associative array containing information about the process, such as real and effective UID numbers, process ID number, and so on.
+
+awk 'BEGIN { print PROCINFO["pid"] }'

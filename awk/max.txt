@@ -1,0 +1,4 @@
+awk 'BEGIN { a = 10; b = 20; (a > b) ? max = a : max = b; print "Max =", max}'
+
+
+
