@@ -1,0 +1,28 @@
+awk 1 input.txt
+awk { print } input.txt
+awk { print $2} input.txt
+awk { print $2, $1} input.txt
+#data type in awk(string and number)
+awk { print $2 "-------" $1 } input.txt
+awk { print $2 "-------" $1, $2 * $3 } input.txt
+awk { print $2 "-------" $1"\t"$2 * $3 } input.txt
+awk  $3 >  0 { print } input.txt
+awk  $3 >  0  && $3 < 20 { print } input.txt
+######## Regular expretion
+awk  /Beth/ { print } input.txt
+awk  /^[A-P]/ { print } input.txt
+awk { print NR, NF, $0} input.txt
+awk NF == 3 { print NR, NF, $0} input.txt
+awk { print FILENAME, NR, NF, $0} input.txt
+awk { print FILENAME, FNR,NR, NF, $0} input.txt
+awk { printf "%s | %d | %d | %d | %s |\n", FILENAME, FNR,NR, NF, $1} input.txt
+awk { printf "%s | %d | %3d | %3d | %10s |\n", FILENAME, FNR,NR, NF, $1} input.txt
+awk FNR<=3 { printf "%s | %d | %3d | %3d | %10s |\n", FILENAME, FNR,NR, NF, $1} input.txt
+awk FNR==1 { printf "%s | %d | %3d | %3d | %10s |\n", FILENAME, FNR,NR, NF, $1} input.txt
+#### just show 3 line
+awk FNR==3 { printf "%s | %d | %3d | %3d | %10s |\n", FILENAME, FNR,NR, NF, $1} input.txt
+awk FNR==1,FNR==3 { printf "%s | %d | %3d | %3d | %10s |\n", FILENAME, FNR,NR, NF, $1} input.txt
+awk BEGIN { print "hello world"}
+awk BEGIN { print "hello world"} END { print NR } input.txt
+awk BEGIN { print "hello world"} { sum =+ NF } END { print NR, "sum:" sum } input.txt
+awk -f calculate.awk inpute2.txt
