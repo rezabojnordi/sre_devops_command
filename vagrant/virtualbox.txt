@@ -1,0 +1,2 @@
+apt install dkms
+sudo apt install vagrant

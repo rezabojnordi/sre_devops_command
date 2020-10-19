@@ -1,0 +1,12 @@
+sudo apt install vagrant
+vagrant init precises64 http://files.vagrantup.com/precise64.box
+vagrant up
+vagrant ssh
+vagrant destroy
+vagrant init hashicorp/bionic64
+vagrant box list
+vagrant box remove precise64
+vagrant destroy
+vagrant status
+vagrant destroy
+sudo python -m SimpleHTTPServer 80
