@@ -1,0 +1,18 @@
+
+echo -e "cat\nbat\nfun\nfin\nfan" | awk '/f.n/'
+
+
+Start of line
+It matches the start of line. For instance, the following example prints all the lines that start with pattern The.
+
+echo -e "This\nThat\nThere\nTheir\nthese" | awk '/^The/'
+
+
+
+End of line
+It matches the end of line. For instance, the following example prints the lines that end with the letter n.
+
+echo -e "knife\nknow\nfun\nfin\nfan\nnine" | awk '/n$/'
+
+
+

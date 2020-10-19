@@ -1,0 +1,6 @@
+NF
+It represents the number of fields in the current record. For instance, the following example prints only those lines that contain more than two fields.
+
+
+
+echo -e "One Two\nOne Two Three\nOne Two Three Four" | awk 'NF > 2'

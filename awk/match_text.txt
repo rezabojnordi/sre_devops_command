@@ -1,0 +1,3 @@
+awk '$0 ~ 9' marks.txt
+
+awk '$0 !~ 9' marks.txt

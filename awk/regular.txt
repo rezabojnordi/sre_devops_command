@@ -1,0 +1,12 @@
+echo -e "cat\nbat\nfun\nfin\nfan" | awk '/f.n/'
+
+echo -e "This\nThat\nThere\nTheir\nthese" | awk '/^The/'
+
+echo -e "knife\nknow\nfun\nfin\nfan\nnine" | awk '/n$/'
+
+echo -e "Call\nTall\nBall" | awk '/[CT]all/'
+
+echo -e "Call\nTall\nBall\nSmall\nShall" | awk '/Call|Ball/'
+
+echo -e "Colour\nColor" | awk '/Colou?r/'
+

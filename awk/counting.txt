@@ -1,0 +1,4 @@
+Counting and Printing Matched Pattern
+Let us see an example where you can count and print the number of lines for which a pattern match succeeded.
+
+awk '/a/{++cnt} END {print "Count = ", cnt}' marks.txt

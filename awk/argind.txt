@@ -1,0 +1,6 @@
+ARGIND
+It represents the index in ARGV of the current file being processed.
+
+awk '{ 
+   print "ARGIND   = ", ARGIND; print "Filename = ", ARGV[ARGIND] 
+}' junk1 junk2 junk3

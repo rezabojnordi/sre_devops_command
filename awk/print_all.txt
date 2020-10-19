@@ -1,0 +1,3 @@
+awk '/a/ {print $0}' marks.txt
+#or
+awk '/a/' marks.txt 

@@ -1,0 +1,4 @@
+NR
+It represents the number of the current record. For instance, the following example prints the record if the current record number is less than three.
+
+echo -e "One Two\nOne Two Three\nOne Two Three Four" | awk 'NR < 3'

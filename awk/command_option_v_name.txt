@@ -1,0 +1,1 @@
+awk -v name=Jerry 'BEGIN{printf "Name = %s\n", name}'
