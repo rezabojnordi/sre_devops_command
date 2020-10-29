@@ -10,3 +10,4 @@ vagrant destroy
 vagrant status
 vagrant destroy
 sudo python -m SimpleHTTPServer 80
+vagrant suspend

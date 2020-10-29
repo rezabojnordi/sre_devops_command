@@ -1,0 +1,32 @@
+##### update os ############
+freebsd-update fetch
+
+freebsd-update install
+
+freebsd-version
+
+
+####### pkg install  #####
+
+pkg install bash vim
+
+whitch bash
+
+ln -s /usr/local/bin/bash    /bin/bash
+
+ls -lF /bin/bash
+
+chsh -s /bin/bash freebsd
+
+chsh -s /bin/bash root
+
+##### change nomal user to root user #####
+
+vim /etc/group
+
+whell :root,freebsd
+#####################################
+uname -a
+uname -r
+uname -v
+uname -a
