@@ -1,0 +1,37 @@
+
+
+
+
+
+VAR = 1
+
+ifeq ($(VAR),1)
+
+variable = "hello"
+endif
+
+template:
+	@echo $(variable)
+
+
+
+
+template2:
+ifeq ($(VAR),1)
+	@echo "hello"
+endif
+
+
+
+
+
+ifeq ($(shell uname -m),x86_64)
+VAR2 = 1
+endif
+
+operating:
+	@echo "test"
+
+ifeq ($(VAR2),1)
+	@echo hellp
+endif
