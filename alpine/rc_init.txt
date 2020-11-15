@@ -1,0 +1,9 @@
+rc-service
+rc-update
+rc-service sshd restart
+rc-service docker start
+
+rc-service docker status
+
+
+

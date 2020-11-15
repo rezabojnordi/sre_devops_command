@@ -1,0 +1,43 @@
+apk update
+
+apk upgrade
+
+apk -h
+
+apk info linux-tls
+
+apk add vim
+
+##remove framvare nano
+
+apk-add framwork-nano
+
+apk add iproute2
+
+
+####### which service
+cd /etc/apk
+cat world
+cat repository
+
+vim repository
+ @edgemain http://
+ @edgetest http://
+
+
+apk add docker
+apk info docker
+apk search docker
+apk add docker-compose
+
+rc-update add docker
+
+rc-update add docker boot
+rc-update add default
+
+rc-update del docker boot    ## enable service
+
+apk search ranger
+
+apk add ranger
+
