@@ -53,11 +53,11 @@ class Authonticate():
 
 class TestAuthonticate():
     def testGetBody(self):
-        auth=Authonticate("admin","c52b6ec9f13883f029b")
+        auth=Authonticate("user","pass")
         print(auth.getRequestBody())
     
     def testGetToken(self):
-        auth=Authonticate("admin","c52b6ec9f13883f029b")
+        auth=Authonticate("user","pass")
         return auth.getToken()
 
 
