@@ -34,7 +34,7 @@ class Authonticate():
         return json.dumps(body)
 
     def getURL(self):
-        return "https://172.16.111.1:5000/v3/auth/tokens"
+        return "https://ip:port/v3/auth/tokens"
 
     def getToken(self):
         if self.expire_time==None or self.expire_time < time.time():
