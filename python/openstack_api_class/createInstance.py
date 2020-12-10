@@ -40,7 +40,7 @@ class Instance():
         return json.dumps(body)
 
     def getURL(self):
-        return "https://172.16.111.1:8774/v2.1/servers"
+        return "https://ip:port/v2.1/servers"
 
     def requestInstance(self):
         header= {"X-Auth-Token":self.auth.getToken(), "X-OpenStack-Nova-API-Version": "2.74","Content-Type":"application/json"}
