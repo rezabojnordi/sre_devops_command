@@ -1,0 +1,30 @@
+
+
+sudo apt-get install autotools-dev
+sudo apt-get install libssl-dev
+apt-get install libssl-dev
+apt-get install automake
+apt-get install curl gcc libssl-dev libnl-3-dev libnl-genl-3-dev libsnmp-dev
+apt install gcc
+./autogen.sh
+
+apt-get install linux-headers-$(uname -r)
+
+
+----------------
+cd keepalived
+sudo make clean
+./configure
+make
+sudo make install
+
+----------------
+wget https://github.com/acassen/keepalived/archive/v2.2.1.tar.gz
+
+
+####### it don't need
+iptables-dev libipset-dev libnfnetlink-dev libnl-3-dev libnl-genl-3-dev libnl-route-3-dev libssl-dev
+
+
+
+
