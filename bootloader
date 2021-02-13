@@ -1,0 +1,22 @@
+====================================================================
+linux = kernel
+/sbin/init
+/etc/init
+/bin/sh
+
+-------
+sysV  ---> unix and old linux
+systemcd --->
+upstart ---->
+
+++++++++++++++++++ read hat +++++++++++++++++
+runlevel --> run level
+runlevel=0 --> shutdown
+runlevel=1 --> single user for trubelshoting
+runlevel=3 --> enviroment terminal and network
+runlevel=4
++++++++++++++++++++ debian
+runlevel=0 --> single user
+runlevel=1 --> multi user
+runlevel=6 --> restart
+

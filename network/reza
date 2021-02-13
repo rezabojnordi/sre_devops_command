@@ -1,0 +1,99 @@
+reza.com .
+. null root
+TLD top level domain
+reza ==> first leve domain
+blog.reza.net ==> subdomain
+
+dns server master ===> reza.net handle kone
+
+HA ===> secondary (slave) server
+
+Caching server Isp ==> khodesh chini handle nemikone javab ha dare
+
+Forwarding server request shoma mifreste baraye kasi ke balade miporse
+
+Stealth dns
+
+
+resolve ==> barnamee ke in kar anjam mide
+
+Recursive name server  ===>
+
+
+
+djbdns   Daniel J.bernstein
+
+dnsmasq
+
+pdnsd
+
+powerdns
+
+bind or named
+
+
+
+redhat   === /etc/namd.conf
+
+debian
+
+cd /etc/bind
+
+
+security
+
+update server realtime
+
+#########hiden information bind
+
+# dig @192.168.0.103 chaos version.bind txt
+
+how to secure:
+cat /etc/named.conf
+    options {
+    version "null"
+    }
+
+create zone and dadtabase for zoone
+
+consider various views
+
+split view
+
+
+zone transfer
+allow-update {none;};  not chnageble
+jaild
+ chroot
+ /var/named/
+ /etc/bind
+ /sbin/bind/
+ bind-chroot    ====> /usr/libexec/sethup-named-chroot.sh /var/named/chrot on
+ systemctl stop named
+ systemctl disable named
+ systemctl start named-chroot
+ systemctl enable named-chroot
+ change file ==== /var/named/chroot/var/named
+
+
+ filtering
+ nslookup facebook.com
+ nslookup facebook 4.2.2.4
+
+dnssec sign key pubcli and private for
+chain of Trust
+Dns resolve that execute DNSSEC
+
+zone signin key
+Key signing key
+DNSSEC Data Validation
+
+dig +dnssec 127.0.0.1 edu. ns |grep flags
+not sign zone transfer
+
+CA for sign  ===========> txt DANE dns-base authentication
+DNSSEC
+
+
+---------------------------------------------
+

@@ -1,0 +1,50 @@
+systemctl
+name+type+config
+type:
+service
+mount
+socet
+ssh
+runlevel0.target
+cd /lib/systemd/system
+
+-----------------------------------------------------------
+[Unit]
+Description=OpenBSD Secure Shell server
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target auditd.service
+ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
+
+[Service]
+EnvironmentFile=-/etc/default/ssh
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+ExecReload=/usr/sbin/sshd -t
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+RuntimeDirectory=sshd
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+Alias=sshd.service
+-----------------------------------------------------
+systemctl command tor
+systemctl start tor
+systemctl restart tor
+systemctl reload tor
+systemctl enable tor
+systemctl enable tor
+systemctl list-unit
+systemctl default
+systemctl isolate rescue.target
+journalctl
+------------------------------------------------------
+
+
+
+
+
