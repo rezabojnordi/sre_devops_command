@@ -18,7 +18,7 @@ class CreateInstance():
         self.flavor_ids=flavor_ids
         self.image_ids=image_ids
     def create(self):
-        self.auth=Authonticate("admin","c52b6ec9f13883f029b")
+        self.auth=Authonticate("user","pass")
         print(self.auth.getToken())
         mInstance=[]
         for i in range(self.instance_number):
