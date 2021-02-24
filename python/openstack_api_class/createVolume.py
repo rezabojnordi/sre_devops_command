@@ -26,7 +26,7 @@ class Volume():
         }
         return json.dumps(body)
     def getURL(self):
-        return "https://172.16.111.1:8776/v3/%s/volumes"%(self.project_id)
+        return "https://ip:8776/v3/%s/volumes"%(self.project_id)
     def requestVolume(self):
         header= {"X-Auth-Token":self.auth.getToken(),"Content-Type":"application/json"}
         body=self.getRequestBody()
