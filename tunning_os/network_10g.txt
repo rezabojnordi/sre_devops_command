@@ -1,0 +1,7 @@
+# Storage
+auto ens192
+iface ens192 inet static
+    address 172.16.109.9
+    netmask 255.255.255.0
+    mtu 9000
+    post-up /sbin/ip link set ens192 txqueuelen 10000
