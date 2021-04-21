@@ -1,0 +1,5 @@
+lvcreate -L 80G -n lv_cache storage /dev/sdc1
+lvcreate -L 10G -n lv_cache_metadata storage /dev/sdc1
+lvconvert --type cache-pool --cachemode writethrough --poolmetadata /dev/storage/lv_cache_metadata /dev/storage/lv_cache
+lvconvert --type cache --cachepool /dev/storage/lv_cache /dev/storage/lvol0
+#lvm #lvm_cache #nfs

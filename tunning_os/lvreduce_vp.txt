@@ -1,0 +1,9 @@
+pvs -o+pv_used
+vgreduce storage /dev/sdc1 
+pvdisplay  -m
+lvreduce -l-25598 /dev/storage/lvol0
+pvs -o+pv_used
+lvreduce -l-1 /dev/storage/lvol0 
+pvs -o+pv_used
+vgreduce storage /dev/sdc1
+#lvs #reduce #lvreduce #segment #bit
