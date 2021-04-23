@@ -1,0 +1,46 @@
+apt-get install thin-provisioning-tools
+
+echo "dm_cache" >> /etc/initramfs-tools/modules
+echo "dm_cache_mq"  >> /etc/initramfs-tools/modules
+echo "dm_cache_smq"  >> /etc/initramfs-tools/modules
+echo "dm_persistent_data"  >> /etc/initramfs-tools/modules
+echo "dm_bufio"  >> /etc/initramfs-tools/modules
+
+##################################################
+vim /etc/initramfs-tools/hooks/cache_hook
+
+#!/bin/sh
+
+PREREQ="lvm2"
+
+prereqs()
+{
+    echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+if [ ! -x /usr/sbin/cache_check ]; then -rdn
+    exit 0
+fi
+
+. /usr/share/initramfs-tools/hook-functions
+
+copy_exec /usr/sbin/cache_check
+
+manual_add_modules dm_cache dm_cache_mq dm_cache_smq dm_persistent_data dm_bufio
+
+
+
+##########################################
+
+chmod +x /etc/initramfs-tools/hooks/cache_hook
+
+############################
+update-initramfs -v -u -k all
+
