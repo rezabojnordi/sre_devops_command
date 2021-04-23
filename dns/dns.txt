@@ -1,0 +1,205 @@
+reza.com .
+. null root
+TLD top level domain
+reza ==> first leve domain
+blog.reza.net ==> subdomain
+
+dns server master ===> reza.net handle kone
+
+HA ===> secondary (slave) server
+
+Caching server Isp ==> khodesh chini handle nemikone javab ha dare
+
+Forwarding server request shoma mifreste baraye kasi ke balade miporse
+
+Stealth dns
+
+
+resolve ==> barnamee ke in kar anjam mide
+
+Recursive name server  ===>
+
+
+
+djbdns   Daniel J.bernstein
+
+dnsmasq
+
+pdnsd
+
+powerdns
+
+bind or named
+
+
+
+redhat   === /etc/namd.conf
+
+debian
+
+cd /etc/bind
+
+
+security
+
+update server realtime
+
+#########hiden information bind
+
+# dig @192.168.0.103 chaos version.bind txt
+
+how to secure:
+cat /etc/named.conf
+    options {
+    version "null"
+    }
+
+create zone and dadtabase for zoone
+
+consider various views
+
+split view
+
+
+zone transfer
+allow-update {none;};  not chnageble
+jaild
+ chroot
+ /var/named/
+ /etc/bind
+ /sbin/bind/
+ bind-chroot    ====> /usr/libexec/sethup-named-chroot.sh /var/named/chrot on
+ systemctl stop named
+ systemctl disable named
+ systemctl start named-chroot
+ systemctl enable named-chroot
+ change file ==== /var/named/chroot/var/named
+
+
+ filtering
+ nslookup facebook.com
+ nslookup facebook 4.2.2.4
+
+dnssec sign key pubcli and private for
+chain of Trust
+Dns resolve that execute DNSSEC
+
+zone signin key
+Key signing key
+DNSSEC Data Validation
+
+dig +dnssec 127.0.0.1 edu. ns |grep flags
+not sign zone transfer
+
+CA for sign  ===========> txt DANE dns-base authentication
+DNSSEC
+====================================================================
+linux = kernel
+/sbin/init
+/etc/init
+/bin/sh
+
+-------
+sysV  ---> unix and old linux
+systemcd --->
+upstart ---->
+
+++++++++++++++++++ read hat +++++++++++++++++
+runlevel --> run level
+runlevel=0 --> shutdown
+runlevel=1 --> single user for trubelshoting
+runlevel=3 --> enviroment terminal and network
+runlevel=4
++++++++++++++++++++ debian
+runlevel=0 --> single user
+runlevel=1 --> multi user
+runlevel=6 --> restart
+
+
+-------------------------
+
+ifdown ens16
+ifup ens16
+
+ifconfig eth0 up 192.168.1.101 netmask 255.255.255.0
+### changable macaddress
+ifconfig enth0 hw ethr AA:BB:CC:DD:EE:FF
+
+ip addr show
+ip route show
+ip addr add 192.168.1.9/24 dev enp2s0f1
+ip addr del 192.168.1.9/24 dev enp2s0f1
+ip link set enp2s0f1 down
+
+
+###wireless
+iwlist wlp4s0 scan
+iwconfig wlp4s0 essid "das;lfk" key s:password
+iw  ~ iwconfig
+
+### routing
+ip/netmask
+netstat -nr
+route -n
+route del default gw 192.168.1.1
+route -n
+route add default gw 192.168.1.1
+
+ip route del default
+ip route add default via 192.168.1.1
+
+### DHCP
+dhclient enp2s0f1
+sudo dhclient -v enp2s0f1
+pummp
+---------------------------------------------
+systemctl
+name+type+config
+type:
+service
+mount
+socet
+ssh
+runlevel0.target
+cd /lib/systemd/system
+
+-----------------------------------------------------------
+[Unit]
+Description=OpenBSD Secure Shell server
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target auditd.service
+ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
+
+[Service]
+EnvironmentFile=-/etc/default/ssh
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+ExecReload=/usr/sbin/sshd -t
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+RuntimeDirectory=sshd
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+Alias=sshd.service
+-----------------------------------------------------
+systemctl command tor
+systemctl start tor
+systemctl restart tor
+systemctl reload tor
+systemctl enable tor
+systemctl enable tor
+systemctl list-unit
+systemctl default
+systemctl isolate rescue.target
+journalctl
+------------------------------------------------------
+
+
+
+
+
