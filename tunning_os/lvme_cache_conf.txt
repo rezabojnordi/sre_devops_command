@@ -1,0 +1,54 @@
+#lvcreate vg1 --size 1T --name hybrid /dev/md1
+
+#lvcreate vg1 --size 50G --name hybrid_cache /dev/md0
+
+#lvcreate vg1 --name hybridcachemeta --size 1G /dev/md0
+
+#lvcreate vg1 --name hybridcachemeta --size 700M /dev/md0
+
+#lvconvert --type cache-pool --polmetadata vg1/hybridcachemeta vg1/hybridcache
+
+#lvconvert --type cache --cachemode writeback --cachepool vg1/hybridcache vg1/hybrid
+
+#mkfs.ext4 /dev/mapper/vg1-hybrid
+
+
+#mkdir /mnt/hybrid
+
+#mount /dev/mapper/vg1-hybrid /mnt/hybrid/
+
+#lvs
+
+#lvs -a
+
+#lvs -a -o +devices
+
+#sysbench --test=fileio --file-test-mode=seqwr run
+
+#sysbench --test=fileio --file-test-mode=rndwr run
+
+
+#lvs -a -o +cachedirtyblocks
+
+#lvs -a -o lv_name,cachedirtyblocks
+
+#lvs -a -o lv_name,cachedirtyblocks,cache_mode,cache_policy
+
+#lvchange --cachepolicy cleaner vg1/hybrid
+
+#lvchange --cachemode writethrogh vg1/hybrid
+#watch lvs -a -o lv_name,cachedirtyblocks,cache_mode,cache_policy
+
+#lvconvert --splitcache vg1/hybrid    #not cached and cache pool unused
+
+#lvextend vg1/hybrid --size +100G
+
+#lvconvert --type cache --cachemode writeback --cachepool vg1/hybridcache vg1/hybrid  #actice cache 
+
+#lvchange --cachepolicy smq vg1/hybrid
+
+echo 3 > /proc/sys/vm/drop_caches && sleep 3 && sysbench --test=fileio --file-test-mode=seqrd run
+
+
+
+
