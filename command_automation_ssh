@@ -1,0 +1,29 @@
+for i in "${array2[@]}"; do ssh $i sed -i 's/#DNS=/DNS=8.8.8.8/g' /etc/systemd/resolved.conf && systemctl restart systemd-resolved.service; done
+
+
+
+for i in "${array2[@]}"; do ssh $i sed -i 's/#DNS=/DNS=8.8.8.8/g' && systemctl restart systemd-resolved.service; done
+
+sed -i 's/Acquire::http::Proxy "http://172.16.104.100:3128";/#/g' /etc/apt/apt.conf.d/90curtin-aptproxy
+
+
+
+auto ens160
+iface ens160 inet static
+        address 172.16.104.111
+        netmask 255.255.252.0
+        gateway 172.16.104.100
+
+
+
+
+auto ens160.30
+iface ens160.30 inet static
+        address 172.16.112.111
+        netmask 255.255.252.0
+
+auto ens160.35
+iface ens160.35 inet static
+        address 192.168.1.2
+        netmask 255.255.255.0
+
