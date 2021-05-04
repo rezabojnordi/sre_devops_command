@@ -1,0 +1,7 @@
+apt install bind9 bind9utils
+
+cd /etc/bind/
+
+cat named.conf
+
+rndc ---> utility tools

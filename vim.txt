@@ -1,0 +1,119 @@
+:terminal
+:ctr+w+q   for exit in terminal
+
+
+################ file manager ###############
+:S
+:Vexplore
+:Explore
+######################## recently file
+:bro oldfiles
+
+############# regi clipboard
+:rgi
+G
+"0p
+ ciw   # copy word in 1 space
+
+ inset mode
+ "ctrl+r" + ctrl+"
+
+ ********************************************************** Introducing VIM Visual Block Mode in Farsi
+ ############## create * in vim ################################
+ i + * + Esc + x100p
+ or
+  i + * + Esc + x100pyy5p
+
+ ############################### vitual block mod ###################
+   v
+ ctrl + v
+
+ ctrl + v + o     ## for change location
+
+  ctrl + v + o   r+space
+  R + space
+  ########################################################################
+  yy + p10
+ select and up down
+ ***
+ test[0] = 1
+ test[0] = 1
+ ctrl+v up or down
+ g + ctrl + a
+
+ +number or - number
+ ctrl+a or ctrl+x
+ 10 + ctrl+a
+ ####################################
+ sharp code ##
+
+ ctrl+v + shift+a+ # + esc
+
+ ; for end code
+ ctrl+v+$ up down + shift+a + esc
+
+ ###########################vimdiff####################################
+
+ :tabnew diff_chalange
+ ctrl+wv
+ i for insert
+ check the diff in window
+ :windo diffthis
+ :windo diffoff
+ #################################################### read commnad and out in file #############
+ command read for run linux command
+ :read !date
+ shift + j up
+ ###############################################################################################
+##################################################### run code##################################
+:!python3 r.py
+:terminal python3 %
+### switch betwin window
+:ctrl + w ctrl + w
+
+#########################################################create shourtcut###################################33
+:tabnew ~/.vimrc
+   map <F5> :terminal python3 %<cr>
+   map <S-F5> :q<cr>
+:source ~/.vimrc
+############################################# macro ##############################
+:tabnew macro
+intert 1
+q + for exmple (n)
+yy
+p
+for save maro using (q)
+@n
+or
+@@
+25@@ ===> 25 etry macro
+***where is save macro in registery
+map <C-n> yyp<C-a><cr>
+
+##################################################################################
+0 ===> go to first in line
+:normal (description for automation write coma  nd in linux)
+:normal 0i#
+######################################### .vimrc ################################
+map <F5> :terminal python3 %<cr>
+map <C-F5> :q<cr>
+map <C-c> :normal 0i#<cr>
+map <S-c> :normal 0x<cr>
+#################################################################################
+
+###############################macro##################################################
+# automation add comment in code
+q + c
+w
+yiw
+O
+adda ****
+
+
+
+
+
+####################
+
+
+

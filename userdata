@@ -1,0 +1,6 @@
+ #cloud-config
+password: 123456
+chpasswd: { expire: False }
+ssh_pwauth: True
+packages:
+  - qemu-guest-agent
