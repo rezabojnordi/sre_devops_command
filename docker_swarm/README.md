@@ -20,7 +20,7 @@
 # Swarm Intro and Creating a 3-Node Swarm Cluster
 
 ## Create Your First Service and Scale it Locally
-
+## Command
 docker info
 
 docker swarm init
@@ -71,7 +71,7 @@ docker service ls
 docker container ls
 
 ## Creating a 3-Node Swarm Cluster
-
+## Command
 http://play-with-docker.com
 
 docker info
@@ -113,6 +113,7 @@ docker node ps node2
 docker service ps sleepy_brown
 
 ## Scaling Out with Overlay Networking
+## Command
 
 * docker network create --driver overlay mydrupal
 
@@ -137,6 +138,7 @@ docker service ps sleepy_brown
 * docker service inspect drupal
 
 ## Rollback
+## Command
 * docker service create -p 8088:80 --name web nginx:1.13.7
 * docker service scale web=5
 * docker service update --image nginx:1.13.6 web
@@ -144,3 +146,58 @@ docker service ps sleepy_brown
 * docker service update --force web
 # Rmove the service we created
 * docker service rm web
+
+# Docker HEakthcheck 
+
+HEakthcheck was added in 1.12
+
+## HEakthcheck Docker Run Example
+docker run --heath-cmd="curl -f localhost:9200/_cluster/health || false" --health-interval=5s --health-retries=3 --health-timeout=2s --health-start-period=15s elasticsearch:2
+
+
+## Option for heakthcheck command
+* --interval=DURATION (default:30s)
+* --timeout=DURATION (default:30s)
+* --start-period=DURATION (default:0s)
+* --retries=N (default:3)
+
+ 
+## Basic command using default options
+* HEALTHCHECK curl -f http://localhost/ || false
+
+## Custom options with the command
+* HEALTHCHECK --timeoute=2s --interval=3s --retries=3 
+* CMD curl -f http://localhost/ || exit 1
+
+
+## Healthcheck in PHP Nginx Dockerfile
+PHP-FPM running behind Nginx, test the Nginx and FPM status URLS 
+
+FROM your-nginx-php-fpm-combo-image
+
+#### don't di this if php-fpm ping/statys in pool,ini
+#### must forward/ping and /status urls from nginx to php php-fpm
+
+HEALTHCHECK --interval=5s --timeoute=3s CMD curl -f http://localhost/ping || exit 1
+
+## Healthcheck in postgres Dockerfile
+USE a Postgress utility to test for ready state
+FROM postgres
+# specify real user with -u to prevent error in log 
+
+Healthcheck --interval=5s --timeoute=3s CMD pg_isready -U postgres || exit 1
+
+
+
+
+## Command
+
+* docker container run --name p1 -d nginx
+* docker container run --name p2 -d --health-cmd="pg_isready -U nginx || exit 1" nginx
+
+* docker service create --name p1 nginx
+* docker service create --name p2 --health-cmd="pg_isready -U nginx || exit 1" nginx
+
+
+
+
