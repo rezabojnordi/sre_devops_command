@@ -21,7 +21,8 @@
 
 ## Create Your First Service and Scale it Locally
 ## Command
-docker info
+
+* docker info
 
 * docker swarm init
 
@@ -140,10 +141,15 @@ http://get.docker.com
 ## Rollback
 ## Command
 * docker service create -p 8088:80 --name web nginx:1.13.7
+
 * docker service scale web=5
+
 * docker service update --image nginx:1.13.6 web
+
 * docker service update --publish-rm 8088 --publish-add 9090:80
+
 * docker service update --force web
+
 # Rmove the service we created
 * docker service rm web
 
@@ -193,9 +199,11 @@ Healthcheck --interval=5s --timeoute=3s CMD pg_isready -U postgres || exit 1
 ## Command
 
 * docker container run --name p1 -d nginx
+
 * docker container run --name p2 -d --health-cmd="pg_isready -U nginx || exit 1" nginx
 
 * docker service create --name p1 nginx
+
 * docker service create --name p2 --health-cmd="pg_isready -U nginx || exit 1" nginx
 
 
