@@ -114,24 +114,33 @@ docker service ps sleepy_brown
 
 ## Scaling Out with Overlay Networking
 
-*docker network create --driver overlay mydrupal
+* docker network create --driver overlay mydrupal
 
-*docker network ls
+* docker network ls
 
-*docker service create --name psql --netowrk mydrupal -e POSTGRES_PASSWORD=mypass postgres
+* docker service create --name psql --netowrk mydrupal -e POSTGRES_PASSWORD=mypass postgres
 
-*docker service ls
+* docker service ls
 
-*docker service ps psql
+* docker service ps psql
 
-*docker container logs psql TAB COMPLETION
+* docker container logs psql TAB COMPLETION
 
-*docker service create --name drupal --network mydrupal -p 80:80 drupal
+* docker service create --name drupal --network mydrupal -p 80:80 drupal
 
-*docker service ls
+* docker service ls
 
-*watch docker service ls
+* watch docker service ls
 
-*docker service ps drupal
+* docker service ps drupal
 
-*docker service inspect drupal
+* docker service inspect drupal
+
+## Rollback
+* docker service create -p 8088:80 --name web nginx:1.13.7
+* docker service scale web=5
+* docker service update --image nginx:1.13.6 web
+* docker service update --publish-rm 8088 --publish-add 9090:80
+* docker service update --force web
+# Rmove the service we created
+* docker service rm web
