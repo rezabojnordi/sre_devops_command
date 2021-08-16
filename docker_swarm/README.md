@@ -47,6 +47,11 @@ docker service update etc25a25dpj7 --replicas 3
 
 
 docker service update TAB COMPLETION --replicas 3
+### or
+###### Scale a single service
+The following command scales the “frontend” service to 50 tasks.
+
+docker service scale frontend=50
 
 docker service ls
 
@@ -74,43 +79,43 @@ docker container ls
 
 http://play-with-docker.com
 
-docker info
+*docker info
 
-docker-machine
+*docker-machine
 
-docker-machine create node1
+*docker-machine create node1
 
-docker-machine ssh node1
+*docker-machine ssh node1
 
-docker-machine env node1
+*docker-machine env node1
 
-docker info
+*docker info
 
 http://get.docker.com
 
-docker swarm init
+*docker swarm init
 
-docker swarm init --advertise-addr TAB COMPLETION
+*docker swarm init --advertise-addr TAB COMPLETION
 
-docker node ls
+*docker node ls
 
-docker node update --role manager node2
+*docker node update --role manager node2
 
-docker node ls
+*docker node ls
 
-docker swarm join-token manager
+*docker swarm join-token manager
 
-docker node ls
+*docker node ls
 
-docker service create --replicas 3 alpine ping 8.8.8.8
+*docker service create --replicas 3 alpine ping 8.8.8.8
 
-docker service ls
+*docker service ls
 
-docker node ps
+*docker node ps
 
-docker node ps node2
+*docker node ps node2
 
-docker service ps sleepy_brown
+*docker service ps sleepy_brown
 
 ## Scaling Out with Overlay Networking
 
@@ -135,3 +140,23 @@ docker service ps sleepy_brown
 *docker service ps drupal
 
 *docker service inspect drupal
+
+#### Scale multiple services
+The docker service scale command allows you to set the desired number of tasks for multiple services at once. The following example scales both the backend and frontend services:
+
+*docker service scale backend=3 frontend=5
+
+
+<img src="pic/11.png" height="300" width="600" style="float:center" ></img>
+
+<img src="pic/22.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/33.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/44.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/55.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/66.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/77.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/88.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/99.png" height="300" width="600" style="float:center" ></img>
+<img src="pic/100.png" height="300" width="600" style="float:center" ></img>
+
+
