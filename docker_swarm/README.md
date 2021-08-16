@@ -231,67 +231,67 @@ https://hub.docker.com/registry
 
 ## Run a Private Docker Registry
 
-docker container run -d -p 5000:5000 --name registry registry
+* docker container run -d -p 5000:5000 --name registry registry
 
-docker container ls
+* docker container ls
 
-docker image ls
+* docker image ls
 
-docker pull hello-world
+* docker pull hello-world
 
-docker run hello-world
+* docker run hello-world
 
-docker tag hello-world 127.0.0.1:5000/hello-world
+* docker tag hello-world 127.0.0.1:5000/hello-world
 
-docker image ls
+* docker image ls
 
-docker push 127.0.0.1:5000/hello-world
+* docker push 127.0.0.1:5000/hello-world
 
-docker image remove hello-world
+* docker image remove hello-world
 
-docker image remove 127.0.0.1:5000/hello-world
+* docker image remove 127.0.0.1:5000/hello-world
 
-docker container rm admiring_stallman
+* docker container rm admiring_stallman
 
-docker image remove 127.0.0.1:5000/hello-world
+* docker image remove 127.0.0.1:5000/hello-world
 
-docker image ls
+* docker image ls
 
-docker pull 127.0.0.1:5000/hello-world:latest
+* docker pull 127.0.0.1:5000/hello-world:latest
 
-docker container kill registry
+* docker container kill registry
 
-docker container rm registry
+* docker container rm registry
 
-docker container run -d -p 5000:5000 --name registry -v $(pwd)/registry-data:/var/lib/registry registry TAB COMPLETION
+* docker container run -d -p 5000:5000 --name registry -v $(pwd)/registry-data:/var/lib/registry registry TAB COMPLETION
 
-docker image ls
+* docker image ls
 
-docker push 127.0.0.1:5000/hello-world
+* docker push 127.0.0.1:5000/hello-world
 
 ## Using Docker Registry With Swarm
 
 http://play-with-docker.com
 
-docker node ls
+* docker node ls
 
-docker service create --name registry --publish 5000:5000 registry
+* docker service create --name registry --publish 5000:5000 registry
 
-docker service ps registry
+* docker service ps registry
 
-docker pull hello-world
+* docker pull hello-world
 
-docker tag hello-world 127.0.0.1:5000/hello-world
+* docker tag hello-world 127.0.0.1:5000/hello-world
 
-docker push 127.0.0.1:5000/hello-world
+* docker push 127.0.0.1:5000/hello-world
 
-docker pull nginx
+* docker pull nginx
 
-docker tag nginx 127.0.0.1:5000/nginx
+* docker tag nginx 127.0.0.1:5000/nginx
 
-docker push 127.0.0.1:5000/nginx
+* docker push 127.0.0.1:5000/nginx
 
-docker service create --name nginx -p 80:80 --replicas 5 --detach=false 127.0.0.1:5000/nginx
+* docker service create --name nginx -p 80:80 --replicas 5 --detach=false 127.0.0.1:5000/nginx
 
-docker service ps nginx
+* docker service ps nginx
 {"threads":[{"position":862,"start":0,"end":861,"connection":"closed"},{"position":862,"start":862,"end":1721,"connection":"open"}],"url":"https://a.udemycdn.com/2018-11-07_22-39-39-2ba95e67e63a882c31b7b87c7daef210/original.txt?nva=20191209144631&download=True&filename=DM-S10-Commands.txt&token=0cc5608f6d3f6cfa560a4","method":"GET","port":443,"downloadSize":1721,"headers":{"date":"Tue, 06 Aug 2019 22:23:53 GMT","content-type":"application/force-download","content-length":"1721","connection":"close","etag":"\"545e96789e5dc32c50c6d401bc5a4dae\"","last-modified":"Wed, 07 Nov 2018 22:39:41 GMT","server":"AmazonS3","x-amz-id-2":"1xpUdco8KEPlGre63vhip9HAcc0+0DnKUDWLD9ZB4gvOlca9TXDJBQah9MH45eBSf393sNBa9wk=","x-amz-meta-qqfilename":"DM%20S10%20Commands.txt","x-amz-replication-status":"COMPLETED","x-amz-request-id":"D0D177545391C728","x-amz-version-id":"G9VelkZRJNcf2uNprsoNmrHFjwWEL24R","access-control-allow-origin":"*","age":"10756826","content-disposition":"attachment; filename=\"DM-S10-Commands.txt\"","accept-ranges":"bytes"}} 
