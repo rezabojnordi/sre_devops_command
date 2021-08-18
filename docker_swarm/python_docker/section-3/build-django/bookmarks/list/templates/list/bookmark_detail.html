@@ -1,0 +1,6 @@
+<h2>{{ bookmark.name }}</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<p><a href="{{ bookmark.url }}">{{ bookmark.url }}</a></p>
+<p>{{ bookmark.description }}</p>
