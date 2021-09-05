@@ -1,0 +1,9 @@
+if [ "$(df -hT | grep -w xfs)" ]; then dd if=/dev/zero of=/swapfile bs=1024 count=3072k; else fallocate -l 3G /swapfile; fi
+mkswap /swapfile
+swapon /swapfile 
+chown root:root /swapfile
+chmod 0600 /swapfile
+swapon -s
+echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
+mount -a
+free -m 
