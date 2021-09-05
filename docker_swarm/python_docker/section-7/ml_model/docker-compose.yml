@@ -1,0 +1,19 @@
+version: "3.7" # Mandatory line in Docker Compose File
+
+services: # Declaration of Containers (here named Sevices) to run
+
+  tf: # Jupyter+TensorFlow Container
+    image: tensorflow/tensorflow:latest-py3-jupyter
+    ports:
+      - "8888:8888" # declare Port Mapping as String due to YAML Processing of xx:xx
+    volumes:
+      - ./notebooks:/tf/notebooks # Bind Mount Source path is relative to Host folder with "docker-compose.yml" file
+      - ./logs:/tf/logs
+
+  tb: # TensorBoard Container
+    image: tensorflow/tensorflow
+    command: tensorboard --bind_all --logdir /tf/logs # Override CMD from Image Metadata
+    ports:
+      - "6006:6006"
+    volumes:
+      - ./logs:/tf/logs

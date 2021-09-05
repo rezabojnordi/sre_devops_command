@@ -1,0 +1,95 @@
+apt install glusterfs-server/stable
+systemctl status glusterd
+systemctl start glusterd
+systemctl enable glusterd
+====================================================================================================
+## command for join cluster
+#gluster peer prob gluster2
+#gluster peer status
+===========================================================================================================
+## create volume in server
+##create directory in node1 and node2 ,..
+#mkdir /gluster
+#gluster volume create volume1 replica 2 gluster:/gluster/wp gluster2:/gluster/wp force
+#gluster volume list
+#gluster volume info
+#gluster volume start volume1
+#gluster volume status
+=========================================================================================================
+root@gluster:/gluster/wp# netstat -nltp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:49152           0.0.0.0:*               LISTEN      9933/glusterfsd     
+tcp        0      0 0.0.0.0:24007           0.0.0.0:*               LISTEN      6179/glusterd 
+
+
+=========================================================================================================
+## mount volume gluster in client
+
+#mkdir /mnt/volume1
+#mount -t gluster gluster:volume1 /mnt/volume1
+## check for mounting volume
+#mount |grep volume
+#cd /mnt/volume1
+## You can create file in this path(/mnt/volume1) after that run bowve command
+#touch reza 
+=========================================================================================================
+## How to umount from client
+
+#umount volume stop volume1
+=========================================================================================================
+## How to remove volume from glusterfs
+gluster volume stop volume
+gluster volime status
+gluster volume delete volume1
+========================================================================================================
+
+##Create volume in gluster and doen't replica beacuse use rounrabin and distribute data
+
+#gluster volime list
+#gluster volume creat volume2 gluster:/gluster/db/ gluster2:/gluster/db force
+#gluster volume list
+#gluster volume status
+#gluster volume start volume2
+#gluster volume info
+=======================================================================================================
+##Help command in gluster 
+#gluster help
+#gluster peer help
+#gluster pool list
+#gluster volume help
+#gluster volume list
+#gluster volume sync gluster volume1
+#gluster volume stop volume1
+#gluster volume delete volume1
+#gluster peer detach gluster2
+#gluster volume create help
+========================================================================================================
+#gluster snapshot help
+
+========================================================================================================
+## How to set quota in volume
+#gluster volume quota help
+#gluster volume quota volume1 list
+#gluster volume quota volume1 enable
+#gluster volume quota volume1 disable
+#gluster volume quota volume1 limit-usage /20MB
+#gluster volume quota volume1 limit-usage /data1 5MB
+#gluster volume quota volume1 limit-usage /data2 15MB
+#gluster volume quota volume1 list
+#df -hP .
+#dd if=/dev/urandom of=myfile1 bs=5MB count=1
+#gluster volume quota volume1 list
+
+
+
+
+
+
+
+
+
+
+
+
+
