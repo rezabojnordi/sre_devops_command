@@ -20,3 +20,9 @@ docker service create --network baloot --name db --hostname databses --constrain
 
 
 docker service create --network baloot --name database --hostname database --constraint node.labels.type==database --constraint node.labels.servernumber==1 mysql
+
+
+==========================================================================================================================
+docker stack deploy -c docker-compose.yml wordpress
+
+docker stack rm wordpress

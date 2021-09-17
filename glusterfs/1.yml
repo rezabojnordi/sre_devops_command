@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  promotheus:
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+#        - '--web.console.libraries=/etc/prometheus/console_libraries'
+#        - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=1d'
+      - '--web.enable-admin-api'
+#        - '--web.enable-lifecycle'
+    volumes:
+      - /mnt/prometheus:/etc/prometheus
+      - /mnt/prometheusStorage:/prometheus
+    ports:
+      - 9090:9090
+#    depends_on:
+#      - alertmanager
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+      - /mnt/alertmanager:/etc/alertmanager/
+    ports:
+      - 9093:9093
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+#      - '--storage.path=/var/lib/alertmanager/data'
+#      - promotheus
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - /mnt/grafana:/var/lib/grafana/
+#    depends_on:
+#      - promotheus
+  mail:
+    image: bytemark/smtp
+    environment:
+      RELAY_HOST: smtp-relay.sendinblue.com
+      RELAY_PORT: 587
+      RELAY_USERNAME: hashem_jahangiri@yahoo.com
+      RELAY_PASSWORD: amZQkjgWL6zTH
+#    logging:
+#      driver: syslog
+#      options:
+#        syslog-address: "tcp://logstash:5000"
+  api:
+#    image: 185.255.91.185:5000/deployment:latest
+    image: deployment:latest
+    ports:
+      - 8800:8800
+    volumes:
+      - /mnt/python:/root/
+      - /mnt/prometheus:/root/codes/prometheus/
+  mongodb:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=hashem123
+    ports:
+      - 27117:27017
+    volumes:
+      - /mnt/mongodb:/data/db
+  registery:
+    image: registry:2
+    ports:
+      - 5000:5000
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    volumes:
+      - /mnt/registery/data:/var/lib/registry
+      - /mnt/registery/auth:/auth

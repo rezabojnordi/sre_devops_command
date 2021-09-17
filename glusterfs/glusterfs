@@ -27,7 +27,8 @@ tcp        0      0 0.0.0.0:24007           0.0.0.0:*               LISTEN      
 ## mount volume gluster in client
 
 #mkdir /mnt/volume1
-#mount -t gluster gluster:volume1 /mnt/volume1
+#mount -t glusterfs gluster:volume1 /mnt/volume1
+# mount -t glusterfs gluster:nginx /mnt/nginx/
 ## check for mounting volume
 #mount |grep volume
 #cd /mnt/volume1
@@ -80,6 +81,34 @@ gluster volume delete volume1
 #df -hP .
 #dd if=/dev/urandom of=myfile1 bs=5MB count=1
 #gluster volume quota volume1 list
+
+#######################################################
+########## [ GlusterFS 7 ] How to extend or shrink a Gluster FS volume ########
+gluster volume create vol gluster:/gluster/vol/ force
+
+gluster volume status
+gluster volume start vol
+gluster volume info
+mount -t glusterfs gluster:vol /mnt/vol
+mount |grep vol
+cd /mnt/vol/
+touch file{1..4}
+
+## this command you can rebalnce data in server
+mkdir /gluster/vol1/
+gluster volume add-brick vol gluster2:/gluster/vol1/ force
+gluster volume rebalance vol start
+gluster volume rebalance vol status
+
+## this command for remove brick for migration setting
+gluster volume remove-brick vol gluster:/gluster/vol1 start
+
+gluster volume remove-brick vol gluster:/gluster/vol1 status
+
+## check th removed bricks to ensure all file are migrated and If files with data are found on the brick path, copy them via a gluster mount point before re-purposing the removed brick.
+
+gluster volume remove-brick vol gluster:/gluster/vol1 commit
+==============================================================================================================================
 
 
 

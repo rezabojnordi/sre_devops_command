@@ -1,0 +1,427 @@
+version: '3.8'
+networks:
+  baas:
+    external: True
+    name: baas
+volumes:
+  cli:
+  prometheus:
+services:
+  cli:
+    image: hyperledger/fabric-tools:2.3
+    deploy:
+      mode: global
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=GreenWeb-sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_TLS_ENABLED=true
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/:/host/var/run/
+      - /mnt/chaincodes/:/opt/gopath/src/github.com/chaincodes
+      - /mnt/crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - /mnt/channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+      - cli:/etc/hyperledger/fabric
+    networks:
+      baas:
+        aliases:
+          - cli
+    logging:
+      options:
+        tag: "admin"
+  o1_orderer_o1_com:
+    image: hyperledger/fabric-orderer:2.3
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      #- ORDERER_GENERAL_GENESISMETHOD=file
+      #- ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_OPERATIONS_LISTENADDRESS=0.0.0.0:8043
+      - ORDERER_METRICS_PROVIDER=prometheus
+      - ORDERER_GENERAL_LOCALMSPID=Orgo1MSP
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7070
+      - ORDERER_ADMIN_TLS_ENABLED=false
+      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_ADMIN_TLS_CLIENTAUTHREQUIRED=true
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/admin/tls/ca.crt]
+      - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+    volumes:
+      #- /mnt/channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - /mnt/crypto-config/peerOrganizations/o1.com/peers/o1.orderer.o1.com/msp:/var/hyperledger/orderer/msp
+      - /mnt/crypto-config/peerOrganizations/o1.com/peers/o1.orderer.o1.com/tls/:/var/hyperledger/orderer/tls
+      - /mnt/crypto-config/peerOrganizations/o1.com/users/Admin@o1.com/:/var/hyperledger/orderer/admin
+      - /mnt/o1.orderer.o1.com:/var/hyperledger/production
+    ports:
+      - 2140:7050
+    networks:
+      baas:
+        aliases:
+          - o1.orderer.o1.com
+    logging:
+      options:
+        tag: "orderer"
+
+  p1_o1_com:
+    image: hyperledger/fabric-peer:2.3
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+- CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=baas
+      - CORE_PEER_ID=p1.o1.com
+      - CORE_PEER_ADDRESS=p1.o1.com:2130
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:2130
+      - CORE_PEER_CHAINCODEADDRESS=p1.o1.com:2142
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:2142
+      - CORE_PEER_GOSSIP_BOOTSTRAP=localhost:2130
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=p1.o1.com:2130
+      - CORE_PEER_LOCALMSPID=Orgo1MSP
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:8043
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_CHAINCODE_LOGGING_SHIM=DEBUG #INFO_DEBUG_WARNING_ERROR_NOTICE_CRITICAL
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb_p1_o1_com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=nUhl409AOf
+    volumes:
+      - /var/run/:/host/var/run/
+      - /mnt/crypto-config/peerOrganizations/o1.com/peers/p1.o1.com/msp:/etc/hyperledger/fabric/msp
+      - /mnt/crypto-config/peerOrganizations/o1.com/peers/p1.o1.com/tls:/etc/hyperledger/fabric/tls
+      - /mnt/p1.o1.com:/var/hyperledger/production
+    ports:
+      - 2130:2130
+    networks:
+      baas:
+        aliases:
+          - p1.o1.com
+    logging:
+      options:
+        tag: "peer"
+
+
+  couchdb_p1_o1_com:
+    image: couchdb:3.1.1
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=nUhl409AOf
+    volumes:
+      - /mnt/couchdb_tls:/etc/hyperledger/fabric/tls
+      #- /mnt/docker.ini:/opt/couchdb/etc/local.d/docker.ini
+      - /mnt/couchdb_p1.o1.com_data:/opt/couchdb/data
+      - /mnt/couchdb_p1.o1.com_localD:/opt/couchdb/etc/local.d
+    ports:
+      - 2098:6984
+    networks:
+      baas:
+        aliases:
+          - couchdb_p1.o1.com
+    logging:
+      options:
+        tag: "db"
+
+  ca_o1_com:
+    image: hyperledger/fabric-ca:1.4.9
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.o1.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.o1.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+      - FABRIC_CA_SERVER_PORT=7054
+      - FABRIC_CA_SERVER_METRICS_PROVIDER=prometheus
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:8043
+    ports:
+      - 2054:7054
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.o1.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -d'
+    volumes:
+      - /mnt/crypto-config/peerOrganizations/o1.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - /mnt/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+    networks:
+      baas:
+        aliases:
+          - ca.o1.com
+    logging:
+      options:
+        tag: "ca"
+
+  p1_o2_com:
+    image: hyperledger/fabric-peer:2.3
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=baas
+      - CORE_PEER_ID=p1.o2.com
+        poya, [04.09.21 14:20]
+- CORE_PEER_ADDRESS=p1.o2.com:2128
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:2128
+      - CORE_PEER_CHAINCODEADDRESS=p1.o2.com:2101
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:2101
+      - CORE_PEER_GOSSIP_BOOTSTRAP=p2.o2.com:2138
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=p1.o2.com:2128
+      - CORE_PEER_LOCALMSPID=Orgo2MSP
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:8043
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_CHAINCODE_LOGGING_SHIM=DEBUG #INFO_DEBUG_WARNING_ERROR_NOTICE_CRITICAL
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb_p1_o2_com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=QM77HLNU1P
+    volumes:
+      - /var/run/:/host/var/run/
+      - /mnt/crypto-config/peerOrganizations/o2.com/peers/p1.o2.com/msp:/etc/hyperledger/fabric/msp
+      - /mnt/crypto-config/peerOrganizations/o2.com/peers/p1.o2.com/tls:/etc/hyperledger/fabric/tls
+      - /mnt/p1.o2.com:/var/hyperledger/production
+    ports:
+      - 2128:2128
+    networks:
+      baas:
+        aliases:
+          - p1.o2.com
+    logging:
+      options:
+        tag: "peer"
+
+
+  couchdb_p1_o2_com:
+    image: couchdb:3.1.1
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=QM77HLNU1P
+    volumes:
+      - /mnt/couchdb_tls:/etc/hyperledger/fabric/tls
+      #- /mnt/docker.ini:/opt/couchdb/etc/local.d/docker.ini
+      - /mnt/couchdb_p1.o2.com_data:/opt/couchdb/data
+      - /mnt/couchdb_p1.o2.com_localD:/opt/couchdb/etc/local.d
+    ports:
+      - 2132:6984
+    networks:
+      baas:
+        aliases:
+          - couchdb_p1.o2.com
+    logging:
+      options:
+        tag: "db"
+
+  ca_o2_com:
+    image: hyperledger/fabric-ca:1.4.9
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.o2.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.o2.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+      - FABRIC_CA_SERVER_PORT=7054
+      - FABRIC_CA_SERVER_METRICS_PROVIDER=prometheus
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:8043
+    ports:
+      - 2062:7054
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.o2.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -d'
+    volumes:
+      - /mnt/crypto-config/peerOrganizations/o2.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - /mnt/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+    networks:
+      baas:
+        aliases:
+          - ca.o2.com
+    logging:
+      options:
+        tag: "ca"
+
+  p2_o2_com:
+    image: hyperledger/fabric-peer:2.3
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=baas
+      - CORE_PEER_ID=p2.o2.com
+      - CORE_PEER_ADDRESS=p2.o2.com:2138
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:2138
+      - CORE_PEER_CHAINCODEADDRESS=p2.o2.com:2118
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:2118
+      - CORE_PEER_GOSSIP_BOOTSTRAP=p1.o2.com:2128
+
+poya, [04.09.21 14:20]
+- CORE_PEER_GOSSIP_EXTERNALENDPOINT=p2.o2.com:2138
+      - CORE_PEER_LOCALMSPID=Orgo2MSP
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:8043
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_CHAINCODE_LOGGING_SHIM=DEBUG #INFO_DEBUG_WARNING_ERROR_NOTICE_CRITICAL
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb_p2_o2_com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=XhPPqyffh6
+    volumes:
+      - /var/run/:/host/var/run/
+      - /mnt/crypto-config/peerOrganizations/o2.com/peers/p2.o2.com/msp:/etc/hyperledger/fabric/msp
+      - /mnt/crypto-config/peerOrganizations/o2.com/peers/p2.o2.com/tls:/etc/hyperledger/fabric/tls
+      - /mnt/p2.o2.com:/var/hyperledger/production
+    ports:
+      - 2138:2138
+    networks:
+      baas:
+        aliases:
+          - p2.o2.com
+    logging:
+      options:
+        tag: "peer"
+
+
+  couchdb_p2_o2_com:
+    image: couchdb:3.1.1
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=XhPPqyffh6
+    volumes:
+      - /mnt/couchdb_tls:/etc/hyperledger/fabric/tls
+      #- /mnt/docker.ini:/opt/couchdb/etc/local.d/docker.ini
+      - /mnt/couchdb_p2.o2.com_data:/opt/couchdb/data
+      - /mnt/couchdb_p2.o2.com_localD:/opt/couchdb/etc/local.d
+    ports:
+      - 2093:6984
+    networks:
+      baas:
+        aliases:
+          - couchdb_p2.o2.com
+    logging:
+      options:
+        tag: "db"
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=2d'
+    networks:
+      - baas
+    volumes:
+      - /mnt/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus:/prometheus
+    logging:
+      options:
+        tag: "admin"
+
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    deploy:
+      mode: global
+    command: -logtostderr -docker_only
+    # ports:
+    #   - 8080:8080
+    networks:
+      - baas
+    volumes:
+      - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock,ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    logging:
+      options:
+        tag: "admin"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    deploy:
+      mode: global
+    # ports:
+    #   - 9100:9100
+    networks:
+      - baas
+    volumes:
+      - /:/rootfs:ro
+    logging:
+      options:
+        tag: "admin"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    networks:
+      - baas
+    volumes:
+      - /mnt/grafana/datasources:/etc/grafana/provisioning/datasources/
+      - /mnt/grafana/GW-dashboards.yml:/etc/grafana/provisioning/dashboards/GW-dashboards.yml
+      - /mnt/grafana/dashboards:/etc/grafana/dashboards/
+      - /mnt/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - /mnt/couchdb_tls:/etc/grafana/tls/
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=nPuqgw9JxY
+      - GF_USERS_ALLOW_SIGN_UP=false
+    logging:
+      options:
+        tag: "admin"
+
+  explorerdb_com:
+    image: hyperledger/explorer-db:latest
+    environment:
+      - DATABASE_DATABASE=fabricexplorer
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWORD=passwordPassword123456
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U postgres"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /mnt/explorerDbData:/var/lib/postgresql/data
+    logging:
+      options:
+        tag: "admin"
+    networks:
+      - baas
