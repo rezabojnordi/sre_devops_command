@@ -1,0 +1,31 @@
+ ansible all -m ping
+ansible -m user -a 'uname=newbie uid=4000 state=present' serveral.lab.example,com
+
+ansible-doc -l
+
+ansible-doc ping
+
+ansible all -i inventory -m ping
+
+ansible all --limit web01 -i inventory -k -m ping
+
+ansible-doc -l |grep service
+ansible-doc service
+
+ansible all -m service -a "state=restarted name=sshd"
+
+ansible webservers -m user -a "name=test password=security_password state=present"
+
+ 
+ansible webservers -m user -a "name=test password=security_password state=absent"
+
+ansible all -m user -a 'name=newbie group=developers,wheel append=yes state=present"
+
+ansible all -m package -a 'name=httpd state=present'
+
+ansible mymanagedhost -m command -a /usr/bin/hostname
+
+ansible webserver -m yum -a "name=httpd state=present"
+ansible-playbook --syntax-check webserver.yml
+
+ansible-playbook -C weberver.yml

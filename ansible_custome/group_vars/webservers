@@ -1,0 +1,6 @@
+
+# variables for the webservers group
+username:
+  test:
+    username: test
+    description: test description

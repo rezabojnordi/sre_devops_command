@@ -1,0 +1,11 @@
+touch secret and add string afther that run this command
+
+ansible-vault encrypt secret
+
+ansible-playbook --ask-vault-pass example.yml
+
+## for change secret key in ansible. You must run this commanc
+ansible-vault rekey secret
+
+## edit secret key
+ansible-vault edit secret

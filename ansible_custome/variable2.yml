@@ -1,0 +1,14 @@
+---
+- name: New user is created and
+  hosts: Webserver
+  become: true
+  vars: 
+    test: 
+      uname: test
+      description: test user acount
+  tasks: 
+    - name: User gets created
+      user: 
+        name: "{{ username['test']['uname'] }}"
+        comment: "{{ username['test']['description']}}"
+        state: present

@@ -1,0 +1,12 @@
+- name: New user is created and
+  hosts: Webserver
+  become: true
+  tasks: 
+    - name: print variables 
+      debug:
+        msg: "{{ secret }}"
+
+    - name: print variable
+      debug:
+        msg: "{{ secret }}"
+      no_log: true
