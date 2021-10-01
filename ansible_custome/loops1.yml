@@ -1,0 +1,10 @@
+---
+- name: " {{ item }}"
+  yum:
+    name: " {{ item }}"
+    state: present
+  loop:
+    - nginx
+    - postgresql
+    - postgresql-server
+    

@@ -1,0 +1,11 @@
+---
+- name: databased
+  hosts: databases
+  become: true
+
+  tasks: 
+    - name:
+      user:
+        name: " {{ item }}"
+        status: present
+      loop: "{{ db_users }}"

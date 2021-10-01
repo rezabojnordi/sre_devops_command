@@ -1,0 +1,13 @@
+---
+- name: Demonstrate "in" a condition
+  hosts: all
+  tasks: 
+    - name: Ger postfix server status
+      command: /user/bin/systemctl is-active postfix
+      ignore_errors: yes
+      register: result
+    - name: Restart Apache Httpd base on postfix status
+      service:
+        name: httpd
+        status: restarted
+      when: result.rc == 0

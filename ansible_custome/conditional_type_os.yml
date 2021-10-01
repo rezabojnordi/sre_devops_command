@@ -1,0 +1,28 @@
+---
+- name: Demonstrate "in" a condition
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    my_service: httpd
+    supported_os: 
+      - RedHat
+      - Fedora
+  tasks: 
+    - name: Install "{{ my_service }}"
+      yum:
+        name: "{{ my_service }}"
+        state: present
+      when: ansible_fact['distribution'] in supported_os
+      
+# ansible_distribution_version == '7.5'
+# ansible_kernel == '3.10.0-327.elk.x86_64"
+
+# when: >
+#     ( ansible_distribution == "RedHat" and
+#       ansible_distribution_major_version == "7" )
+    
+#     or
+    
+#     ( ansible_distribution == "Fedora" and
+#       ansible_distribution_major_version == "28")

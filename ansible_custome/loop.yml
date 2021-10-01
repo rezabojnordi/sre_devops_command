@@ -1,0 +1,17 @@
+---
+- name: Create users
+  hosts:
+  vars:
+    myusers:
+      - aditya
+      - boris
+      - carlotta
+  tasks:
+    - name: create 
+      user:
+         name: "{{ item }}"
+         state: present
+      loop: "{{ myusers }}"
+
+#ansible-playbook loop.yml -b
+

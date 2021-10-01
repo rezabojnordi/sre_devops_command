@@ -1,0 +1,8 @@
+---
+- name: Install a list of packages 
+  yum:
+    name: install-packages
+      - nginx
+      - postgresql
+      - postgresql-server
+    status: present

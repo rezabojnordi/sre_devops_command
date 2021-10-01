@@ -1,0 +1,18 @@
+---
+- name: create users in the appropriate groups
+  hostname: all
+  tasks:
+    - name: create groups
+      groups:
+        name: "{{ item }}"
+      loop:
+        - flintstones
+        - rubbles
+    - name: Create users in their
+      user: 
+        name: " {{ item.name }}"
+        groups: " {{ item.groups }}"
+        with_dict: 
+          - { name: 'reza', groups: 'flintstones' }
+          - { name: 'wilma', groups: 'flintstones'}
+          - { name: 'barney', groups: 'rubbles'}
