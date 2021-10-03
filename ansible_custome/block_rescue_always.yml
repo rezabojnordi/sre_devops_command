@@ -1,0 +1,30 @@
+---
+- name: Utilize block, rescue ans always
+  hosts: all
+  become: true
+
+  tasks: 
+    - name: upgrade database
+      block: 
+        - name: Disable an update message
+          debug: 
+            msg: "Upgrade database"
+        - name: Upgrade postgresql to latest version
+          yum:
+            name: postgresql-server
+            state: latest
+      rescue:
+        - name: Disaply error message that database will be restarted 
+          debug: 
+            msg: "Update failed. Restarting database to correct issues."
+        - name: Restart the database if upgrade failed.
+          service: 
+            name: postgresql
+            state: restarted
+      always: 
+        - name: Notify user of reboot after update attempt
+          debug: 
+            msg: "Upgrade process has completed. See previous output for status, Rebooting system now"
+      - name: Reboot the system 
+        reboot:
+          status: reboot

@@ -1,0 +1,17 @@
+---
+- name: Blcok Rescue Always
+  task: 
+    - name: Upgrade DB
+      block:
+        - name: Upgrade the database
+          sell: 
+            cmd: /usr/local/lib/upgrade-database
+      rescue:
+        - name: revert the database Upgrade
+          shell:
+            cmd: /usr/local/lib/revert-database
+      always:
+        - name: always restart the database
+          service:
+            name: mariadb
+            state: restarted
