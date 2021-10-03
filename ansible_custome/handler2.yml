@@ -1,0 +1,18 @@
+---
+tasks:
+  - name: copy demo.example.conf 
+    template:
+      src: /var/lib/templates/demo.example/conf.templates
+      dest: /etc/httpd/conf.d/demo.example.conf
+    notify: 
+      - restart mysql
+      - restart apache
+handlers:
+  - name: restart mysql
+    service: 
+      name: mariadb
+      state: restart 
+  - name: restart apache
+    service:
+      name: httpd
+      state: restarted

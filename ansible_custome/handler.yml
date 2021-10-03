@@ -1,0 +1,15 @@
+---
+- name: handler for restart apache2
+  task: 
+    - name: Copy demo example apache2
+      template:
+        src: /var/lib/templates/demo.example.conf.template
+        dest: /etc/httpd/conf.d/
+      notify:
+        - restart apache
+  handler:
+    - name: restart apache
+      service: 
+        name: httpd
+        status: restarted
+        
