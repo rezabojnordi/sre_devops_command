@@ -1,0 +1,11 @@
+---
+- name: test copy file with jinja2
+  task:
+    - name: Make sure sshd_config is customized
+      template:
+        src: sshd_config.j2
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: "0600"
+        setype: etc_t

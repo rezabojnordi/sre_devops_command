@@ -1,0 +1,14 @@
+---
+- name: Deploy files using a Jinja2 template 
+  hosts: all
+  becomes: true
+
+- name:  hostname
+  task:
+    - name: hostname server
+      template:
+        src: hosts.j2
+        dest: /etc/ssh/hosts
+        owner: root
+        group: root
+        mode: "0600"
