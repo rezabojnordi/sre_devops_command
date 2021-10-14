@@ -1,0 +1,19 @@
+---
+- name: test copy file with jinja2
+  host: all
+  tasks:
+    - name: all fac
+      debug:
+        var: ansible_facts
+    - name: Disable a list of all IPV4 addresses
+      debug:
+        var: ansible_facts['all_ipv4_addresses']
+
+# { % for host in groups['all'] %}
+# {{ hostvars['host']['ansible_facts']['default_ipv4']['address'] }} {{ hostvars['host']['ansible_facts']['fqdn'] }}
+# {% endfor %}
+#------------------------
+# { # only include if finished is True # }
+# { % if finished % }
+# {{ result }}
+# {% endif %}
