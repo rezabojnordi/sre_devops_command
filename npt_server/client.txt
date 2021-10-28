@@ -1,0 +1,15 @@
+timedatectl set-timezone Asia/Tehran
+
+apt install chrony -y
+
+vim /etc/chrony/chrony.conf
+
+server 172.20.8.9 iburst
+rtcsync
+makestep 1 3
+
+systemctl restart chrony
+
+chronyc tracking
+
+chronyc sources
