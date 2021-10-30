@@ -63,6 +63,14 @@ cephadm bootstrap --mon-ip 172.16.112.110
 ```
 
 ## network cluster
+
+```
+cat <<EOF > /root/ceph.conf
+ [global]
+ public network = 172.16.112.0/22
+ cluster network = 172.20.104.0/24
+  EOF
+ ```
 ```
 
 cephadm bootstrap -c /root/ceph.conf --mon-ip 172.16.112.110
