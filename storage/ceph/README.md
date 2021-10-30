@@ -13,6 +13,10 @@ sudo apt update
 sudo ./cephadm install
 cephadm shell -- -s
 cephadm shell -- ceph -s
+
+add ceph common tools
+cephadm add-repo --release pacific
+cephadm install ceph-common
 -------------------------------------
 ```
 
