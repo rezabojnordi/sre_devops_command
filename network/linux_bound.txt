@@ -1,0 +1,48 @@
+# Ethernet
+auto ens160
+iface ens160 inet manual
+   mtu 9000
+
+auto ens192
+iface ens192 inet manual
+   mtu 9000
+
+
+auto ens160.4
+iface ens160.4 inet manual
+        vlan-raw-device ens160
+
+
+auto ens192.13
+iface ens192.13 inet manual
+        vlan-raw-device ens192
+
+
+
+
+auto br-mgmt
+iface br-mgmt inet static
+    bridge_stp off
+    bridge_waitport 0
+    bridge_fd 0
+    bridge_ports ens160
+    address 172.20.8.50/22
+    gateway 172.20.11.254
+
+# Storage bridge
+auto br-storage
+iface br-storage inet static
+    bridge_stp off
+    bridge_waitport 0
+    bridge_fd 0
+    bridge_ports ens160.4
+    address 172.20.4.50/22
+
+auto br-cluster
+iface br-cluster inet static
+    bridge_stp off
+    bridge_waitport 0
+    bridge_fd 0
+    bridge_ports ens192.13
+    address 172.20.13.13
+
