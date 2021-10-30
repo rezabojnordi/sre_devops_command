@@ -62,6 +62,12 @@ This command will ：
 cephadm bootstrap --mon-ip 172.16.112.110
 ```
 
+## network cluster
+```
+
+cephadm bootstrap -c /root/ceph.conf --mon-ip 172.16.112.110
+```
+
 ## Add host
 
 ```
