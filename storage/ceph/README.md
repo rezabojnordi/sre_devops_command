@@ -1,4 +1,9 @@
 
+## requrement for cephadm
+apt update
+apt dist-upgrade
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
 ## install ceph
 ```
 
@@ -64,9 +69,14 @@ cephadm bootstrap --mon-ip 172.16.112.110
 
 # you can conenct openstack with ceph storage 
 ```
+ceph osd pool create cinder-volumes 128
+ceph osd pool create images 128
+ceph osd pool create backups 128
+ceph osd pool create vms 128
+
 rbd pool init cinder-volumes
 
- ssh 172.16.104.101 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+ssh 172.16.104.101 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
 cat ~/.ssh/id_rsa.pub 
 ssh 172.16.104.101 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
 ssh 172.16.104.102 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
