@@ -62,6 +62,45 @@ This command will ：
 cephadm bootstrap --mon-ip 172.16.112.110
 ```
 
+# you can conenct openstack with ceph storage 
+```
+rbd pool init cinder-volumes
+
+ ssh 172.16.104.101 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+cat ~/.ssh/id_rsa.pub 
+ssh 172.16.104.101 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+ssh 172.16.104.102 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+ssh 172.16.104.103 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+ssh 172.16.104.104 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+ceph auth get-or-create client.cinder mon 'profile rbd' osd 'profile rbd pool=cinder-volumes, profile rbd pool=vms, profile rbd pool=images'
+ls
+#ceph auth get-or-create client.cinder mon 'profile rbd' osd 'profile rbd pool=cinder-volumes, profile rbd pool=vms, profile rbd pool=images'
+ls
+cat ceph.client.admin.keyring 
+ceph auth get-or-create client.cinder | ssh 172.16.104.110 sudo tee /etc/ceph/ceph.client.cinder.keyring
+ls
+cat ceph.client.cinder.keyring 
+vim ceph.client.cinder.keyring 
+cat ~/.ssh/id_rsa.pub 
+vim ceph.client.cinder.keyring 
+scp * mon2:/etc/ceph/
+scp * mon3:/etc/ceph/
+scp * osd1:/etc/ceph/
+scp * osd2:/etc/ceph/
+scp * osd3:/etc/ceph/
+ceph -s
+
+#---------------
+
+[client.cinder]
+        key = AQCeaINhnOSuKBAAaWLlNUbqrJ3lQjgKHajUhg==
+                caps mds = "allow *"
+                caps mgr = "allow *"
+                caps mon = "allow *"
+                caps osd = "allow *"
+#----------------------------------                
+```
+
 ## network cluster
 
 ```
