@@ -1,0 +1,274 @@
+---
+cidr_networks: &cidr_networks
+  container: 172.16.104.0/22
+  tunnel: 172.16.108.0/22
+  storage: 172.16.112.0/22
+used_ips:
+  - "172.16.104.99,172.16.104.106"
+  - "172.16.108.99,172.16.108.106"
+  - "172.16.112.99,172.16.112.106"
+  - "172.16.116.99,172.16.116.106"
+global_overrides:
+  cidr_networks: *cidr_networks
+  external_lb_vip_address: 172.16.116.99
+  internal_lb_vip_address: 172.16.104.99
+  tunnel_bridge: "br-vxlan"
+  management_bridge: "br-mgmt"
+
+  provider_networks:
+    - network:
+        group_binds:
+          - all_containers
+          - hosts
+        type: "raw"
+        container_bridge: "br-mgmt"
+        container_interface: "eth1"
+        container_type: "veth"
+        ip_from_q: "container"
+        is_container_address: true
+    - network:
+        group_binds:
+          - glance_api
+          - cinder_api
+          - cinder_volume
+          - nova_compute
+          # Uncomment the next line if using swift with a storage network.
+          # - swift_proxy
+        type: "raw"
+        container_bridge: "br-storage"
+        container_type: "veth"
+        container_interface: "eth2"
+        container_mtu: "9000"
+        ip_from_q: "storage"
+    - network:
+        group_binds:
+          - neutron_linuxbridge_agent
+        container_bridge: "br-vxlan"
+        container_type: "veth"
+        container_interface: "eth10"
+        container_mtu: "9000"
+        ip_from_q: "tunnel"
+        type: "vxlan"
+        range: "1:1000"
+        net_name: "vxlan"
+    - network:
+        group_binds:
+          - neutron_linuxbridge_agent
+        container_bridge: "br-vlan"
+        container_type: "veth"
+        container_interface: "eth11"
+        type: "vlan"
+        range: "101:200,301:400"
+        net_name: "vlan"
+    - network:
+        group_binds:
+          - neutron_linuxbridge_agent
+        container_bridge: "br-vlan"
+        container_type: "veth"
+        container_interface: "eth12"
+        host_bind_override: "eth12"
+        type: "flat"
+        net_name: "flat"
+
+
+shared-infra_hosts:
+  infra1:
+    ip: 172.16.104.101
+    container_vars:
+      container_tech: lxc
+  infra2:
+    ip: 172.16.104.102
+    container_vars:
+      container_tech: lxc
+  infra3:
+    ip: 172.16.104.103
+    container_vars:
+      container_tech: lxc
+
+repo-infra_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+os-infra_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+identity_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+network_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+compute_hosts:
+  compute1:
+    ip: 172.16.104.104
+
+storage-infra_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+# cinder api services
+storage_hosts:
+  infra1:
+    ip: 172.16.104.101
+    container_vars:
+     cinder_backends:
+       limit_container_types: cinder_volume
+       rbd:
+         volume_group: cinder-volumes
+         volume_driver: cinder.volume.drivers.rbd.RBDDriver
+         rbd_pool: cinder-volumes
+         rbd_ceph_conf: /etc/ceph/ceph.conf
+         rbd_store_chunk_size: 8
+         volume_backend_name: rbddriver
+         rbd_user: "cinder"
+         rbd_secret_uuid: "{{ cinder_ceph_client_uuid }}"
+         report_discard_supported: true
+
+  infra2:
+    ip: 172.16.104.102
+    container_vars:
+     cinder_backends:
+       limit_container_types: cinder_volume
+       rbd:
+         volume_group: cinder-volumes
+         volume_driver: cinder.volume.drivers.rbd.RBDDriver
+         rbd_pool: cinder-volumes
+         rbd_ceph_conf: /etc/ceph/ceph.conf
+         rbd_store_chunk_size: 8
+         volume_backend_name: rbddriver
+         rbd_user: "cinder"
+         rbd_secret_uuid: "{{ cinder_ceph_client_uuid }}"
+         report_discard_supported: true
+ 
+  infra3:
+    ip: 172.16.104.103
+    container_vars:
+     cinder_backends:
+       limit_container_types: cinder_volume
+       rbd:
+         volume_group: cinder-volumes
+         volume_driver: cinder.volume.drivers.rbd.RBDDriver
+         rbd_pool: cinder-volumes
+         rbd_ceph_conf: /etc/ceph/ceph.conf
+         rbd_store_chunk_size: 8
+         volume_backend_name: rbddriver
+         rbd_user: "cinder"
+         rbd_secret_uuid: "{{ cinder_ceph_client_uuid }}"
+         report_discard_supported: true
+ 
+
+image_hosts:
+  infra1:
+    ip: 172.16.104.101
+    container_vars:
+      limit_container_types: glance
+      glance_nfs_client:
+        - server: "172.16.112.105"
+          remote_path: "/storage/glance"
+          local_path: "/var/lib/glance/images"
+          type: "nfs"
+          options: "_netdev,auto"
+  infra2:
+    ip: 172.16.104.102
+    container_vars:
+      limit_container_types: glance
+      glance_nfs_client:
+        - server: "172.16.112.105"
+          remote_path: "/storage/glance"
+          local_path: "/var/lib/glance/images"
+          type: "nfs"
+          options: "_netdev,auto"
+  infra3:
+    ip: 172.16.104.103
+    container_vars:
+      limit_container_types: glance
+      glance_nfs_client:
+        - server: "172.16.112.105"
+          remote_path: "/storage/glance"
+          local_path: "/var/lib/glance/images"
+          type: "nfs"
+          options: "_netdev,auto"
+haproxy_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+
+# placement
+placement-infra_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+# nova api, conductor, etc services
+compute-infra_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+# heat
+orchestration_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+# horizon
+dashboard_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+# neutron server, agents (L3, etc)
+network_hosts:
+  infra1:
+    ip: 172.16.104.101
+  infra2:
+    ip: 172.16.104.102
+  infra3:
+    ip: 172.16.104.103
+
+
+
+
+# nova hypervisors
+compute_hosts:
+  compute1:
+    ip: 172.16.104.104
