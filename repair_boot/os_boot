@@ -1,0 +1,16 @@
+Mount main drive
+Change sdb2 to the root partition of your drive.
+
+mount /dev/sdb2 /mnt
+Mount other stuff
+
+mount -t proc none /mnt/proc
+mount -o bind /dev /mnt/dev
+mount -o bind /sys /mnt/sys
+mount -o bind /run /mnt/run
+If you want to, you can mount the boot partition.  Change sdb1 if your boot partition is something else.  For efi, you may need to mount the boot partition then mount the efi partition inside /boot/efi.
+
+mount /dev/sdb1 /mnt/boot
+Chroot
+
+ chroot /mnt
