@@ -98,6 +98,8 @@ scp * mon3:/etc/ceph/
 scp * osd1:/etc/ceph/
 scp * osd2:/etc/ceph/
 scp * osd3:/etc/ceph/
+sudo rbd pool init cinder-volumes
+sudo ceph osd pool application enable cinder-volumes rbd
 ceph -s
 
 #---------------
