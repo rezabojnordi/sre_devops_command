@@ -1,0 +1,15 @@
+for name in `ls`
+do
+echo $name
+done;
+
+-------------------------------
+for line in `cat filename`
+do
+echo $line
+done;
+----------------------------------
+for line in `cat xac`
+do
+touch $line
+done;

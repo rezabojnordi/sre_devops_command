@@ -1,0 +1,17 @@
+date +%T
+date +%a
+date +%A
+date +%F
+
+date -d now
+date -d tomorrow
+date -d yesrerday
+
+date -r filename
+
+date -u
+
+date %T -s "14:05:03"
+
+date -s "16 jul 2013 14:00:00"
+

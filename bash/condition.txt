@@ -1,0 +1,27 @@
+
+test -f xac
+
+test 1 -gt 2 && echo "true"
+test 3-gt 2 && echo "true"
+
+test 1 -gt 2 && echo "true" || echo "False"
+
+[ 5 -eq 5 ]; echo $?
+
+[ " hello" = "hello" ]; echo $?
+
+[ "hello" = "hello world" ];; echo $?
+
+
+test 5 -eq 5 && echo "yes it is" || echo "no it is"
+
+
+
+test 3 -gt 2 && echo "true" || echo "false"
+
+[ 5 -eq 5 ]; echo $?
+
+[ 5 -eq 6 ]; echo $?
+
+[ "hello" = "hello world" ]; echo $?
+

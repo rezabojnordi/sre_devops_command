@@ -1,0 +1,28 @@
+grep hello testf
+cat testf |grep hello
+
+grep -R "string"
+
+grep ^hello xac 
+
+grep -c ^hello xac  => flag c = counter
+
+grep hello$ xac
+
+grep [z] xac
+
+grep ^[hpokhj] xac
+ 
+grep [ab] xac
+
+grep [1-9] xac
+
+grep [a-z] xac
+
+egrep 'hello.*world' testf
+egrep -i 'hello|world' testf
+
+egrep 'hello|world' testf | grep -v jeff
+
+grep hello$ testf
+

@@ -1,0 +1,6 @@
+curl -s google.com | egrep -ci "Internal server error" > /dev/null && echo "file has move" || echo "false"
+
+
+curl -s google.com | egrep -ci "html" > /dev/null && echo "file has move" || echo "false"
+
+curl -s google.com | egrep -ci "Internal server error" > /dev/null && mail -s "internal server error anthony@linux.com"

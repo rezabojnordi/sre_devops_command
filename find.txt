@@ -1,0 +1,12 @@
+find /home -perm 777 -exec chmod 555 {} \;
+
+find / -mtmime +1
+
+find / -mtime +1
+
+find / -group nameofgroup
+
+find . -size 512c
+
+find . -name 'file*' -exec rm {} \;
+

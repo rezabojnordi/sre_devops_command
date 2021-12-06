@@ -1,0 +1,21 @@
+awk '/string/' filename
+awk '/reza/' xac
+
+awk '/reza/ {print $0;}' xac
+
+awk '/reza/ {print $2 " " $1;}' xac
+
+awk '/reza/ { print NF }' xac   # show number file in your file
+
+awk 'BEGIN {print "starting script"; count=0;} $2 ~/parttime/ {count++;} END {print "Part time sp found:", count;}' xac
+
+-----------------------------------------------------------------------------------
+sed 's/fulltime/parttime/' xac
+
+sed 's/partime/fulltime/w promotions.txt' xac
+
+sed 's/partime/fulltime/w promotions.txt' xac > /dev/null
+
+sed '0,/parttime/s/parttime/promotion/' xac 
+
+sed 's/<[^>]*>//' xac

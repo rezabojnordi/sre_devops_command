@@ -1,0 +1,15 @@
+cat file1 |wc -l
+
+split -l 2 file1
+
+diff xaa xab
+
+ls heiwfh 2> testfile
+
+set -o   ==> on or off tools and history in linux
+
+set -o noclobber # this command you can't add string in the existing file because it has error
+
+set +o noclobber #redo change configure in linux 
+
+ 
