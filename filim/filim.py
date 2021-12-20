@@ -1,9 +1,9 @@
 
 import os
 
-str = ("curl -v \'https://ww"
-   "w.filimo.com/w/o1veb"
-   "\' -H \'accept: */*"
+link = "\'https://ww" "w.filimo.com/w/o1veb""\'"
+
+str = (f"curl -v {link} -H \'accept: */*"
    "\' -H \'accept-encod"
    "ing: gzip, deflate, "
    "br\' -H \'accept-lan"
@@ -70,10 +70,15 @@ str = ("curl -v \'https://ww"
    "Chrome/96.0.4664.110"
    " Safari/537.36\' --c"
    "ompressed");
-print(str)
+# print(str)
 stream = os.popen(str)
 output = stream.readlines()
 
-print(output)
+# print(output)
 
 
+file1 = open("myfile.txt","w")
+L = output
+file1.writelines(L)
+file1.close()
+  

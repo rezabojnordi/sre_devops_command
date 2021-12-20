@@ -17,4 +17,7 @@ sudo apt install mariadb-server mariadb-client
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
+sudo mysql_secure_installation
 
+sudo vim /etc/mysql/mariadb.conf.d/50-server.cnf
+#bind-address            = 127.0.0.1
