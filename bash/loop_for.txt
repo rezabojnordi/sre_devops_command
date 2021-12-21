@@ -13,3 +13,5 @@ for line in `cat xac`
 do
 touch $line
 done;
+--------------------------------
+for i in hostName{1..5}; do ssh $i service apache reload; done;
