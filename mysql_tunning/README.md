@@ -119,7 +119,13 @@ show databases;
 
 # Step 6: Install ProxySQL server
 
+PASS
 
+
+# MASTER AND SLAVE
+
+* Master MySQL Server: 10.131.74.92
+* Slave MySQL Server:  10.131.35.167
 
 
 
