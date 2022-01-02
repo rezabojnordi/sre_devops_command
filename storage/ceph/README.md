@@ -1,9 +1,11 @@
 
 ## requrement for cephadm
+```
 apt update
 apt dist-upgrade
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
+```
 ## install ceph
 ```
 
