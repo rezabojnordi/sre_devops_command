@@ -1,0 +1,20 @@
+timedatectl set-timezone Asia/Tehran
+
+apt install chrony -y
+
+vim /etc/chrony/chrony.conf
+
+pool ntp.ubuntu.com        iburst
+#pool 0.ubuntu.pool.ntp.org iburst maxsources 1
+#pool 1.ubuntu.pool.ntp.org iburst maxsources 1
+#pool 2.ubuntu.pool.ntp.org iburst maxsources 2
+ 
+makestep 1.0 3
+ 
+allow 172.20.8.0/22
+ 
+local stratum 10
+
+systemctl restart chrony
+
+
