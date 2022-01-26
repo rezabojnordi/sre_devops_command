@@ -1,0 +1,22 @@
+apt install python3.8-venv
+
+
+python3 -m venv env
+
+source env/bin/activate
+
+pip list
+
+pip install --upgrade pip
+
+pip install flask
+
+
+export FLASK_APP=app.py
+
+flask run
+
+export FLASK_ENV=production
+export FLASK_ENV=develop
+## make requirementfile
+pip3 freeze > requirements.txt
