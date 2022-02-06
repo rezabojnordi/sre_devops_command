@@ -14,7 +14,11 @@ or
 sudo wireshark
 ## remove ip in arp table
 arp -d 192.168.1.30
-
+## add ip and gateway on linux
+sudo ip addr del 192.168.56.15/24 dev eth0  
+ip route add default via 192.168.1.254 dev eth0
+or
+ip route add default via 192.168.1.254 
 ### routing
 ip/netmask
 netstat -nr
