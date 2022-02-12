@@ -1,0 +1,20 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: nginx-pv
+  #  labels:
+  #    type: local
+  #    name: apparsfiles
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storageclass
+  nfs:
+    path: /volumes/nginx
+    server: nfs.doomain.ir
+    readOnly: false
+

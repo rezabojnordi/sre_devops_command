@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginxapp
+spec:
+  containers:
+    - name: nginxc
+      image: nginx
+  affinity:
+    nodeAffinity:
+      requiredDuringSchdulingIgnoreDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: In
+            values:
+            - Large
+            - Medium
+
+#            operator: NotIn
+#            values:
+#            - Small
+            
+
+#             operator: Exists 
+
+           
+# size must be defined for node like this:
+# kubectl label nodes mynode size=Large
+

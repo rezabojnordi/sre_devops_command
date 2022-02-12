@@ -1,0 +1,20 @@
+kind: PersistentVolume                                                                                                                                                                                                                      
+apiVersion: v1
+metadata:
+  name: wp-pv
+  labels:
+    type: local
+    name: apparsfiles
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storageclass
+  nfs:
+    path: /nfs/public/wp
+    server: nfs.akks.ir
+    readOnly: false
+

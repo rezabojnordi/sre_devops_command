@@ -1,0 +1,9 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: argocd-ext-svc
+spec:
+  type: ExternalName
+  externalName: argocd-server.argocd.svc.cluster.local
+  ports:
+  - port: 8080

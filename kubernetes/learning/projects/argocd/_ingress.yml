@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+#apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-ing
+  namespace: argocd
+spec:
+  rules:
+  - host: argocd.doomain.ir
+    http:
+      paths:
+      - backend:
+              #serviceName: argocd-server
+          serviceName: argocd-server
+          #servicePort: 30082
+          servicePort: 8080
