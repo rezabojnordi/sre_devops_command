@@ -423,3 +423,108 @@ Now you should also delete the old ceph data on the host to be removed. Otherwis
 sudo rm -R /etc/ceph/
 sudo rm -R /var/lib/ceph/
 ```
+
+
+### To Troubleshoot This Problem
+
+```
+# ceph health detail
+HEALTH_WARN 24 pgs stale; 3/300 in osds are down
+...
+pg 2.5 is stuck stale+active+remapped, last acting [2,0]
+...
+osd.10 is down since epoch 23, last address 192.168.106.220:6800/11080
+osd.11 is down since epoch 13, last address 192.168.106.220:6803/11539
+osd.12 is down since epoch 24, last address 192.168.106.220:6806/11861
+
+```
+
+### Start the deep scrubbing process on the placement group:
+```
+# ceph pg deep-scrub <id>
+#  ceph pg deep-scrub 0.6
+```
+```
+# ceph -w | grep <id>
+
+```
+
+```
+# ceph -w | grep 0.6
+```
+
+### Unclean Placement Groups
+
+The ceph health command returns an error message similar to the following one:
+
+HEALTH_WARN 197 pgs stuck unclean
+
+
+```
+# ceph pg <id> query
+
+
+# ceph pg 0.5 query
+
+{ "state": "down+peering",
+  ...
+  "recovery_state": [
+       { "name": "Started\/Primary\/Peering\/GetInfo",
+         "enter_time": "2012-03-06 14:40:16.169679",
+         "requested_info_from": []},
+       { "name": "Started\/Primary\/Peering",
+         "enter_time": "2012-03-06 14:40:16.169659",
+         "probing_osds": [
+               0,
+               1],
+         "blocked": "peering is blocked due to down osds",
+         "down_osds_we_would_probe": [
+               1],
+         "peering_blocked_by": [
+               { "osd": 1,
+                 "current_lost_at": 0,
+                 "comment": "starting or marking this osd lost may let us proceed"}]},
+       { "name": "Started",
+         "enter_time": "2012-03-06 14:40:16.169513"}
+   ]
+}
+```
+```
+# ceph health detail
+
+```
+
+```
+State	What it means	Most common causes	See
+inactive
+
+The PG has not been able to service read/write requests.
+
+Peering problems
+Section 7.1.4, “Inactive Placement Groups”
+
+unclean
+
+The PG contains objects that are not replicated the desired number of times. Something is preventing the PG from recovering.
+
+unfound objects
+OSDs are down
+Incorrect configuration
+Section 7.1.3, “Unclean Placement Groups”
+
+stale
+
+The status of the PG has not been updated by a ceph-osd daemon.
+
+OSDs are down
+Section 7.1.1, “Stale Placement Groups”
+
+```
+
+```
+List the stuck PGs:
+
+# ceph pg dump_stuck inactive
+# ceph pg dump_stuck unclean
+# ceph pg dump_stuck stale
+```
