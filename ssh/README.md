@@ -4,7 +4,7 @@
 <img src="./ssh2.png" width="600" height="300" />
 <img src="./ssh3.png" width="600" height="300" />
 <img src="./ssh4.png" width="600" height="300" />
-<img src="./ssh6.png" width="600" height="300" />
+<img src="./sshd6.png" width="600" height="300" />
 <img src="./ssh8.png" width="600" height="300" />
 ```
 # ssh -X testuser@192.168.1.1
