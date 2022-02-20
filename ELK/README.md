@@ -33,3 +33,9 @@ Logstash OSS 8.0.0
 ```
 https://opendistro.github.io/for-elasticsearch-docs/docs/install/
 ```
+
+### Operating system and JVM compatibility
+```
+https://opensearch.org/docs/latest/opensearch/install/compatibility
+
+```
