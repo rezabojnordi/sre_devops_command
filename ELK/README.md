@@ -39,3 +39,84 @@ https://opendistro.github.io/for-elasticsearch-docs/docs/install/
 https://opensearch.org/docs/latest/opensearch/install/compatibility
 
 ```
+#### Important settings on kernel
+```
+https://opensearch.org/docs/latest/opensearch/install/important-settings/
+```
+
+### step1 ones
+```
+./ssl/ssl-gen.sh
+```
+### step2 up docker-compose
+```
+ docker-compose up -d
+```
+
+### step3 up docker-compose
+```
+docker-compose down 
+```
+
+You can go to this directory for config files
+```
+cd /var/lib/docker/volumes/opensearch_opensearch-data1-config/_data/config
+```
+
+You can change jvm.options for jvm machine
+```
+cat jvm.options
+```
+
+
+### step4 make subject for security on opensearch
+```
+cd ssl/
+openssl x509 -subject -nameopt RFC2253 -noout -in node1.pem
+openssl x509 -subject -nameopt RFC2253 -noout -in node2.pem
+openssl x509 -subject -nameopt RFC2253 -noout -in node3.pem
+
+subject=CN=opensearch-node1,OU=UNIT,O=ORG,L=TEHRAN,ST=ARIA,C=CA
+```
+you must run this command for all of nodes on your services finally add outpu these files
+```
+opensearch-1.yml 
+opensearch-2.yml 
+opensearch-3.yml 
+```
+## step5 you need copy 3 files on other location
+```
+cp opensearch-1.yml /var/lib/docker/volumes/elk_opensearch-data1-config/_data/config/opensearch.yml 
+
+cp opensearch-2.yml /var/lib/docker/volumes/elk_opensearch-data2-config/_data/config/opensearch.yml 
+
+cp opensearch-3.yml /var/lib/docker/volumes/elk_opensearch-data3-config/_data/config/opensearch.yml
+```
+
+## step6 run these command on linux for copy ssl files 
+
+```
+cd ssl 
+cp *.pem /var/lib/docker/volumes/elk_opensearch-data1-config/_data/config/
+
+cp *.pem /var/lib/docker/volumes/elk_opensearch-data2-config/_data/config/
+
+cp *.pem /var/lib/docker/volumes/elk_opensearch-data3-config/_data/config/
+```
+
+## step7 change permission on linux for elk services
+
+```
+chown -R 1000.1000 /var/lib/docker/volumes/elk_opensearch-data1-config/_data/config/
+chown -R 1000.1000 /var/lib/docker/volumes/elk_opensearch-data2-config/_data/config/
+chown -R 1000.1000 /var/lib/docker/volumes/elk_opensearch-data3-config/_data/config/
+
+```
+
+## step8 run this command for up all of Containers
+
+```
+docker-compose up -d
+```
+
+
