@@ -119,4 +119,27 @@ chown -R 1000.1000 /var/lib/docker/volumes/elk_opensearch-data3-config/_data/con
 docker-compose up -d
 ```
 
+## step9 set security plugin configuration
 
+```
+docker exec -ti opensearch-node1 bash
+
+ls
+
+ls plugins/opensearch-security/
+```
+
+## step10 set security plugin configurations on container
+```
+sh plugins/opensearch-security/tools/securityadmin.sh  -backup ./backup -cd plugins/opensearch-security/securityconfig/ -icl -nhnv -cacert config/root-ca.pem -cert config/admin.pem -key config/admin-key.pem 
+
+```
+
+## step11 check autentication on elk on container
+```
+curl -XGET --insecure -u 'admin:admin' https://localhost:9200/_cluster/health?pretty
+```
+## open dashboard
+```
+http://ip:5601/app/login?nextUrl=%2F
+```
