@@ -216,3 +216,10 @@ if [type] == "syslog" {
 systemctl restart rsyslog.service
 ```
 
+### finally
+
+add rsyslog on ELK. flowing this picture
+<img src="../number1.png" width="800" height="500" />
+<img src="../number2.png" width="800" height="500" />
+<img src="../number3.png" width="800" height="500" />
+<img src="../number6.png" width="800" height="500" />
