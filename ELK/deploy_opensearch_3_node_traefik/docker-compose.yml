@@ -1,0 +1,184 @@
+version: '3.7'
+
+x-default-logs: &default-opts
+  logging:
+    options:
+      max-size: "10m"
+
+services:
+  opensearch-node1:
+    image: opensearchproject/opensearch:1.2.3
+    container_name: opensearch-node1
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "ES_JAVA_OPTS=-Xms6g -Xmx6g" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2,opensearch-node3
+      - cluster.initial_master_nodes=opensearch-node1
+      - network.host=0.0.0.0
+    healthcheck:
+      test: curl -s  http://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536  # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
+      - opensearch-data1-config:/usr/share/opensearch
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - 9200:9200
+      - 9600:9600 # required for Performance Analyzer
+    networks:
+      - opensearch-net
+    <<: *default-opts
+
+  opensearch-node2:
+    image: opensearchproject/opensearch:1.2.3
+    container_name: opensearch-node2
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node2
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2,opensearch-node3
+      - cluster.initial_master_nodes=opensearch-node1
+      - network.host=0.0.0.0
+    healthcheck:
+      test: curl -s  http://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536  # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data2:/usr/share/opensearch/data
+      - opensearch-data2-config:/usr/share/opensearch
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    networks:
+      - opensearch-net
+    <<: *default-opts
+
+  opensearch-node3:
+    image: opensearchproject/opensearch:1.2.3
+    container_name: opensearch-node3
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true"
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node3
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2,opensearch-node3
+      - cluster.initial_master_nodes=opensearch-node1
+      - network.host=0.0.0.0
+    healthcheck:
+      test: curl -s  http://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536  # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data3:/usr/share/opensearch/data
+      - opensearch-data3-config:/usr/share/opensearch
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    networks:
+      - opensearch-net
+    <<: *default-opts
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:1.2.0
+    container_name: opensearch-dashboards
+    ## opensearch Dashboard Label for treafik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`elk.softgrand.ir`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+    restart: always
+    # ports:
+    #  - 5601:5601
+    #expose:
+    #  - "5601"
+    healthcheck:
+      test: curl http://localhost:5601 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      OPENSEARCH_URL: https://opensearch-node1:9200
+      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200","https://opensearch-node2:9200","https://opensearch-node3:9200"]' # must be a string with no spaces when specified as an environment variable
+    volumes:
+      - opensearch_dashboards:/usr/share/opensearch-dashboards
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    networks:
+      - opensearch-net
+    <<: *default-opts
+
+## reverse Proxy
+  traefik:
+    image: "traefik:v2.5"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=rezabojnordi2012@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - opensearch-net
+    <<: *default-opts
+
+volumes:
+  opensearch-data1:
+  opensearch-data1-config:
+  opensearch-data2:
+  opensearch-data2-config:
+  opensearch-data3:
+  opensearch-data3-config:
+  opensearch_dashboards:
+
+networks:
+  opensearch-net:
+    ipam:
+     config:
+      - subnet: 172.16.99.0/24
+
