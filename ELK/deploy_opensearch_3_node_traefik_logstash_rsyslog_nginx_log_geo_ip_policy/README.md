@@ -357,3 +357,170 @@ filter {
 ## add policy on Dashboard
 
 
+<img src="../pilicy1.png" width="800" height="500" />
+<img src="../pilicy2.png" width="800" height="500" />
+<img src="../api1.png" width="800" height="500" />
+
+## add policy for hot and warm and cold\
+
+```
+{
+    "policy": {
+        "policy_id": "hot-wam-delete-filebeat",
+        "description": "",
+        "default_state": "hot",
+        "states": [
+            {
+                "name": "hot",
+                "actions": [
+                    {
+                        "replica_count": {
+                            "number_of_replicas": 0
+                        }
+                    },
+                    {
+                        "allocation": {
+                            "require": {
+                                "temp": "hot"
+                            },
+                            "wait_for": false
+                        }
+                    }
+                ],
+                "transitions": [
+                    {
+                        "state_name": "warm",
+                        "conditions": {
+                            "min_index_age": "2d"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "warm",
+                "actions": [
+                    {
+                        "allocation": {
+                            "require": {
+                                "temp": "warm"
+                            },
+                            "wait_for": false
+                        }
+                    },
+                    {
+                        "replica_count": {
+                            "number_of_replicas": 1
+                        }
+                    }
+                ],
+                "transitions": [
+                    {
+                        "state_name": "delete",
+                        "conditions": {
+                            "min_index_age": "7d"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "delete",
+                "actions": [
+                    {
+                        "delete": {}
+                    }
+                ],
+                "transitions": []
+            }
+        ],
+        "ism_template": {
+            "index_patterns": [
+                "filebeat*"
+            ],
+            "priority": 100
+        }
+    }
+}
+
+```
+### syslog
+
+```
+{
+    "policy": {
+        "policy_id": "hot-wam-delete-syslog",
+        "description": "",
+        "default_state": "hot",
+        "states": [
+            {
+                "name": "hot",
+                "actions": [
+                    {
+                        "replica_count": {
+                            "number_of_replicas": 0
+                        }
+                    },
+                    {
+                        "allocation": {
+                            "require": {
+                                "temp": "hot"
+                            },
+                            "wait_for": false
+                        }
+                    }
+                ],
+                "transitions": [
+                    {
+                        "state_name": "warm",
+                        "conditions": {
+                            "min_index_age": "2d"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "warm",
+                "actions": [
+                    {
+                        "allocation": {
+                            "require": {
+                                "temp": "warm"
+                            },
+                            "wait_for": false
+                        }
+                    },
+                    {
+                        "replica_count": {
+                            "number_of_replicas": 1
+                        }
+                    }
+                ],
+                "transitions": [
+                    {
+                        "state_name": "delete",
+                        "conditions": {
+                            "min_index_age": "7d"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "delete",
+                "actions": [
+                    {
+                        "delete": {}
+                    }
+                ],
+                "transitions": []
+            }
+        ],
+        "ism_template": {
+            "index_patterns": [
+                "syslog*"
+            ],
+            "priority": 100
+        }
+    }
+}
+
+
+```
