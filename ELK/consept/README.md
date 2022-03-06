@@ -288,3 +288,85 @@ PUT /blogs/_settings
 ==========================
 
 ```
+## add dataset or import dataset imdb on opensearch
+### steps To Bulk import Data
+
+```
+curl -s -XPOST localhost:9200/actresses/_bult --data-bindary @sctresses.json;
+
+curl -s -XPOST 172.16.109,19:9200/actresses/_bult --data-bindary @sctresses.json;
+```
+
+## get dataset
+https://github.com/TetraTutorials/imdb_data_import_elastic
+
+### get value on dataset
+```
+GET actresses/_mapping
+```
+## get
+```
+GET _search
+{
+
+  "query": {
+  "match":{
+    "name": " sGaby' Goff, Mary"
+    }
+    }
+}
+```
+‍‍```
+GET _search
+{
+  "query": {
+  "match":{
+    "name":{
+     "query": "hanequa",
+     "operator": "or",
+     "fuzziness": 1
+    }
+    }
+}
+}
+```
+```
+
+GET _search
+{
+  "query": {
+  "match":{
+    "year":{
+    "query": "2016",
+    "operator": "and"
+
+    }
+    }
+}
+}
+```
+```
+GET _search
+{
+
+  "query": {
+  "match":{
+    "year":{
+    "query": "2016,2017",
+    "operator": "or"
+
+    }
+    }
+}
+}
+```
+
+## post
+```
+POST actor/actors
+{
+  "name": "ABC",
+  "date": 2017
+}
+
+```
