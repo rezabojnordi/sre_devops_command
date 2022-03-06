@@ -17,9 +17,10 @@
 * Stong Elasticsearch and Kibana synergy
 * Handles data of all shapes and sizes
 
-<img src="./img/logstash.png.png" width="800" height="500" />
+<img src="./img/logstash.png" width="800" height="500" />
 
 <img src="./img/logstash_1.png" width="800" height="500" />
+
 <img src="./img/basic_logstash_pipeline.png" width="800" height="500" />
 
 ## download logstash
@@ -46,8 +47,11 @@ cd /usr/share/logstash/bin
 * Outputs to standard output stdout in a structured format
 
 <img src="./img/pipline_sample.png" width="800" height="500" />
+
 <img src="./img/pipline_logstash.png" width="800" height="500" />
+
 <img src="./img/simple_pipline.png" width="800" height="500" />
+
 <img src="./img/advanced_pipline.png" width="800" height="500" />
 
 ## filter on logstash
@@ -57,12 +61,19 @@ cd /usr/share/logstash/bin
 how to write inpute in logstash
 
 <img src="./img/inpute_file_plugin.png" width="800" height="500" />
+
 <img src="./img/input_elastic_search.png" width="800" height="500" />
+
 <img src="./img/input_jdbc.png" width="800" height="500" />
+
 <img src="./img/input_netflow_udp.png" width="800" height="500" />
+
 <img src="./img/input_s3.png" width="800" height="500" />
+
 <img src="./img/input_tcp.png" width="800" height="500" />
+
 <img src="./img/logstash_input.png" width="800" height="500" />
+
 <img src="./img/logstash_input_plugin.png" width="800" height="500" />
 
 ### output
@@ -78,24 +89,28 @@ filter-grok
 * syntax for grok pattern is %{SYNTAX:SEMANTIC}
 * custme patterns can be added
 
+<img src="./img/logstash_filter_plugin.png" width="800" height="500" />
 
-<img src="elk2.png" width="800" height="500" />
-<img src="elk3.png" width="800" height="500" />
-<img src="elk5.png" width="800" height="500" />
-<img src="elk6.png" width="800" height="500" />
-<img src="elk7.png" width="800" height="500" />
-<img src="elk8.png" width="800" height="500" />
-<img src="elk9.png" width="800" height="500" />
-<img src="elk10.png" width="800" height="500" />
-<img src="elk11.png" width="800" height="500" />
-<img src="elk12.png" width="800" height="500" />
-<img src="elk13.png" width="800" height="500" />
-<img src="elk14.png" width="800" height="500" />
-<img src="elk15.png" width="800" height="500" />
-<img src="elk17.png" width="800" height="500" />
-<img src="elk19.png" width="800" height="500" />
-<img src="elk20.png" width="800" height="500" />
-<img src="elk21.png" width="800" height="500" />
+<img src="./img/filter_csv.png" width="800" height="500" />
+
+<img src="./img/filter_data.png" width="800" height="500" />
+
+<img src="./img/filter_grok_http_sample.png" width="800" height="500" />
+
+<img src="./img/filter_grok_pattern.png" width="800" height="500" />
+
+<img src="./img/filter_grok_patterns_directory.png" width="800" height="500" />
+<img src="./img/filter_mutate.png" width="800" height="500" />
+
+<img src="./img/filter_sleep.png" width="800" height="500" />
+
+<img src="./img/filter_translate.png" width="800" height="500" />
+
+<img src="./img/logstash_filter_plugin.png" width="800" height="500" />
+
+<img src="./img/logstash_filter_plugin.png" width="800" height="500" />
+
+<img src="./img/logstash_filter_plugin.png" width="800" height="500" />
 
 
 
