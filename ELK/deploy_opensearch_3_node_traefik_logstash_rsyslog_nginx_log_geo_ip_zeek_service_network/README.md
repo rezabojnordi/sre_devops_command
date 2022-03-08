@@ -1,202 +1,204 @@
-# Elk config for your project 
+## network monitoring
+
+https://packages.ntop.org/apt-stable/
 
 
-MetricBeat - Used for capturing system related metrics like CPU usage, Heap Usage etc
-PacketBeat - For monitoring network data
-WinlogBeat - For capturing windows event logs
-AuditBeat - Monitor user activity and processes
-HeartBeat - For uptime monitoing
-FunctionBeat - Serverless architectures let you deploy code, without needing to spin up and manage extra underlying software and hardware. Functionbeat brings that same simplicity to monitoring your cloud infrastructure.
+### install pfring for ZEEk
+```
+apt-get install software-properties-common wget
+add-apt-repository universe
+wget https://packages.ntop.org/apt-stable/20.04/all/apt-ntop-stable.deb
+apt install ./apt-ntop-stable.deb
 
-Input - It receives data sent by different beats
-Filter - Here you need to write parser to parse the data
-Output - It pushes data to ElasticSearch Indexes via API call
-
-<img src="../1.png" width="800" height="500" />
-<img src="../2.png" width="800" height="500" />
-<img src="../3.png" width="800" height="500" />
-<img src="../4.png" width="800" height="500" />
-<img src="../5.jpg" width="800" height="500" />
-
+apt install pfring
 
 ```
-https://www.elastic.co/downloads/past-releases
+### activing promsqus on interface
 ```
-
-OSS is importan for your project when you need a free version
-```
-Logstash OSS 8.0.0
-```
-
-
-### opendistro
-```
-https://opendistro.github.io/for-elasticsearch-docs/docs/install/
-```
-
-### Operating system and JVM compatibility
-```
-https://opensearch.org/docs/latest/opensearch/install/compatibility
-
-```
-#### Important settings on kernel
-```
-https://opensearch.org/docs/latest/opensearch/install/important-settings/
-```
-
-### step1 ones
-```
-./ssl/ssl-gen.sh
-```
-### step2 up docker-compose
-```
- docker-compose up -d
-```
-
-### step3 up docker-compose
-```
-docker-compose down 
-```
-
-You can go to this directory for config files
-```
-cd /var/lib/docker/volumes/opensearch_opensearch-data1-config/_data/config
-```
-
-You can change jvm.options for jvm machine
-```
-cat jvm.options
-```
-
-
-### step4 make subject for security on opensearch
-```
-cd ssl/
-openssl x509 -subject -nameopt RFC2253 -noout -in node1.pem
-openssl x509 -subject -nameopt RFC2253 -noout -in node2.pem
-openssl x509 -subject -nameopt RFC2253 -noout -in node3.pem
-
-subject=CN=opensearch-node1,OU=UNIT,O=ORG,L=TEHRAN,ST=ARIA,C=CA
-```
-you must run this command for all of nodes on your services finally add outpu these files
-```
-opensearch-1.yml 
-opensearch-2.yml 
-opensearch-3.yml 
-```
-## step5 you need copy 3 files on other location
-```
-cp opensearch-1.yml /var/lib/docker/volumes/elk_opensearch-data1-config/_data/config/opensearch.yml 
-
-cp opensearch-2.yml /var/lib/docker/volumes/elk_opensearch-data2-config/_data/config/opensearch.yml 
-
-cp opensearch-3.yml /var/lib/docker/volumes/elk_opensearch-data3-config/_data/config/opensearch.yml
-```
-
-## step6 run these command on linux for copy ssl files 
-
-```
-cd ssl 
-cp *.pem /var/lib/docker/volumes/elk_opensearch-data1-config/_data/config/
-
-cp *.pem /var/lib/docker/volumes/elk_opensearch-data2-config/_data/config/
-
-cp *.pem /var/lib/docker/volumes/elk_opensearch-data3-config/_data/config/
-```
-
-## step7 change permission on linux for elk services
-
-```
-chown -R 1000.1000 /var/lib/docker/volumes/elk_opensearch-data1-config/_data/config/
-chown -R 1000.1000 /var/lib/docker/volumes/elk_opensearch-data2-config/_data/config/
-chown -R 1000.1000 /var/lib/docker/volumes/elk_opensearch-data3-config/_data/config/
-
-```
-
-## step8 run this command for up all of Containers
-
-```
-docker-compose up -d
-```
-
-## step9 set security plugin configuration
-
-```
-docker exec -ti opensearch-node1 bash
-
-ls
-
-ls plugins/opensearch-security/
-```
-
-## step10 set security plugin configurations on container
-```
-sh plugins/opensearch-security/tools/securityadmin.sh  -backup ./backup -cd plugins/opensearch-security/securityconfig/ -icl -nhnv -cacert config/root-ca.pem -cert config/admin.pem -key config/admin-key.pem 
-
-```
-
-## step11 check autentication on elk on container
-```
-curl -XGET --insecure -u 'admin:admin' https://localhost:9200/_cluster/health?pretty
-```
-## open dashboard
-```
-http://ip:5601/app/login?nextUrl=%2F
+ip link set $IFACE promisc on
+ip link set ens160 promisc on
 ```
 
 
 
-```
-vim /etc/rsyslog.d/60-output.conf 
-
-# This line sends all lines to defined IP address at port 10514,
-# using the "json-template" format template
-*.*                         @127.0.0.1:5045;json-template
+### instaling Zeek on linux
 
 ```
+echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_20.04/ /' | sudo tee /etc/apt/sources.list.d/security:zeek.list
+curl -fsSL https://download.opensuse.org/repositories/security:zeek/xUbuntu_20.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/security_zeek.gpg > /dev/null
+apt update
 
+apt install zeek
 
+echo "export PATH=$PATH:/opt/zeek/bin" >> ~/.bashrc
 
-```
-vim /etc/rsyslog.d/01-json-template.conf 
-
-template(name="json-template"
-  type="list") {
-    constant(value="{")
-      constant(value="\"@timestamp\":\"")     property(name="timereported" dateFormat="rfc3339")
-      constant(value="\",\"@version\":\"1")
-      constant(value="\",\"message\":\"")     property(name="msg" format="json")
-      constant(value="\",\"sysloghost\":\"")  property(name="hostname")
-      constant(value="\",\"severity\":\"")    property(name="syslogseverity-text")
-      constant(value="\",\"facility\":\"")    property(name="syslogfacility-text")
-      constant(value="\",\"programname\":\"") property(name="programname")
-      constant(value="\",\"procid\":\"")      property(name="procid")
-    constant(value="\"}\n")
-}
+source ~/.bashrc
 ```
 
-
-### add logstash
+## where is it configure Zeek
+```
+cd /opt/zeek/
+```
+what is networks.cfg in Zeek
+network.cfg is using for a configure network on Zeek
 
 ```
-vim logstash/pipeline/00-input.conf
+vim networks.cfg
+```
+### configuring Zeek Service on linux
+
+```
+cp node.cfg node.cfg.back
+
+commenting old config on this file afther that add this config on node.cfg
+
+vim node.cfg
+
+[manager]
+type=manager
+host=localhost
+#
+[proxy-1]
+type=proxy
+host=localhost
+#
+[worker-1]
+type=worker
+host=localhost
+interface=ens160
+lb_method=pf_ring 
+lb_procs=3
 
 ```
 
-you must add in logstash
-```
-        udp {
-                type => "syslog"
-                port => 5045
-                codec => "json"                                                                          
+### changing old config on Zeek file to json
 
+```
+vim /opt/zeek/share/zeek/site/local.zeek
+
+@load policy/tuning/json-logs.zeek
+```
+
+saving logs on ZEEk first saving this path
+```
+SpoolDir = /opt/zeek/spool
+```
+
+### installing Zeek on server
+
+```
+zeekctl
+
+zeekctl deploy
+
+zeekctl status
+```
+### changing filebeat for Zeek
+
+```
+cd /etc/filebeat/
+cp filebeat.yml filebeat.yml.back
+
+```
+## where is directory file?
+```
+cd /opt/zeek/logs
+```
+
+```
+vim filebeat2.yml
+
+filebeat.inputs:
+
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
+
+- type: log
+
+  # Change to true to enable this input configuration.
+  enabled: true
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /opt/zeek/logs/current/conn.log*
+  json.keys_under_root: true
+  json.add_error_key: true
+
+
+# ================================== Logging ===================================
+
+logging.level: error
+
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat2
+  keepfiles: 7
+  permissions: 0640
+
+# ---------------------------- Elasticsearch Output ----------------------------
+output.logstash:
+        hosts: ["127.0.0.1:5044"]
+
+# ================================= Processors =================================
+processors:
+  - drop_fields:
+      fields: ["agent.ephemeral_id", "agent.hostname", "agent.id", "agent.type", "agent.version", "agent.name", "ecs.version", "input.type", "histroy", "log.offset", "version", "host.architecture", "host.containerized", "host.hostname", "host.id", "host.ip", "host.mac", "host.name", "host.os.codename", "host.os.family", "host.os.kernel", "host.os.name", "host.os.platform", "host.os.version", "log.file.path", "log.file.path", "tags", "type", "tunnel_parents" ]
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+```
+
+### adding filebeat for Zeek service
+
+```
+cat /lib/systemd/system/filebeat.service
+
+vim /lib/systemd/system/filebeat2.service
+```
+```
+[Unit]
+Description=Filebeat2 sends log files to Logstash or directly to Elasticsearch.
+Documentation=https://www.elastic.co/products/beats/filebeat
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+
+Environment="BEAT_LOG_OPTS="
+Environment="BEAT_CONFIG_OPTS=-c /etc/filebeat/filebeat2.yml"
+Environment="BEAT_PATH_OPTS=--path.home /usr/share/filebeat2 --path.config /etc/filebeat --path.data /var/lib/filebeat2 --path.logs /var/log/filebeat2"
+ExecStart=/usr/share/filebeat/bin/filebeat --environment systemd $BEAT_LOG_OPTS $BEAT_CONFIG_OPTS $BEAT_PATH_OPTS
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+### makding directory for filebeat2
+```
+mkdir -p /var/log/filebeat2 /usr/share/filebeat2 /var/lib/filebeat2
+```
+
+### weird file is directory for keeping logs when you don't know logs
+```
+weird.log
+```
+
+## addding inpute and output for logstash service
+
+```
+        beats { 
+                type => "netmon"
+                port => 5046
         }
 
 ```
-
-### you need to add this pip in logstash in output
 ```
-if [type] == "syslog" {
+output {
+
+if [type] == "syslog-elk" {
         elasticsearch {
                 hosts => ["https://opensearch-node1:9200", "https://opensearch-node2:9200", "https://opensearch-node3:9200"]
                 ssl => true
@@ -206,152 +208,37 @@ if [type] == "syslog" {
                 index => "%{type}-log-%{+YYYY.MM.dd}"
         } # end of elastic
 
-} 
+} # end of if
+
+
+else if [type] == "netmon" {
+        elasticsearch {
+                hosts => ["https://opensearch-node1:9200", "https://opensearch-node2:9200", "https://opensearch-node3:9200"]
+                ssl => true
+                ssl_certificate_verification => false
+                user => admin
+                password => admin
+                index => "%{type}-log-%{+YYYY.MM.dd}"
+        } # end of elastic
+
+} # end of if
+
+else {
+        elasticsearch {
+                hosts => ["https://opensearch-node1:9200", "https://opensearch-node2:9200", "https://opensearch-node3:9200"]
+                ssl => true
+                ssl_certificate_verification => false
+                user => admin
+                password => admin
+                #index => "%{type}-log-%{+YYYY.MM.dd}"
+                index => "%{[@metadata][beat]}-%{[host][hostname]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+        } # end of elastic
+
+} # end of else
+} # end of output
 
 ```
-
-## you have to restart rsyslog
-
+### You must add port on docker-compose for Zeel service
 ```
-systemctl restart rsyslog.service
+5046
 ```
-
-### nginx
-```
-
-log_format custom '$host - $remote_addr - $remote_user [$time_local] - '
-'"$request" $status $body_bytes_sent - '
-'"$http_referer" "$http_user_agent" - '
-'cache: $upstream_cache_status [$time_local] - '
-'content_type: $sent_http_content_type';
-
-
-        access_log /var/log/nginx/access.log custom;
-        error_log /var/log/nginx/error.log;
-```
-
-change port 80 to 8080
-
-
-### download filebeat for nginx
-
-```
-wget  https://www.elastic.co/downloads/past-releases/filebeat-oss-7-10-2
-dpkg -i https://www.elastic.co/downloads/past-releases/filebeat-oss-7-10-2
-```
-
-```
-cd /etc/filebeat/
-
-
-/etc/filebeat/modules.d
-
-
-vim filebeat.yml
-
-```
-```
-# ============================== Filebeat inputs ===============================
-
-filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-    - /var/log/nginx/access.log*
-  exclude_files: ['.gz$']
-  fields:
-    type: access
-  fields_under_root: true
-
-- type: log
-  enabled: true
-  paths:
-    - /var/log/nginx/error.log*
-  exclude_files: ['.gz$']
-  fields:
-    type: error
-  fields_under_root: true
-
-# ============================== Filebeat modules ==============================
-
-filebeat.config.modules:
-  # Glob pattern for configuration loading
-  path: ${path.config}/modules.d/*.yml
-
-  # Set to true to enable config reloading
-  reload.enabled: false
-
-  # Period on which files under path should be checked for changes
-  #reload.period: 10s
-
-# ================================== Outputs ===================================
-
-# ------------------------------ Logstash Output -------------------------------
-output.logstash:
-  hosts: ["localhost:5044"]
-
-# ================================= Processors =================================
-processors:
-  - add_host_metadata:
-      when.not.contains.tags: forwarded
-  - add_cloud_metadata: ~
-  - add_docker_metadata: ~
-  - add_kubernetes_metadata: ~
-
-
-#  ================================ Loging ====================
-logging.level: error
-logging.to_files: true
-logging.files:
-  path: /var/log/filebeat
-  name: filebeat
-  keepfiles: 7  ## 7 day for keeping
-  permissions: 0644
-=================================================================
-
-```
-```
-mkdir /var/log/filebeat
-
-chmod 777 -R /var/log/filebeat
-```
-https://grokdebug.herokuapp.com/
-
-## delete filebeat
-```
-docker container exec -it opensearch-node1 bash
-
-curl --insecure -XDELETE -u 'admin:admin' https://localhost:9200/filebeat-reza-7.10.2-2022.02.28
-```
-
-## add filter for nginx
-```
-filter {
- 
- if "access" in [type] {
-    grok {  
-      match => { "message" => '%{IPORHOST:host_name} - %{IPV4:remote_ip} - %{DATA:user_name} \[%{HTTPDATE:access_time}\] - "%{WORD:http_method} %{DATA:url} HTTP/%{NUMBER:http_version}" %{NUMBER:response_code} %{NUMBER:body_sent_bytes} - "%{DATA:referrer}" "%{DATA:user_agent}" - cache: %{DATA:cache_status} \[%{HTTPDATE:time_local}\] - content_type: %{DATA:content_type}$' }
-      remove_field => "message"
-    }
-    
-    }
-  
-  
-  
-  else if "network-conn" in [type] {
-    
-    geoip {
-       database => "/usr/share/logstash/GeoLite2-City.mmdb"
-       source => "id.orig_h"
-       target => "src_geo"
-    }
-    
-    
-    }
-
-
-}
-```
-
-
-
