@@ -1,0 +1,43 @@
+filebeat.inputs:
+
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
+
+- type: log
+
+  # Change to true to enable this input configuration.
+  enabled: true
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /opt/zeek/logs/current/conn.log*
+  json.keys_under_root: true
+  json.add_error_key: true
+
+
+# ================================== Logging ===================================
+
+logging.level: error
+
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat2
+  keepfiles: 7
+  permissions: 0640
+
+# ---------------------------- Elasticsearch Output ----------------------------
+output.logstash:
+        hosts: ["127.0.0.1:5046"]
+
+# ================================= Processors =================================
+processors:
+  - drop_fields:
+      fields: ["agent.ephemeral_id", "agent.hostname", "agent.id", "agent.type", "agent.version", "agent.name", "ecs.version", "input.type", "histroy", "log.offset", "version", "host.architecture", "host.containerized", "host.hostname", "host.id", "host.ip", "host.mac", "host.name", "host.os.codename", "host.os.family", "host.os.kernel", "host.os.name", "host.os.platform", "host.os.version", "log.file.path", "log.file.path", "tags", "type", "tunnel_parents" ]
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+
