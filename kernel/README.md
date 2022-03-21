@@ -22,7 +22,7 @@ afther that when you add or active params or driver on custome kernel afther tha
 
 ```
 make clean
-make j8 all
+make -j8 all
 ```
 ## or
 ```
