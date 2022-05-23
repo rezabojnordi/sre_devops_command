@@ -35,3 +35,5 @@ vim main.go
 go run main.go
 go run github.com/pluralsight/webservice
 '''
+
+<img src="./img/go_cli.png" width="600" height="300" />
