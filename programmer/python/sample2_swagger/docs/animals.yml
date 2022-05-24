@@ -1,0 +1,20 @@
+Example endpoint returning a list of animals by zoo
+
+This is using yaml for specifications.
+
+---
+parameters:
+  - name: type
+    in: path
+    type: string
+    enum: ['all','4legs','2legs']
+    required: true
+    default: all
+responses:
+  200: 
+    description: A json of animals
+    examples:
+      {
+      "application/json":{
+      4legs: ['cat',dog','horse']
+      }}
