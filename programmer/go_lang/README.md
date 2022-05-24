@@ -54,3 +54,4 @@ go get -u github.com/gin-goinc/gin
 
 
 ```
+<img src="./img/go_cli.png" width="600" height="300" />
