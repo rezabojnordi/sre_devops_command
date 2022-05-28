@@ -1,11 +1,294 @@
-net.core.rmem_max = 134217728
-net.core.wmem_max = 134217728
-net.ipv4.tcp_rmem = 4096 87380 134217728
-net.ipv4.tcp_wmem = 4096 65536 134217728
-net.core.netdev_max_backlog = 300000
-net.ipv4.tcp_moderate_rcvbuf =1
-net.ipv4.tcp_no_metrics_save = 1
-net.ipv4.tcp_congestion_control=htcp
-net.ipv4.tcp_mtu_probing = 1
+lscpu and /proc/cpuinfo show Cpu information
+
+Ip and hostname are required
+
+Get an overview of running service using systemctl list-units -t service
+
+Measurement tools may be simple: top
+
+Disable anything you don't need
+  Think of service like bluetooth and Modem manager
+  
+ 
+let me show you
+
+#lscpu
+
+# cat /proc/cpuinfo
+
+# ip a
+
+# hostname
+
+====================================================
+
+#top
+
+how time system up
+load avrage
+load avrage system process cpu
+core by core first one
+
+cpu0   
+   us: cpu running system in user space
+   sy: cpu running system in system space
+   ni: NI (Nice Value): Also depicts the priority of the task. The difference between PR and NI is that PR is the real priority of a process as seen by the kernel, while NI is just a priority hint for the kernel.
+   id
+   wa: 
+   hi
+   si
+   st
+   
+   us - Time spent in user space
+sy - Time spent in kernel space
+ni - Time spent running niced user processes (User defined priority)
+id - Time spent in idle operations
+wa - Time spent on waiting on IO peripherals (eg. disk)
+hi - Time spent handling hardware interrupt routines. (Whenever a peripheral unit want attention form the CPU, it literally pulls a line, to signal the CPU to service it)
+si - Time spent handling software interrupt routines. (a piece of code, calls an interrupt routine...)
+st - Time spent on involuntary waits by virtual cpu while hypervisor is servicing another processor (stolen from a virtual machine)
+
+ 
+==============================================================
+
+
+Configuring System Tunables
+
+1. change /proc values with echo
+2. change /proc values with sysctl
+3. configure kernel loadable module options
+
+cd /proc
+cd /sys
+
+afther that
+cd vm    #vm for memory management
+
+cat swappiness   -> 30
+
+echo 60 > swappiness
+
+
+systemctl status systemd-sysctl
+
+vim sysctl.conf
+
+cd /usr/lib/sysctl.d/
+
+==============
+vim /ete/sysctl.conf
+
+ vm.swappiness = 40
+
+sysctl -p  /etc/sysctl.conf OR sysctl --system or reboot 
+
+sysctl -a  # show all parames in linux kernel
+
+================================================================
+
+Managing Kernel Module Parameters
+1. Use modinfo to find which parameters are available
+2. Use modprobe module key=value to specify parameter in runtime
+3. Use /etc/modprobe.d/modulename.conf to specify a permanent parameter
+
+
+#lsmod   #available module
+
+modinfo cdrom
+modonfo e1000
+
+
+## remove module on kernel
+
+modprobe -r cdrom
+
+when you can't remove module you need to check mound directory on linux or maybe cdrome is mounted
+
+
+# moundt 
+
+# modprob -r sr_mod
+# modrob -r cdrom
+# lsmod |grep cdrom   # you must not see outpute this command
+# modprob cdrom lockdoor=1
+
+#dmesg
+
+# cd /sys/module/
+# ls
+# cd cdrom #ls
+
+# cd /etc/modprob.d/
+# cat mlx4.conf
+# vim cdrom.conf
+   options cdrom lockdoor=1
+# modprob -r cdrom
+# modprob cdrom
+
+=======================================================
+
+tuned is Readhat solution for tunning operating system
+
+
+tuned-adm --help
+
+tuned-adm list
+
+# tuned-adm active
+
+# tuned-adm profile throughput-performace
+
+# tuned-adm list
+
+# tuned-adm recommend
+===============================================================
+
+tuna manage
+
+yum install tuna
+
+#tuna
+
+
+======================================================================
+
+Limiting resource usage
+
+  Configuring Ulimit Resource Limits
+  
+  Understanding Control Groups
+  Integrating Control Groups in Systemd
+  
+  Managing Systemd Cgroups
+  Managing Slices
+
+. Ulimit setting to /etc/security/limits.conf
+. Soft limits can be modified by the user,hard limits implement an absolut ceiling
+. Users can set soft limits, but only lower than the enforced hard limit
+
+
+Setting Limits to services
+
+/etc/systemd/system/blah.serviced/10-cpulimits.conf
+
+[service]
+limitedcpu=60
+
+pam.limit.so
+
+/etc/security/limits.conf
+
+cd /etc/pam.d
+grep pam_limits *
+
+# vim system-auth
+
+# cd /etc/security
+
+# vim limits.conf
+# cd limit.d
+# man systemd.exec
+   /limit
+# cd /etc/systemd/system
+#vim sleep.service
+
+# mkdir sleep.service.d
+# vim sleep.service.d/10-cpulimits.conf
+  [Service]
+  LimitCPU=60
+
+# systemctl deamon-reload
+#systemctl restart sleep
+
+
+===========================================================
+
+Cgroup in systemd
+
+/sys/fs/cgroups
+
+# cd /sys/fs
+# ls
+# cd cgroup
+# ls
+
+## cpu cgroup
+# cd /sys/fs/cpu
+
+## memory cgroup
+# cd /sys/fs/memory
+# cat memory.limit_in_bytes
+# mkdir test
+# cd test
+# ls
+# echo 10000 > memory.limit_in_bytes
+# ps aux
+# echo 1472 > tasks
+# cat task
+
+####
+Systemd integrade with CGroup
+
+slice system
+Cpu share
+1024
+
+machine 2048
+
+user 256
+
+
+System divides cpu, cpuacct, blkio, and memory into slices
+. system for system processes and daemons
+. mechine for virtual machines
+. user for user sessions
+
+On s systemd-system, system-enabled cgroup can be omitted and you can still use cgconfig and cgred. See system-system.conf for
+in structions on how to do that and make sure to rebuild the initramfs to make this effective
+
+
+Using Custome Slices
+. Administators can create their own slices, naming them *.slice, or slices within a slice, using the parent-child,slice naming
+. child slice will inherit the settings of the parent slices
+. Make sure to turn on Cpu, memory, or I/O accounting to see how they are used within a slice
+
+=========================================================
+
+# cd /sys/devices/system/cpu
+
+
+#echo 0 > /sys/devices/system/cpu/cpu1/online
+
+# while true; do true; done &
+
+******
+root@redis:~# cat /etc/systemd/system/stress1.service
+[unit]
+Description= Create some stree
+
+[Service]
+
+Type=simple
+ExecStart=/usr/bin/dd if=/dev/zero of=/dev/null
+****
+
+*****
+[unit]
+Description= Create some stree
+
+[Service]
+
+Type=simple
+ExecStart=/usr/bin/dd if=/dev/zero of=/dev/null
+
+CPUsHARES=1024
+****
+#  man systemd.resource-control
+
+
+
+
+
+
 
 

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata: 
+  name: simple-web-app1-service
+spec:
+  type: NodePort
+  ports:
+    - nodePort: 30021
+      port: 8000
+      #targetPort: 8000
+  selector:
+    app: simple-web-app1
+    type: backend
+

@@ -1,0 +1,20 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv0001
+  labels:
+    type: local
+    name: apparsfiles  
+spec:
+  capacity:
+    storage: 5Gi 
+  volumeMode: Filesystem  
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storageclass
+  nfs: 
+    path: /nfs/public/
+    server: nfs.akks.ir
+    readOnly: false
+
