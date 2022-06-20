@@ -329,7 +329,8 @@ scp ca.crt client.crt client.key root@185.213.164.24:/etc/nebula/
 
 
 ## Client
-
+‍‍‍
+```
 mkdir /etc/nebula
 
 cd /etc/nebula
@@ -339,7 +340,7 @@ wget -c https://github.com/slackhq/nebula/releases/download/v1.4.0/nebula-linux-
 tar -xzf nebula-linux-amd64.tar.gz
 
 curl -o config.yml https://raw.githubusercontent.com/slackhq/nebula/master/examples/config.yml
-
+```
 vim config.yml
 ```
 # This is the nebula example configuration file. You must edit, at a minimum, the static_host_map, lighthouse, and firewall sections
