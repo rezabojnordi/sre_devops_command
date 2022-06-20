@@ -5,6 +5,7 @@
 
 ## lighthouse
 ## run nebula service
+```
 mkdir /etc/nebula
 cd /etc/nebula
 
@@ -32,7 +33,7 @@ tar -xzf nebula-linux-amd64.tar.gz
 
 
 curl -o config.yml https://raw.githubusercontent.com/slackhq/nebula/master/examples/config.yml
-
+```
 vim config.yml 
 
 ```
