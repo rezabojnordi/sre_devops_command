@@ -40,18 +40,53 @@ go run github.com/pluralsight/webservice
 ```
 go mod init helloworld
 
+or
+ go mod init github.com/rezabojnordi/helloworld
+
 main.gotests
 
 DRY: Don't Repeat Yourself
 * Functions
 * packages
 ```
-
+### install package from your project when you used package
+```
+go mod tidy
+```
 ### packages
 
 ```
 go get -u github.com/gin-goinc/gin
+```
+
+
+#### imporut your modules
+```
+you moust first your directore afhter that you module
+   directory/data.go
+   main.go    /myapp/data
+
 
 
 ```
+
+
 <img src="./img/go_cli.png" width="600" height="300" />
+
+
+
+
+### data types
+* basic -> numerical string boolean
+* derived
+
+
+## install with this repository
+```
+https://brew.sh/
+```
+```
+brew install go
+```
+
+
