@@ -1,0 +1,138 @@
+# Cicd
+
+
+
+<img src="pic/1-.png" height="700" width="900" style="float:center" ></img>
+
+
+<img src="pic/2.png" height="700" width="900" style="float:center" ></img>
+
+<img src="pic/3.png" height="700" width="900" style="float:center" ></img>
+
+<img src="pic/5.png" height="700" width="900" style="float:center" ></img>
+
+
+
+## installing gitlab-runner
+curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | sudo bash
+sudo apt-get install gitlab-runner
+
+## adding config in gitlab-runner
+
+```
+vim /etc/gitlab-runner/config.toml
+```
+
+```
+concurrent = 4
+check_interval = 0
+ 
+[session_server]
+  session_timeout = 1800
+ 
+[[runners]]
+  name = "cicd"
+  url = "https://cicd.softgrand.ir/"
+  token = "ZAqdYWrEKHB1T7zNTjz1"
+  executor = "docker"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    #image = "alpine"
+    image = "cicd:1"
+    privileged = true
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache","/var/run/docker.sock:/var/run/docker.sock"]
+    shm_size = 0
+    pull_policy = "if-not-present"
+
+```
+
+## customming docker image for gitlab-ruuner
+
+```
+
+RUN apk add --update --no-cache openssh  python3 py3-pip openssl ca-certificates sshpass openssh-client rsync git && \
+    apk --no-cache add --virtual build-dependencies python3-dev libffi-dev musl-dev gcc cargo openssl-dev libressl-dev build-base && \
+    echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_configi && \
+    adduser -h /home/reza -s /bin/sh -D reza && \
+    pip3 install --upgrade pip wheel && \
+    pip3 install --upgrade cryptography cffi && \
+    pip3 install ansible-core ansible && \
+    pip3 install mitogen ansible-lint jmespath && \
+    pip3 install --upgrade pywinrm && \
+    apk del build-dependencies && \
+    echo -n 'reza:reza@123' | chpasswd && \
+    mkdir -p /home/reza/.ssh && chmod 700 /home/reza/.ssh && chown reza:reza /home/reza/.ssh
+COPY ./key/* /home/reza/.ssh/
+RUN export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa"
+#COPY ./entrypoint.sh /entrypoint.sh
+#RUN chmod +x entrypoint.sh
+#ENTRYPOINT ["/entrypoint.sh"]
+EXPOSE 22
+```
+
+## adding entrypoint
+```
+
+#!/bin/sh
+ssh-keygen -A
+exec /usr/sbin/sshd -D -e "$@"
+
+```
+
+## adding rule in gitlab-ci
+
+```
+vim .gitlab-ci.yml
+```
+```
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - test
+  - deploy
+ 
+ 
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - echo "Compiling the code..."
+    - echo "Compile complete."
+    - export ANSIBLE_HOST_KEY_CHECKING=False
+    - rm -rf cicd
+    #- git clone -b dev https://root:09368700813@cicd.softgrand.ir/root/cicd.git
+    - git clone -b dev https://root@cicd.softgrand.ir/root/cicd.git
+    - cd ./cicd/
+    - ansible-playbook -i inventory syscl.yml
+ 
+ 
+ 
+unit-test-job:   # This job runs in the test stage.
+  stage: test    # It only starts when the job in the build stage completes successfully.
+  script:
+    - echo "Running unit tests... This will take about 60 seconds."
+    - sleep 40
+    - echo "Code coverage is 90%"
+ 
+ 
+lint-test-job:   # This job also runs in the test stage.
+  stage: test    # It can run at the same time as unit-test-job (in parallel).
+  script:
+    - echo "Linting code... This will take about 10 seconds."
+    - sleep 10
+    - echo "No lint issues found."
+ 
+ 
+deploy-job:      # This job runs in the deploy stage.
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  script:
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
+
+```
