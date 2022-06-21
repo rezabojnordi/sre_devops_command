@@ -18,6 +18,30 @@
 curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | sudo bash
 sudo apt-get install gitlab-runner
 ```
+
+## or install with shell
+```
+# Download the binary For Debian/Ubuntu/Mint:
+curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | sudo bash
+#For RHEL/CentOS/Fedora
+curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | sudo bash
+
+# Give it permission to execute
+sudo chmod +x /usr/local/bin/gitlab-runner
+
+# Create a GitLab Runner user
+sudo useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+
+# Install and run as a service
+sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+
+echo  -e 'gitlab-runner\tALL=(ALL)\tNOPASSWD:\tALL' > /etc/sudoers.d/gitlab-runner
+
+sudo gitlab-runner start
+
+```
+
+
 ## adding config in gitlab-runner
 
 ```
