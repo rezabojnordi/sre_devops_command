@@ -236,8 +236,8 @@ change port 80 to 8080
 ### download filebeat for nginx
 
 ```
-wget  https://www.elastic.co/downloads/past-releases/filebeat-oss-7-10-2
-dpkg -i https://www.elastic.co/downloads/past-releases/filebeat-oss-7-10-2
+wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-oss-7.10.2-amd64.deb
+dpkg -i filebeat-oss-7.10.2-amd64.deb
 ```
 
 ```
