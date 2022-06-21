@@ -2,14 +2,14 @@
 
 
 
-<img src="img/1-.png" height="300" width="500" style="float:center" ></img>
+<img src="img/1-.png" height="200" width="700" style="float:center" ></img>
 
 
 <img src="img/2.png" height="500" width="700" style="float:center" ></img>
 
-<img src="img/3.png" height="300" width="500" style="float:center" ></img>
+<img src="img/3.png" height="500" width="300" style="float:center" ></img>
 
-<img src="img/5.png" height="300" width="500" style="float:center" ></img>
+<img src="img/5.png" height="100" width="500" style="float:center" ></img>
 
 
 
