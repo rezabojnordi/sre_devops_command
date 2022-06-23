@@ -83,6 +83,8 @@ check_interval = 0
 
 ```
 
+FROM alpine:latest
+LABEL maintainer="Vivek Gite webmater@cyberciti.biz"
 RUN apk add --update --no-cache openssh  python3 py3-pip openssl ca-certificates sshpass openssh-client rsync git && \
     apk --no-cache add --virtual build-dependencies python3-dev libffi-dev musl-dev gcc cargo openssl-dev libressl-dev build-base && \
     echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_configi && \
@@ -94,13 +96,15 @@ RUN apk add --update --no-cache openssh  python3 py3-pip openssl ca-certificates
     pip3 install --upgrade pywinrm && \
     apk del build-dependencies && \
     echo -n 'reza:reza@123' | chpasswd && \
-    mkdir -p /home/reza/.ssh && chmod 700 /home/reza/.ssh && chown reza:reza /home/reza/.ssh
+    mkdir -p /home/reza/.ssh && chmod 700 /home/reza/.ssh && chown reza:reza /home/reza/.ssh 
 COPY ./key/* /home/reza/.ssh/
 RUN export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa"
 #COPY ./entrypoint.sh /entrypoint.sh
 #RUN chmod +x entrypoint.sh
 #ENTRYPOINT ["/entrypoint.sh"]
 EXPOSE 22
+#COPY entrypoint.sh /
+
 ```
 
 ## adding entrypoint
