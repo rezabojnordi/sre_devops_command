@@ -165,3 +165,129 @@ deploy-job:      # This job runs in the deploy stage.
     - echo "Application successfully deployed."
 
 ```
+
+## sample more than 1 stage
+
+```
+stages:
+  - init
+  - build
+  - run
+  - run-deploy
+
+init-project-deploy:
+  stage: init
+  tags:
+    - deploy 
+  script:
+  - hostname
+  - cd /home/gitlab-runner
+  - pwd
+  - sudo rm -rf * && git clone ssh://git@cicd.softgrand.ir:3031/mrm/cinder.git
+  
+  
+build-project-deploy:
+  stage: build
+  tags:
+    - deploy
+  script:
+  - cd /home/gitlab-runner
+  - pwd
+  - ls -lah
+  - cd /home/gitlab-runner/cinder
+  - pwd
+  - ls -lah
+
+
+run-project-deploy:
+  stage: run-deploy
+  tags:
+    - deploy
+  script:
+  - cd /home/gitlab-runner/cinder
+  - sudo ansible-playbook playbook.yml
+```
+
+## How to configure ci cd for dependence 
+
+```
+stages:
+  - init
+  - build
+  - run
+  - run-deploy
+  
+init-project-test:
+  stage: init
+  tags:
+    - test 
+  script:
+  - hostname
+  - pwd
+  - sudo chown gitlab-runner:root /home/app  
+  - sudo chown gitlab-runner:root /var/www/html
+  - cd /home/gitlab-runner
+  - pwd
+  - sudo rm -rf * && git clone ssh://git@cicd.softgrand.ir:3031/mrm/nginx.git
+
+init-project-deploy:
+  stage: init
+  tags:
+    - deploy 
+  script:
+  - hostname
+  - pwd
+  - sudo chown gitlab-runner:root /home/app  
+  - sudo chown gitlab-runner:root /var/www/html
+  - cd /home/gitlab-runner
+  - pwd
+  - sudo rm -rf * && git clone ssh://git@cicd.softgrand.ir:3031/mrm/nginx.git
+  
+  
+build-project-test:
+  stage: build
+  tags:
+    - test  
+  script:
+  - cd /var/www/html
+  - pwd
+  - sudo rm -rf *
+  - cd /home/gitlab-runner/nginx
+  - pwd
+  - ls -lah
+  - cp index.html /var/www/html
+  
+build-project-deploy:
+  stage: build
+  tags:
+    - deploy
+  script:
+  - cd /var/www/html
+  - pwd
+  - sudo rm -rf *
+  - cd /home/gitlab-runner/nginx
+  - pwd
+  - ls -lah
+  - cp index_2.html /var/www/html/index.html
+
+
+run-project-test:
+  stage: run
+  tags:
+    - test
+  script:
+  - sudo service nginx restart
+  - sudo nginx -t
+  - sudo service nginx status
+
+run-project-deploy:
+  stage: run-deploy
+  tags:
+    - deploy
+  needs:  ["run-project-test"]
+  script:
+  - sudo service nginx restart
+  - sudo nginx -t
+  - sudo service nginx status
+
+```
