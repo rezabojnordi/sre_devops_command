@@ -13,11 +13,11 @@ service httpd start
 
 # aws auto scaling
 
-<img src="1.png" width="800" height="500" />
-<img src="2.png" width="800" height="500" />
-<img src="3.png" width="800" height="500" />
-<img src="4.png" width="800" height="500" />
-<img src="5.png" width="800" height="500" />
+<img src="1.png" width="500" height="300" />
+<img src="2.png" width="500" height="300" />
+<img src="3.png" width="500" height="300" />
+<img src="4.png" width="500" height="300" />
+<img src="5.png" width="500" height="300" />
 
 
 
