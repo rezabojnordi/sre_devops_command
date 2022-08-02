@@ -1,16 +1,17 @@
-# Elk config for your project 
+
+## how to install httpd on aws 
+
+you can add this command on user data
+```
+#!/bin/bash
+yum install -y httpd
+chkconfig httpd on
+echo "<h1><br>Welcome to my world<></h1>" > /var/www/html/index.html
+service httpd start
+```
 
 
-MetricBeat - Used for capturing system related metrics like CPU usage, Heap Usage etc
-PacketBeat - For monitoring network data
-WinlogBeat - For capturing windows event logs
-AuditBeat - Monitor user activity and processes
-HeartBeat - For uptime monitoing
-FunctionBeat - Serverless architectures let you deploy code, without needing to spin up and manage extra underlying software and hardware. Functionbeat brings that same simplicity to monitoring your cloud infrastructure.
-
-Input - It receives data sent by different beats
-Filter - Here you need to write parser to parse the data
-Output - It pushes data to ElasticSearch Indexes via API call
+# aws auto scaling
 
 <img src="1.png" width="800" height="500" />
 <img src="2.png" width="800" height="500" />
