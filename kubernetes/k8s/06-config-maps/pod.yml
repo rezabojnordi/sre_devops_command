@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-pod
+spec:
+  containers:
+    - name: redis-c
+      imagePullPolicy: IfNotPresent
+      image: redis
+      envFrom:
+        - configMapRef:
+            name: redis-config
+

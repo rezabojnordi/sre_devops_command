@@ -1,0 +1,5 @@
+A rest api app is running
+Check probe on get /
+Check probe on delayed loading
+Check a delay for scripting
+

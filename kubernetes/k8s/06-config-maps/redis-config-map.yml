@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+
+data:
+  port: "6379"
+  rdb-compression: "yes"
+
