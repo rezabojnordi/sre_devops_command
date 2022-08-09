@@ -21,14 +21,6 @@ service httpd start
 
 
 
-
-
-
-
-
-
-
-
 # terraform_on_aws
 
 
