@@ -675,19 +675,19 @@ kubens my-namespace
 ```
 
 
-<img src="image/namespace.png" width="300" height="200" />
-<img src="image/namespace2.png" width="300" height="200" />
-<img src="image/namespace3.png" width="300" height="200" />
-<img src="image/namespace4.png" width="300" height="200" />
-<img src="image/namespace7.png" width="400" height="200" />
-<img src="image/namespace9.png" width="400" height="200" />
-<img src="image/namespace10.png" width="400" height="200" />
-<img src="image/namespace13.png" width="400" height="200" />
-<img src="image/namespace14.png" width="400" height="200" />
-<img src="image/namespace15.png" width="400" height="200" />
-<img src="image/namespace16.png" width="400" height="200" />
-<img src="image/namespace17.png" width="400" height="200" />
-<img src="image/namespace18.png" width="400" height="200" />
+<img src="images/namespace.png" width="300" height="200" />
+<img src="images/namespace2.png" width="300" height="200" />
+<img src="images/namespace3.png" width="300" height="200" />
+<img src="images/namespace4.png" width="300" height="200" />
+<img src="images/namespace7.png" width="400" height="200" />
+<img src="images/namespace9.png" width="400" height="200" />
+<img src="images/namespace10.png" width="400" height="200" />
+<img src="images/namespace13.png" width="400" height="200" />
+<img src="images/namespace14.png" width="400" height="200" />
+<img src="images/namespace15.png" width="400" height="200" />
+<img src="images/namespace16.png" width="400" height="200" />
+<img src="images/namespace17.png" width="400" height="200" />
+<img src="images/namespace18.png" width="400" height="200" />
 
 
 
@@ -708,30 +708,30 @@ kubectl get ingress -n kubernetes-dashboard
 kubectl describe ingress dashboard-ingress -n kubernetes-dashboard
 
 ```
-<img src="image/ingrees.png" width="400" height="200" />
-<img src="image/ingress`.png" width="400" height="200" />
-<img src="image/ingrees1.png" width="400" height="200" />
-<img src="image/ingrees2.png" width="400" height="200" />
-<img src="image/ingrees3.png" width="400" height="200" />
-<img src="image/ingrees4.png" width="400" height="200" />
-<img src="image/igress4.png" width="400" height="200" />
-<img src="image/ingress4.png" width="400" height="200" />
-<img src="image/ingress5.png" width="400" height="200" />
-<img src="image/ingress6.png" width="400" height="200" />
-<img src="image/ingress7.png" width="400" height="200" />
-<img src="image/ingress8.png" width="400" height="200" />
-<img src="image/ingress9.png" width="400" height="200" />
-<img src="image/ingress10.png" width="400" height="200" />
-<img src="image/ingress11.png" width="400" height="200" />
-<img src="image/ingress12.png" width="400" height="200" />
+<img src="images/ingrees.png" width="400" height="200" />
+<img src="images/ingress`.png" width="400" height="200" />
+<img src="images/ingrees1.png" width="400" height="200" />
+<img src="images/ingrees2.png" width="400" height="200" />
+<img src="images/ingrees3.png" width="400" height="200" />
+<img src="images/ingrees4.png" width="400" height="200" />
+<img src="images/igress4.png" width="400" height="200" />
+<img src="images/ingress4.png" width="400" height="200" />
+<img src="images/ingress5.png" width="400" height="200" />
+<img src="images/ingress6.png" width="400" height="200" />
+<img src="images/ingress7.png" width="400" height="200" />
+<img src="images/ingress8.png" width="400" height="200" />
+<img src="images/ingress9.png" width="400" height="200" />
+<img src="images/ingress10.png" width="400" height="200" />
+<img src="images/ingress11.png" width="400" height="200" />
+<img src="images/ingress12.png" width="400" height="200" />
 
 ## ssl
 
-<img src="image/ssl.png" width="400" height="200" />
-<img src="image/ssl1.png" width="400" height="200" />
-<img src="image/ssl4.png" width="400" height="200" />
-<img src="image/ssl5.png" width="400" height="200" />
-<img src="image/ssl6.png" width="400" height="200" />
+<img src="images/ssl.png" width="400" height="200" />
+<img src="images/ssl1.png" width="400" height="200" />
+<img src="images/ssl4.png" width="400" height="200" />
+<img src="images/ssl5.png" width="400" height="200" />
+<img src="images/ssl6.png" width="400" height="200" />
 
 
 ```
