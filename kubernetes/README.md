@@ -296,7 +296,7 @@ spec:
   - protocol: TCP
     port: 8081
     targetPort: 8081
-    nodePort:  30000  #30000-32767
+    nodePort:  50000  #50000-32767
 =======
 # Kubernetes Training: How to Deploy a Cluster from Scratch
 
@@ -675,10 +675,10 @@ kubens my-namespace
 ```
 
 
-<img src="images/namespace.png" width="300" height="200" />
-<img src="images/namespace2.png" width="300" height="200" />
-<img src="images/namespace3.png" width="300" height="200" />
-<img src="images/namespace4.png" width="300" height="200" />
+<img src="images/namespace.png" width="500" height="200" />
+<img src="images/namespace2.png" width="500" height="200" />
+<img src="images/namespace3.png" width="500" height="200" />
+<img src="images/namespace4.png" width="500" height="200" />
 <img src="images/namespace7.png" width="500" height="200" />
 <img src="images/namespace9.png" width="500" height="200" />
 <img src="images/namespace10.png" width="500" height="200" />
