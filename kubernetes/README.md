@@ -31,6 +31,26 @@ or
 minikube start --force
 ```
 
+
+
+### Hellowworld
+```
+kubectl get nodes
+
+kubectl run hw --image=karthequian/helloworlk --port=80
+
+kubectl get deployments
+
+kubectl get rs
+
+kubectl get pods
+
+kubectl expose deployment hw --type=NodePort
+
+kubectl get services
+
+```
+
 ## import command on k8s server
 ```
 kubectl get pod
