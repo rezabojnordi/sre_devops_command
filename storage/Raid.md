@@ -1,4 +1,6 @@
 
+### You can create raid between 2 nvme dist after that create lvmcache
+```
 sudo apt install mdadm
 
 
@@ -70,3 +72,4 @@ manual_add_modules dm_cache dm_cache_mq dm_cache_smq dm_persistent_data dm_bufio
 
 chmod +x /etc/initramfs-tools/hooks/cache_hook
 update-initramfs -v -u -k all
+```
