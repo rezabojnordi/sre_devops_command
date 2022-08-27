@@ -1,3 +1,4 @@
+
 # Kubernetes cheatsheet 
 
 First install docker:
@@ -16,7 +17,11 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 ```
-
+### set hostname
+```
+hostnamectl set-hostname master1 --static
+hostnamectl set-hostname worker1 --static
+```
 ### Change native cgroup to systemd
 Run this for all nodes
 ```
