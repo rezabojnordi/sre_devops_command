@@ -144,10 +144,18 @@ or
 export kubever=$(kubectl version | base64 | tr -d '\n')
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"
 ```
+### if you don't have token You can generate it with this command
+```
+kubeadm token create --print-join-command
+```
 ### check status weave net
 ```
 kubectl get pods --all-namespaces
 
+```
+### get error to join worker
+```
+kubeadm reset
 ```
 
 ### Get upload certs:
