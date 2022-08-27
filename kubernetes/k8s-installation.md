@@ -84,6 +84,8 @@ kubeadm init
 rm /etc/containerd/config.toml
 systemctl restart containerd
 kubeadm init
+
+source: https://github.com/containerd/containerd/issues/4581
 ```
 
 
