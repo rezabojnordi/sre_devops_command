@@ -85,6 +85,11 @@ rm /etc/containerd/config.toml
 systemctl restart containerd
 kubeadm init
 
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+export KUBECONFIG=/etc/kubernetes/admin.conf
+  
 source: https://github.com/containerd/containerd/issues/4581
 ```
 ```
@@ -93,6 +98,7 @@ To start using your cluster, you need to run the following as a regular user:
   mkdir -p $HOME/.kube
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  export KUBECONFIG=/etc/kubernetes/admin.conf
 
 Alternatively, if you are the root user, you can run:
 
@@ -130,6 +136,10 @@ complete -F __start_kubectl k
 source <(kubectl completion bash)
 export KUBECONFIG=/etc/kubernetes/admin.conf        
 ```
+```
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+```
+or
 ```
 export kubever=$(kubectl version | base64 | tr -d '\n')
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"
