@@ -87,7 +87,26 @@ kubeadm init
 
 source: https://github.com/containerd/containerd/issues/4581
 ```
+```
+To start using your cluster, you need to run the following as a regular user:
 
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 85.208.253.140:6443 --token 18z0lj.3l2bv63tf63or2m9 \
+        --discovery-token-ca-cert-hash sha256:aa2518bdc0a2beb02a6aaeaec9da358b95cdcb1d6d498fbca10f0eff6f908
+```
 
 Join a node with this command :
 ```
