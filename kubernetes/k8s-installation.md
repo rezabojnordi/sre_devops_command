@@ -78,6 +78,15 @@ sysctl -p
 kubeadm init
 ```
 
+### error CRI
+```
+“[ERROR CRI]: container runtime is not running: output:” Code Answer
+rm /etc/containerd/config.toml
+systemctl restart containerd
+kubeadm init
+```
+
+
 Join a node with this command :
 ```
 kubeadm join xxx.xxx.xxx.xxx:6443 --token wqjxpm.vqupwqtp5xyvf1cg \
