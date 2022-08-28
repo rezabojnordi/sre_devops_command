@@ -190,3 +190,4 @@ kubeadm config images pull
 ```
 kubectl auth can-i create deployment                yes
 kubectl auth can-i create deployment --as linda     no
+kubectl auth can-i create deployment --namespace secret  yes
