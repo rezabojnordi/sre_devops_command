@@ -186,3 +186,7 @@ kubeadm init --config config.yaml
 kubeadm config images pull
 ```
 
+## check api on openstack
+```
+kubectl auth can-i create deployment                yes
+kubectl auth can-i create deployment --as linda     no
