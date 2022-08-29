@@ -157,6 +157,8 @@ kubectl get pods --all-namespaces
 ```
 apt install bash-completion
 kubectl completion bash > /etc/bash_completion.d/kubectl
+and
+kubectl completion bash > ~/.bashrc
 ```
 
 ### get error to join worker
