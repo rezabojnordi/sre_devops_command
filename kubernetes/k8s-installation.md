@@ -153,6 +153,12 @@ kubeadm token create --print-join-command
 kubectl get pods --all-namespaces
 
 ```
+### add autocomplition
+```
+apt install bash-completion
+kubectl completion bash > /etc/bash_completion.d/kubectl
+```
+
 ### get error to join worker
 ```
 kubeadm reset
