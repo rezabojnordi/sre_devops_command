@@ -45,7 +45,7 @@ services:
       EF_FLOW_OUTPUT_ELASTICSEARCH_BATCH_DEADLINE: 1000
       EF_FLOW_DECODER_ENRICH_NETIF_GET_ATTRS: 'true'
       EF_FLOW_DECODER_ENRICH_SNMP_ENABLE: 'true'
-      EF_FLOW_DECODER_ENRICH_SNMP_COMMUNITY: 'f65EzmREH4w5sYBU'
+      EF_FLOW_DECODER_ENRICH_SNMP_COMMUNITY: 'comunity snmp'
       EF_FLOW_DECODER_ENRICH_SNMP_TIMEOUT: 1
       EF_FLOW_DECODER_ENRICH_NETIF_CACHE_SIZE: 8000000000
       EF_FLOW_DECODER_ENRICH_DROP_FIELDS: 'flow.client.host.name,flow.dst.host.name,flow.end.sysuptime,flow.end.timestamp,flow.export.sysuptime,flow.server.host.name,flow.src.host.name'
