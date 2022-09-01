@@ -15,3 +15,37 @@ root soft nproc 1000000
 root soft nproc 100000
 root soft nofile 100000
 root hard nofile 100000
+
+
+==========================
+sudo vim /etc/pam.d/common-session
+ 
+ 
+# add this line to it
+session required pam_limits.so
+
+===============
+# /etc/systemd/system/something.service
+[Unit]
+# ...
+
+[Service]
+# ...
+LimitNOFILE=2048
+
+[Install]
+# ...
+
+# Reload the systemd daemon
+$ sudo systemctl daemon-reload
+
+# Restart changed service
+$ sudo systemctl restart something
+=====================
+# show all currently available values (some require `sudo`)
+$ sysctl -a
+
+# set a specific variable's value (some require `sudo`)
+$ sysctl -w fs.file-max=2097152
+
+
