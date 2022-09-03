@@ -178,6 +178,10 @@ cephadm shell -- ceph orch host label add mon2 mon
 cephadm shell -- ceph orch host label add mon3 mon
 ```
 
+## add new mgr
+```
+ceph orch apply mgr mon3
+```
 ## check hosts in ceph structure
 ```
 ceph orch host ls

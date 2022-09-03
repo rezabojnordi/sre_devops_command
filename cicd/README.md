@@ -83,6 +83,8 @@ check_interval = 0
 
 ```
 
+FROM alpine:latest
+LABEL maintainer="Vivek Gite webmater@cyberciti.biz"
 RUN apk add --update --no-cache openssh  python3 py3-pip openssl ca-certificates sshpass openssh-client rsync git && \
     apk --no-cache add --virtual build-dependencies python3-dev libffi-dev musl-dev gcc cargo openssl-dev libressl-dev build-base && \
     echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_configi && \
@@ -94,13 +96,15 @@ RUN apk add --update --no-cache openssh  python3 py3-pip openssl ca-certificates
     pip3 install --upgrade pywinrm && \
     apk del build-dependencies && \
     echo -n 'reza:reza@123' | chpasswd && \
-    mkdir -p /home/reza/.ssh && chmod 700 /home/reza/.ssh && chown reza:reza /home/reza/.ssh
+    mkdir -p /home/reza/.ssh && chmod 700 /home/reza/.ssh && chown reza:reza /home/reza/.ssh 
 COPY ./key/* /home/reza/.ssh/
 RUN export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa"
 #COPY ./entrypoint.sh /entrypoint.sh
 #RUN chmod +x entrypoint.sh
 #ENTRYPOINT ["/entrypoint.sh"]
 EXPOSE 22
+#COPY entrypoint.sh /
+
 ```
 
 ## adding entrypoint
@@ -159,5 +163,131 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
+
+```
+
+## sample more than 1 stage
+
+```
+stages:
+  - init
+  - build
+  - run
+  - run-deploy
+
+init-project-deploy:
+  stage: init
+  tags:
+    - deploy 
+  script:
+  - hostname
+  - cd /home/gitlab-runner
+  - pwd
+  - sudo rm -rf * && git clone ssh://git@cicd.softgrand.ir:3031/mrm/cinder.git
+  
+  
+build-project-deploy:
+  stage: build
+  tags:
+    - deploy
+  script:
+  - cd /home/gitlab-runner
+  - pwd
+  - ls -lah
+  - cd /home/gitlab-runner/cinder
+  - pwd
+  - ls -lah
+
+
+run-project-deploy:
+  stage: run-deploy
+  tags:
+    - deploy
+  script:
+  - cd /home/gitlab-runner/cinder
+  - sudo ansible-playbook playbook.yml
+```
+
+## How to configure ci cd for dependence 
+
+```
+stages:
+  - init
+  - build
+  - run
+  - run-deploy
+  
+init-project-test:
+  stage: init
+  tags:
+    - test 
+  script:
+  - hostname
+  - pwd
+  - sudo chown gitlab-runner:root /home/app  
+  - sudo chown gitlab-runner:root /var/www/html
+  - cd /home/gitlab-runner
+  - pwd
+  - sudo rm -rf * && git clone ssh://git@cicd.softgrand.ir:3031/mrm/nginx.git
+
+init-project-deploy:
+  stage: init
+  tags:
+    - deploy 
+  script:
+  - hostname
+  - pwd
+  - sudo chown gitlab-runner:root /home/app  
+  - sudo chown gitlab-runner:root /var/www/html
+  - cd /home/gitlab-runner
+  - pwd
+  - sudo rm -rf * && git clone ssh://git@cicd.softgrand.ir:3031/mrm/nginx.git
+  
+  
+build-project-test:
+  stage: build
+  tags:
+    - test  
+  script:
+  - cd /var/www/html
+  - pwd
+  - sudo rm -rf *
+  - cd /home/gitlab-runner/nginx
+  - pwd
+  - ls -lah
+  - cp index.html /var/www/html
+  
+build-project-deploy:
+  stage: build
+  tags:
+    - deploy
+  script:
+  - cd /var/www/html
+  - pwd
+  - sudo rm -rf *
+  - cd /home/gitlab-runner/nginx
+  - pwd
+  - ls -lah
+  - cp index_2.html /var/www/html/index.html
+
+
+run-project-test:
+  stage: run
+  tags:
+    - test
+  script:
+  - sudo service nginx restart
+  - sudo nginx -t
+  - sudo service nginx status
+
+run-project-deploy:
+  stage: run-deploy
+  tags:
+    - deploy
+  needs:  ["run-project-test"]
+  script:
+  - sudo service nginx restart
+  - sudo nginx -t
+  - sudo service nginx status
 
 ```

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: simple-web-app1
+   labels:
+     app: simple-web-app1
+     type: backend
+spec:
+  template:
+    metadata:
+       name: simple-web-app1
+       labels:
+         app: simple-web-app1
+         type: backend
+    spec:
+      containers:
+      - name: simple-web-app1
+        image: shirzadi/simple-web-app
+  replicas: 1
+  selector:
+    matchLabels:
+      type: backend
+

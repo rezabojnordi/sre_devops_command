@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: server
+spec:
+  containers:
+    - name: server
+      image: server
+      imagePullPolicy: IfNotPresent
+
+
