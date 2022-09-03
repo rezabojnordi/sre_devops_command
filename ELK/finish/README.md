@@ -295,7 +295,10 @@ create policy  --> that name is hot-wam-delete-cloud
     }
 }
 ```
-
+after that you need set this policy on index
+```
+opensearch_index_management_dashboards --> indices
+```
 ## Get Error
 
 if you get this error 
