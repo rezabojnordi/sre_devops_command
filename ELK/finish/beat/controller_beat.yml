@@ -1,0 +1,6 @@
+---
+- hosts: controller
+  tasks:
+    - name: install journal_beat into the compute server
+      import_role:
+        name: opensearch_beat
