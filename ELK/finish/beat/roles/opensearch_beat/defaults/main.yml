@@ -1,0 +1,12 @@
+---
+# defaults file for opensearch_beat
+
+computes: ["192.168.1.1:5046"]
+controller: ["192.168.1.2:5047"]
+ceph: ["192.168.1.3:5048"]
+
+logging_level: "error"
+logging_to_syslog: false
+version: 7.10.2
+journalbeat_oss_name: "journalbeat-oss-{{ version }}-amd64.deb"
+journalbeat_oss_name_path: /home/
