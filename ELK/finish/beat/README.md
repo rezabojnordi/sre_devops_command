@@ -5,7 +5,7 @@
 if you want add ypur address's server. you can open default's file to change opensearch ip
 
 ```
-vim role/opensearch_beat/defaults
+vim roles/opensearch_beat/defaults/main.yml
 
 ```
 ## how to run this project on production
