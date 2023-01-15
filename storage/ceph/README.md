@@ -597,3 +597,26 @@ sudo ceph-fuse -m {ip-address-of-monitor}:6789 ~/mycephfs
 ```
 sudo ceph-fuse -k ./ceph.client.admin.keyring -m 192.168.0.1:6789 ~/mycephfs
 ```
+
+### Verification
+* List the service:
+```
+ceph orch ls
+```
+
+* Check the CephFS status:
+```
+ceph fs ls
+ceph fs status
+```
+
+* List the hosts, daemons, and processes:
+
+```
+ceph orch ps --daemon_type=DAEMON_NAME
+```
+* Example
+```
+ceph orch ps --daemon_type=mds
+```
+
