@@ -1,0 +1,24 @@
+---
+
+- hosts: journal_beat
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Copy deb File
+      ansible.builtin.copy:
+        src: /home/reza/ansible_beat/journalbeat-oss-7.10.2-amd64.deb
+        dest: /tmp/journalbeat-oss-7.10.2-amd64.deb
+    - name: Install JourntalBeat 7.10 OSS Local
+      apt:
+        deb: /tmp/journalbeat-oss-7.10.2-amd64.deb
+#    - name: Install JourntalBeat 7.10 OSS
+#      apt:
+#        deb: https://mirror.iranserver.com/elk/journalbeat-oss-7.10.2-amd64.deb
+    - name: Copy Config File
+      ansible.builtin.copy:
+        src: /home/reza/ansible_beat/journalbeat.yml
+        dest: /etc/journalbeat/journalbeat.yml
+    - name: restart journalbeat
+      shell: "systemctl restart journalbeat"

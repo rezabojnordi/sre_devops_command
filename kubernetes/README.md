@@ -29,6 +29,7 @@ sudo install minikube-linux-amd64 /usr/local/bin/minikube
 minikube start
 or
 minikube start --force
+kubectl proxy --address='0.0.0.0' --disable-filter=true
 ```
 
 

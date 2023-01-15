@@ -464,11 +464,13 @@ The ceph health command returns an error message similar to the following one:
 HEALTH_WARN 197 pgs stuck unclean
 
 
-```
+
 # ceph pg <id> query
 
-
 # ceph pg 0.5 query
+
+
+```
 
 { "state": "down+peering",
   ...
@@ -493,7 +495,7 @@ HEALTH_WARN 197 pgs stuck unclean
    ]
 }
 ```
-```
+
 # ceph health detail
 
 ```
@@ -525,7 +527,7 @@ Section 7.1.1, “Stale Placement Groups”
 
 ```
 
-```
+
 List the stuck PGs:
 
 # ceph pg dump_stuck inactive
@@ -534,9 +536,12 @@ List the stuck PGs:
 ```
 
 
+
+
 ### Ceph fs
 
 #### Adding MDS in linux with ceph
+
 ```
 ceph orch apply mds test --placement="3 mon1 mon2 mon3"
 
@@ -577,7 +582,6 @@ sudo mkdir /mnt/mycephfs
 sudo mount -t ceph {ip-address-of-monitor}:6789:/ /mnt/mycephfs
 ```
 * The Ceph Storage Cluster uses authentication by default. Specify a user name and the secretfile you created in the Create a Secret File section. For example:
-
 ```
 sudo mount -t ceph 192.168.0.1:6789:/ /mnt/mycephfs -o name=admin,secretfile=admin.secret
 ```
@@ -589,12 +593,7 @@ sudo mount -t ceph 192.168.0.1:6789:/ /mnt/mycephfs -o name=admin,secretfile=adm
 sudo mkdir ~/mycephfs
 sudo ceph-fuse -m {ip-address-of-monitor}:6789 ~/mycephfs
 ```
-
 * The Ceph Storage Cluster uses authentication by default. Specify a keyring if it is not in the default location (i.e., /etc/ceph):
-
 ```
 sudo ceph-fuse -k ./ceph.client.admin.keyring -m 192.168.0.1:6789 ~/mycephfs
 ```
-
-
-

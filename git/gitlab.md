@@ -11,6 +11,37 @@ curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/scrip
 
 sudo EXTERNAL_URL="https://gitlab.example.com" apt-get install gitlab-ce
 ```
+
+# Update Gitlab Version
+```
+curl -s https://packages.gitlab.com/gpg.key | apt-key add -
+```
+```
+apt update && apt dist-upgrade
+```
+```
+gitlab-rake gitlab:env:info
+```
+```
+sudo touch /etc/gitlab/skip-auto-reconfigure
+```
+```
+apt-cache policy gitlab-ce | grep 14.6
+```
+```
+apt install gitlab-ce=14.6.7-ce.0
+```
+```
+sudo SKIP_POST_DEPLOYMENT_MIGRATIONS=true gitlab-ctl reconfigure
+```
+```
+sudo gitlab-rake db:migrate
+```
+```
+sudo gitlab-ctl hup puma
+sudo gitlab-ctl restart sidekiq
+```
+
 # Gitlab cheatsheet 
 
 ### How to reset root password?

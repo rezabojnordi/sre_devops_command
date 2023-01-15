@@ -1,0 +1,5 @@
+---
+# tasks file for mysql_backup
+- include: computes.yml
+- include: controller.yml
+- include: ceph.yml

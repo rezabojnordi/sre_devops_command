@@ -1,0 +1,32 @@
+---
+- name: copy journalbeat in other server
+  copy:
+    src: "{{ journalbeat_oss_name }}"
+    dest: "{{ journalbeat_oss_name_path }}"
+    mode: '0777'
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  tags:
+    - computes
+
+- name: Install JourntalBeat 7.10 OSS Local
+  apt:
+    deb: /home/{{ journalbeat_oss_name }}
+  tags:
+    - computes
+#    - name: Install JourntalBeat 7.10 OSS
+#      apt:
+#        deb: https://mirror.iranserver.com/elk/journalbeat-oss-7.10.2-amd64.deb
+
+
+- name: Copy Config File into the /etc/journalbeat
+  template:
+    src: computes.yml.j2
+    dest: /etc/journalbeat/journalbeat.yml
+  tags:
+    - computes
+
+
+- name: restart journalbeat
+  shell: "systemctl restart journalbeat"
+  tags:
+    - computes
