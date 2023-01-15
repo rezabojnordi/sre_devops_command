@@ -464,11 +464,13 @@ The ceph health command returns an error message similar to the following one:
 HEALTH_WARN 197 pgs stuck unclean
 
 
-```
+
 # ceph pg <id> query
 
-
 # ceph pg 0.5 query
+
+
+```
 
 { "state": "down+peering",
   ...
@@ -493,7 +495,7 @@ HEALTH_WARN 197 pgs stuck unclean
    ]
 }
 ```
-```
+
 # ceph health detail
 
 ```
@@ -525,7 +527,7 @@ Section 7.1.1, “Stale Placement Groups”
 
 ```
 
-```
+
 List the stuck PGs:
 
 # ceph pg dump_stuck inactive
