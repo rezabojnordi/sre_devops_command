@@ -532,3 +532,69 @@ List the stuck PGs:
 # ceph pg dump_stuck unclean
 # ceph pg dump_stuck stale
 ```
+
+
+### Ceph fs
+
+#### Adding MDS in linux with ceph
+```
+ceph orch apply mds test --placement="3 mon1 mon2 mon3"
+
+```
+
+
+## How to mount directory in cephfs
+
+
+```
+cat ceph.client.admin.keyring
+```
+* Copy the key of the user who will be using the mounted CephFS filesystem. It should look something like this:
+```
+[client.admin]
+   key = AQCj2YpRiAe6CxAA7/ETt7Hcl9IyxyYciVs47w==
+```
+* Open a text editor.
+
+* Paste the key into an empty file. It should look something like this:
+```
+AQCj2YpRiAe6CxAA7/ETt7Hcl9IyxyYciVs47w==
+```
+* Save the file with the user name as an attribute (e.g., admin.secret).
+
+* Ensure the file permissions are appropriate for the user, but not visible to other users.
+
+```
+sudo mount -t ceph 172.16.112.120:6789:/ /mnt/mycephfs -o name=admin,secretfile=admin.secret
+
+```
+
+
+#### KERNEL DRIVER
+* Mount CephFS as a kernel driver.
+```
+sudo mkdir /mnt/mycephfs
+sudo mount -t ceph {ip-address-of-monitor}:6789:/ /mnt/mycephfs
+```
+* The Ceph Storage Cluster uses authentication by default. Specify a user name and the secretfile you created in the Create a Secret File section. For example:
+
+```
+sudo mount -t ceph 192.168.0.1:6789:/ /mnt/mycephfs -o name=admin,secretfile=admin.secret
+```
+
+#### FILESYSTEM IN USER SPACE (FUSE)
+* Mount CephFS as a Filesystem in User Space (FUSE).
+
+```
+sudo mkdir ~/mycephfs
+sudo ceph-fuse -m {ip-address-of-monitor}:6789 ~/mycephfs
+```
+
+* The Ceph Storage Cluster uses authentication by default. Specify a keyring if it is not in the default location (i.e., /etc/ceph):
+
+```
+sudo ceph-fuse -k ./ceph.client.admin.keyring -m 192.168.0.1:6789 ~/mycephfs
+```
+
+
+
