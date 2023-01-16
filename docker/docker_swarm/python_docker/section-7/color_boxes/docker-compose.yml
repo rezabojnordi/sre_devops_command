@@ -1,0 +1,42 @@
+version: "3.7"
+
+volumes:
+  db_vol: # Database Persistent Volume - uses default driver and settings
+
+services:
+
+  cb:
+    image: cb:mysql
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        tag: "3.8"
+    ports:
+      - "5000:5000"
+    environment:
+      # Database Connection details are set in 'DATABASE_URL' Environment Variable
+      # Format: db_driver+dialect://user:password@host:port/database_name
+      # DB User and database must exist before first use
+      # MySQL and MariaDB use default port 3306
+      DATABASE_URL: "mysql+mysqldb://cbuser:cbpass@db:3306/cbdb"
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mariadb:10.4
+    volumes:
+      - db_vol:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "my_secret"
+      MYSQL_USER: "cbuser"
+      MYSQL_PASSWORD: "cbpass"
+      MYSQL_DATABASE: "cbdb"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=db

@@ -1,0 +1,3 @@
+Flask
+SQLAlchemy
+mysqlclient # MySQL (MariaDB) Python Client Library for SQLAlchemy

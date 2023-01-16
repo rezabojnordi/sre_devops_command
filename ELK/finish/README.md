@@ -186,3 +186,128 @@ opensearch-dashboards/indexPatterns
 
 
 ```
+## add policy in opensearch
+
+```
+opensearch_index_management_dashboards -->index-policies
+
+create policy  --> that name is hot-wam-delete-cloud
+```
+### dDefine policy
+```
+{
+    "policy": {
+        "policy_id": "hot-wam-delete-cloud",
+        "description": "hot warm delete workflow for cloud logs",
+        "last_updated_time": 1662182755779,
+        "schema_version": 16,
+        "error_notification": null,
+        "default_state": "hot",
+        "states": [
+            {
+                "name": "hot",
+                "actions": [
+                    {
+                        "retry": {
+                            "count": 3,
+                            "backoff": "exponential",
+                            "delay": "1m"
+                        },
+                        "allocation": {
+                            "require": {
+                                "temp": "hot"
+                            },
+                            "include": {},
+                            "exclude": {},
+                            "wait_for": false
+                        }
+                    },
+                    {
+                        "retry": {
+                            "count": 3,
+                            "backoff": "exponential",
+                            "delay": "1m"
+                        },
+                        "replica_count": {
+                            "number_of_replicas": 0
+                        }
+                    }
+                ],
+                "transitions": [
+                    {
+                        "state_name": "warm",
+                        "conditions": {
+                            "min_index_age": "10d"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "warm",
+                "actions": [
+                    {
+                        "retry": {
+                            "count": 3,
+                            "backoff": "exponential",
+                            "delay": "1m"
+                        },
+                        "replica_count": {
+                            "number_of_replicas": 0
+                        }
+                    }
+                ],
+                "transitions": [
+                    {
+                        "state_name": "delete",
+                        "conditions": {
+                            "min_index_age": "15d"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "delete",
+                "actions": [
+                    {
+                        "retry": {
+                            "count": 3,
+                            "backoff": "exponential",
+                            "delay": "1m"
+                        },
+                        "delete": {}
+                    }
+                ],
+                "transitions": []
+            }
+        ],
+        "ism_template": [
+            {
+                "index_patterns": [
+                    "cloud-journal-log*",
+                    "controller*",
+                    "ceph*",
+                    "compute*"
+                ],
+                "priority": 100,
+                "last_updated_time": 1662018810354
+            }
+        ]
+    }
+}
+```
+after that you need set this policy on index
+```
+opensearch_index_management_dashboards --> indices
+```
+## Get Error
+
+if you get this error 
+```
+Data too large, datafor [<http_request>] would be [1035462944/987.4mb], which is larger than the limit of
+```
+You can cnage jvm option n opensearch-node in container or mount's file
+
+```
+ config/jvm.options
+```
+

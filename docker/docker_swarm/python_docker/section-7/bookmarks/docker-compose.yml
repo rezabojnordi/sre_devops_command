@@ -1,0 +1,66 @@
+version: "3.7"
+
+volumes:
+  db_vol:
+
+networks:
+  frontend: # Front end Virtual Network for 'proxy', 'app1' and 'app2' Containers
+  backend: # Back end Virtual Network for 'app1', 'app2', 'db' and 'pgadmin' Containers
+
+services:
+
+  db: # DB Engine Container
+    image: postgres:12
+    volumes:
+      - db_vol:/var/lib/postgresql/data # Mount Volume to Postgres Data directory
+    environment:
+      POSTGRES_USER: "bkuser"
+      POSTGRES_PASSWORD: "bkpass"
+      POSTGRES_DB: "bookmarks"
+    networks:
+      - backend
+    command: postgres -c log_destination=stderr -c log_statement=all
+    restart: always
+
+  pgadmin: # PGAdmin Container - PostgreSQL GUI Admin
+    image: dpage/pgadmin4
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@example.com"
+      PGADMIN_DEFAULT_PASSWORD: "my_secret"
+    networks:
+      - backend
+
+  app1: # Bookmarks Django Application Server Container number 1
+    image: mydjango:psql
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - frontend
+      - backend
+    restart: always
+
+  app2: # Bookmarks Django Application Server Container number 2
+    image: mydjango:psql
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - frontend
+      - backend
+    restart: always
+
+  proxy: # NGINX Proxy Server Container
+    image: nginx:stable
+    volumes:
+      - ./bookmarks_nginx.conf:/etc/nginx/conf.d/bookmarks_nginx.conf
+    ports:
+      - "8000:8000"
+    networks:
+      - frontend
+    depends_on:
+      - app1
+      - app2
+    restart: always

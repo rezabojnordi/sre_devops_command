@@ -1,0 +1,12 @@
+{% block content %}
+{% if object_list %}
+    <h2>Bookmarks</h2>
+    <ul>
+        {% for bookmark in object_list %}
+            <li><a href="/{{bookmark.id}}/">{{ bookmark.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No bookmarks available.</p>
+{% endif %}
+{% endblock %}

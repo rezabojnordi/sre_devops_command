@@ -1,0 +1,28 @@
+docker init
+docker swarm init
+docker node ls
+
+docker node update --label-add type=databases --label-add servernumber=1 databases
+docker node update --label-add type=swarm --label-add servernumber=1 swarm1 
+docker node update --label-add type=swarm --label-add servernumber=2 swarm2 
+docker node update --label-add type=nginx --label-add servernumber=1 nginx
+
+
+docekr node promote swarm2
+docker network create --driver overlay baloot
+
+docker service create --network baloot --name nginx1 --hostname nginx --constraint node.labels.type==nginx --constraint node.labels.servernumber==1 nginx
+
+
+docker service create --network baloot --name nginx1 --hostname nginx --constraint node.labels.type==nginx --constraint node.labels.servernumber==1 --no-resolve-image never nginx
+
+docker service create --network baloot --name db --hostname databses --constraint node.labels.type==database --constraint node.labels.servernumber==1 -e MYSQL_ROOT_PASSWORD=reza@123 mysql 
+
+
+docker service create --network baloot --name database --hostname database --constraint node.labels.type==database --constraint node.labels.servernumber==1 mysql
+
+
+==========================================================================================================================
+docker stack deploy -c docker-compose.yml wordpress
+
+docker stack rm wordpress
