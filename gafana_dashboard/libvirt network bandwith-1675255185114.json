@@ -1,0 +1,365 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 114,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ReGmuCaMk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 70
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Download"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "lcd-gauge"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Upload"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "lcd-gauge"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ReGmuCaMk"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "topk(10, max(abs(delta(libvirt_domain_interface_stats_receive_bytes_total{}[$__range]))) by (instanceId,instanceName,projectName))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{instanceName}} - {{instanceId}}",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ReGmuCaMk"
+          },
+          "editorMode": "code",
+          "expr": "topk(6, max(delta(libvirt_domain_interface_stats_transmit_bytes_total{}[$__range])) by (instanceId,instanceName))",
+          "format": "table",
+          "hide": true,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Top Receivers",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "instanceId",
+            "mode": "inner"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "instanceName 2": true
+            },
+            "indexByName": {
+              "Time 1": 0,
+              "Time 2": 4,
+              "Value #A": 3,
+              "Value #B": 6,
+              "instanceId": 2,
+              "instanceName 1": 1,
+              "instanceName 2": 5
+            },
+            "renameByName": {
+              "Time 1": "",
+              "Value": "Download",
+              "Value #A": "Download",
+              "Value #B": "Upload",
+              "instanceName 2": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ReGmuCaMk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ReGmuCaMk"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "max(abs(delta(libvirt_domain_interface_stats_receive_bytes_total{instanceId=~\"$instaceid\"}[$__range])))",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{instanceName}} - {{instanceId}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Receives For  : $instaceid",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ReGmuCaMk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ReGmuCaMk"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "max(abs(delta(libvirt_domain_interface_stats_transmit_bytes_total{instanceId=~\"$instaceid\"}[$__range])))",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{instanceName}} - {{instanceId}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Transmits  For  : $instaceid",
+      "transformations": [],
+      "type": "stat"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "f55e279c-96a3-418f-a692-e69b71dfdbf0",
+          "value": "f55e279c-96a3-418f-a692-e69b71dfdbf0"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "ReGmuCaMk"
+        },
+        "definition": "label_values(libvirt_domain_state_code{ job=\"prometheus-libvirt-exporter\"}, instanceId)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "instaceid",
+        "multi": false,
+        "name": "instaceid",
+        "options": [],
+        "query": {
+          "query": "label_values(libvirt_domain_state_code{ job=\"prometheus-libvirt-exporter\"}, instanceId)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "ReGmuCaMk"
+        },
+        "filters": [],
+        "hide": 0,
+        "name": "Filters",
+        "skipUrlSync": false,
+        "type": "adhoc"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "libvirt network bandwith",
+  "uid": "oYNu0hFVk",
+  "version": 3,
+  "weekStart": ""
+}
