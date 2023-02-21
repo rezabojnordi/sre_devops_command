@@ -7,10 +7,17 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 ```
 ## install ceph
+#### version quincy
+```
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
+```
+#### or version pacific
+```
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
 ```
 
-cd /tmp
-curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
+### other install
+```
 chmod +x cephadm
 sudo ./cephadm add-repo --release pacific
 sudo rm /etc/apt/trusted.gpg.d/ceph.release.gpg
