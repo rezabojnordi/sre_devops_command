@@ -10,7 +10,11 @@ sh get-docker.sh
 ```
 
 cd /tmp
+=== version quincy
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
+=== version pacific
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
+
 chmod +x cephadm
 sudo ./cephadm add-repo --release pacific
 sudo rm /etc/apt/trusted.gpg.d/ceph.release.gpg
