@@ -10,16 +10,18 @@ sh get-docker.sh
 #### version quincy
 ```
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
+chmod +x cephadm
+sudo ./cephadm add-repo --release quincy
 ```
 #### or version pacific
 ```
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
+chmod +x cephadm
+sudo ./cephadm add-repo --release pacific
 ```
 
 ### other install
 ```
-chmod +x cephadm
-sudo ./cephadm add-repo --release pacific
 sudo rm /etc/apt/trusted.gpg.d/ceph.release.gpg
 wget https://download.ceph.com/keys/release.asc
 sudo apt-key add release.asc
