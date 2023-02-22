@@ -7,12 +7,30 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 ```
 ## install ceph
+#### version quincy
 ```
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
+chmod +x cephadm
+sudo ./cephadm add-repo --release quincy
+sudo rm /etc/apt/trusted.gpg.d/ceph.release.gpg
+wget https://download.ceph.com/keys/release.asc
+sudo apt-key add release.asc
+sudo apt update
+sudo ./cephadm install
+cephadm shell -- -s
+cephadm shell -- ceph -s
 
-cd /tmp
+add ceph common tools
+cephadm add-repo --release quincy
+cephadm install ceph-common
+-------------------------------------
+```
+#### or version pacific
+```
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
 chmod +x cephadm
 sudo ./cephadm add-repo --release pacific
+
 sudo rm /etc/apt/trusted.gpg.d/ceph.release.gpg
 wget https://download.ceph.com/keys/release.asc
 sudo apt-key add release.asc
@@ -26,6 +44,7 @@ cephadm add-repo --release pacific
 cephadm install ceph-common
 -------------------------------------
 ```
+
 
 ## install cephadm in other monitor's servera
 
