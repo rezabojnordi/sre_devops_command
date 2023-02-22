@@ -1,3 +1,121 @@
+
+## docker swarm on custome ip
+
+```
+docker swarm init swarm init --advertise-addr 192.168.1.8
+```
+* afther you need to copy link on other server for worker
+
+```
+docker node ls
+
+```
+
+## docker info and join-token
+
+```
+docker info
+```
+
+### How to get token for worker and manager
+
+```
+docker swarm join-token worker
+
+or
+
+docker swarm join-token manager
+
+```
+
+ ## how to convert worker to master
+ 
+ ```
+ docker node promote worker1 worker2
+ 
+ docker node ls
+ ```
+ 
+ 
+ ## how to convert manager to worker
+ ```
+ docker node demote worker2
+ 
+ docker node ls
+ ```
+ 
+ ## REmoving nodes from Docker swarm
+ 
+ * you need to run this command on node such as worker node
+ ```
+ docker swarm leave
+ ```
+ * run this command on master or manager
+ 
+ ```
+ docker node rm worker1
+ or
+ docker node rm -f worker2
+ ```
+ 
+ ## add new server on swarm 
+ * run this command on master
+ ```
+ docker swarm jon-token manager
+ ```
+ * run output up command on worker
+ ```
+ docker swarm join --token string
+ ```
+ 
+ ## inspecting the nodes of swarm
+ ```
+ 
+ docker node inspect worker1
+ ```
+ 
+ ## Creating first docker service
+ 
+Note: Service = image for a microservice
+
+ '''
+ docker service create -d busybox ping www.google.com
+
+ docker dervice create -d busybox ping 192.168.1.8
+
+ docker service ls
+
+
+
+ '''
+  
+ 
+ ## adding replicas of docker services
+
+ ```
+docker service inspect tw
+
+docker service create -d --replicas 7 busybox
+
+docker service create -d --replicas 7 busybox ping 192.168.1.8
+
+ ```
+
+ ## Docker swarm Visualizer
+
+* https://github.com/dockersamples/docker-swarm-visualizer
+
+ ‍‍```
+docker-swarm-visualizer
+
+docker service create --name-viz --public=8080:8080/tcp --constraint=node.role==manager --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock dockersample/visualizer
+
+
+ ```
+
+ 
+
+
 docker network ls
 create network for fronend and backend
 
