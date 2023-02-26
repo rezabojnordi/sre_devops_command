@@ -1,0 +1,47 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:v2.6
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmmode=true"
+      - "--providers.docker.exposedbydefault=false"
+      # - "--providers.docker.network=application"
+      - "--entrypoints.web.address=:80"
+      - "--log.level=INFO"
+    ports:
+      - "8081:80"
+      - "8088:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # - "./letsencrypt:/letsencrypt"
+    networks:
+      - application
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.traefik.entrypoints=web"
+        - "traefik.http.routers.traefik-secure.rule=Host(`traefik.example.com`)"
+        - "traefik.http.routers.traefik-secure.service=api@internal"
+
+  whoami:
+    image: "traefik/whoami"
+    # container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.entrypoints=web"
+      # - "traefik.http.routers.whoami.rule=Host(`whoami.docker.local`)"
+      - "traefik.http.routers.whoami.rule=Path(`/whoami`)"
+      # - "traefik.http.middlewares.whoami.stripprefix.prefixes=/whoami"
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+      - "traefik.http.routers.whoami.service=whoami"
+    networks:
+      - application
+
+networks:
+  application:
+    external: true

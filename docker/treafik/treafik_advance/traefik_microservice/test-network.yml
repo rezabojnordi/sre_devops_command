@@ -1,0 +1,9 @@
+version: '3'
+services:
+  tool:
+    image: "praqma/network-multitool:alpine-minimal"
+    networks:
+      - application
+networks:
+  application:
+    external: true
