@@ -1,0 +1,38 @@
+version: "3"
+services:
+  reverse-proxy:
+    image: traefik:latest
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - "demo-net"
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  frontend:
+    build: ./frontend
+    image: demo-frontend
+    networks:
+      - "demo-net"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`front.softgrand.ir`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+
+  backend:
+    build: ./backend
+    image: demo-backend
+    networks:
+      - "demo-net"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`back.softgrand.ir`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+
+networks:
+  demo-net:
