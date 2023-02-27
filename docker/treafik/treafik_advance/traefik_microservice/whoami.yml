@@ -1,0 +1,15 @@
+version: '3'
+services:
+  whoami:
+    image: "traefik/whoami"
+    networks:
+      - application
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.whoami.entrypoints=web"
+        - "traefik.http.routers.whoami.rule=Path(`/whoami`)"
+        - "traefik.http.services.whoami.loadbalancer.server.port=80"
+networks:
+  application:
+    external: true

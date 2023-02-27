@@ -1,0 +1,60 @@
+# traefik.yml
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+# Define the entrypoints for HTTP and TCP traffic
+entryPoints:
+  web:
+    address: :80
+
+  websecure:
+    address: :443
+
+api:
+  dashboard: true
+  insecure: false
+
+docker:
+  endpoint: "unix:///var/run/docker.sock"
+
+
+# Enable Docker Swarm mode
+providers:
+  docker:
+    swarmMode: true
+    swarmModeRefreshSeconds: 30
+    exposedByDefault: true
+    network: application
+    allowEmptyServices: true
+
+# Configure the HTTPS certificates
+# certificatesResolvers:
+#   letsencrypt:
+#     acme:
+#       email: youremail@example.com
+#       storage: acme.json
+#       httpChallenge:
+#         entryPoint: http
+  # Add additional certificate resolvers as needed
+
+# Configure the routers and services for the walletm service
+http:
+  routers:
+    walletm:
+      rule: "Host(`example.com`) && Path(`/walletm`)"
+#       service: "walletm"
+#     whoami:
+#       rule: "Path(`/whoami`)"
+#       service: "whoami"
+#   services:
+#     walletm:
+#       loadBalancer:
+#         server:
+#           address: "walletm:80"
+#           # port: ":80"
+#     whoami:
+#       loadBalancer:
+#         servers:
+#           # address: "whoami"
+#           port: "80"
