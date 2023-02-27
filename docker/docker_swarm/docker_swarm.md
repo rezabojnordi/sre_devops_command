@@ -110,11 +110,123 @@ docker-swarm-visualizer
 
 docker service create --name-viz --public=8080:8080/tcp --constraint=node.role==manager --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock dockersample/visualizer
 
+```
+```
+## Viewing logs of services and tasks
 
- ```
+```
+docker service logs n6
+
+docker service ps n6
+
+
+```
+
+
+
 
  
+## Updating role and availability
 
+```
+docker node update --role manager worker1
+
+docker node update --role worker worker1
+
+docker node update --availableity=pause workre1
+
+docker node ls   ## if you run this command worker node will pause it
+
+docker node update --availability=active worker1 
+```
+```
+docker service create -d alpine ping 192.168.1.8
+docker service create -d --constraint="node.labels.env==development" alpine ping 192.168.1.8
+
+docker service ps gw
+
+```
+## Port Mapping
+
+```
+docker service create -d -p 8090:80 nginx
+
+docker service rm service_id or service_name
+```
+
+## labels
+* key-value pair storage in form of strings
+* Useful in adding metadata into nodes
+* role: Development,Testing.Production
+* region: Us, EU, APAC
+* disk: HDD,SDD
+```
+docker node update --label-add env=development worker1
+docker node update --label-add env=testing worker2
+docker node ls
+docker node update --label-rm env rd xp ## error
+
+docker node update --help
+
+docker node update --label-rm evn xp
+
+docker service create --constraint="node.labels.env==development" -d alpine ping 192.168.1.8
+
+docker service create --constraint="node.labels.env==testing" --replicas=2 -d alpine ping 192.168.1.8
+
+```
+
+## High availability
+```
+
+Note: If you remove container and then the service aumateing run.
+
+    
+```
+
+## Scalability and Load
+
+```
+docker service --help 
+  scalling up and scalling down
+docker service ls
+
+docker service scale tw=5  # tw(service name) 
+
+docker service ls
+
+docker service scale tw=1
+
+```
+
+## Loadbalcing and force rebalancing
+```
+docker service create --name service1 -d --replicas=30 ping www.google.com 
+
+docker service ls
+
+docker service ps j9
+
+docker service j9 |grep worker1
+docker service j9 |grep worker1 | wc -l
+
+docker swarm join-token worker
+
+docker service ls
+
+docker service update j9 --detach=false --force
+
+docker service ps j9 |grep manager1 |grep -iv shutdown |we -l
+
+```
+## Rebalncing docker
+
+
+## Traefik sample
+
+
+
+## other sample
 
 docker network ls
 create network for fronend and backend
