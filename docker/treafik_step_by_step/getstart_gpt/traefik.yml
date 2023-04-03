@@ -1,0 +1,22 @@
+log:
+  level: ERROR
+
+api:
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: youremail@example.com
+      storage: acme.json
+      httpChallenge:
+        entryPoint: web

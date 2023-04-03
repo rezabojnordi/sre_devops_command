@@ -1,0 +1,35 @@
+version: '3'
+services:
+  reverse-proxy: 
+    image: traefik:v2.4
+    command: --api.insecure=true --providers.docker
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080 #Management UI
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/etc/traefik/traefik.yml
+
+  webservice:
+    image: nobody1997/nginx-tutorial:1.0.0
+    #nginx:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webservice.rule=Host(`webservice.softgrand.ir`)"
+      - "traefik.http.services.webservice.loadbalancer.server.port=8000"
+      - "traefik.http.routers.webservice.middlewares=app1"
+      - "traefik.http.middlewares.app1.stripprefix.prefixes=/foobar,/fiibar"
+        #ports:
+        #- 8000:80
+
+  webservice1:
+    image: nginx:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webservice1.rule=Host(`webservice.softgrand.ir`)"
+      - "treafik.http.services.webservice1.loadbalancer.server.port=8001"
+
+    ports:
+      - 8001:80
+
