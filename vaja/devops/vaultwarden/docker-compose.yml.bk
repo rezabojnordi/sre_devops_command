@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+      #container_name: vaultwarden
+      #restart: always
+    environment:
+      - WEBSOCKET_ENABLED=true
+    volumes:
+      - vault:/data
+    networks:
+      - vault
+
+  caddy:
+    image: caddy:2
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      #container_name: caddy
+      #restart: always
+    ports:
+      - 8092:80
+      - 8443:443
+    volumes:
+      #- vault:./Caddyfile:/etc/caddy/Caddyfile:ro
+      # - vault:/etc/caddy/Caddyfile:ro
+      - vault:/etc/caddy/:ro
+        #- vault:./caddy-config:/config
+      - vault:/config
+        #- vault:./caddy-data:/data
+      - vault:/data
+    environment:
+      - DOMAIN=https://vault.vajab.ir
+      - EMAIL=rezabojnordi2012@gmail.com
+      - LOG_FILE=/data/access.log
+    networks:
+      - vault
+volumes:
+  vault:
+    driver: convoy
+
+networks:
+  vault:
+    external: true

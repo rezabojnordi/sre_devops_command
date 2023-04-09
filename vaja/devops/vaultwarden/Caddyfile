@@ -1,0 +1,40 @@
+{$DOMAIN}:443 {
+  log {
+    level INFO
+    output file {$LOG_FILE} {
+      roll_size 10MB
+      roll_keep 10
+    }
+  }
+
+  # Get a cert by using the ACME HTTP-01 challenge.
+  tls {$EMAIL}
+
+  encode gzip
+
+  # Headers to improve security.
+  header {
+  # Enable HSTS
+  Strict-Transport-Security "max-age=31536000;"
+
+  # Enable cross-site filter (XSS)
+  X-XSS-Protection "1; mode=block"
+
+  # Disallow the site to be rendered within a frame (clickjacking protection)
+  X-Frame-Options "DENY"
+
+  # Prevent search engines from indexing
+  X-Robots-Tag "none"
+
+  # Remove Caddy branding
+  -Server
+  }
+
+  # Redirect notifications to the WebSocket.
+  reverse_proxy /notifications/hub vaultwarden:3012
+
+  reverse_proxy vaultwarden:8092 {
+       header_up X-Real-IP {remote_host}
+  }
+}
+

@@ -1,0 +1,27 @@
+# traefik.yml
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+# Define the entrypoints for HTTP and TCP traffic
+entryPoints:
+  web:
+    address: :80
+
+  websecure:
+    address: :443
+
+api:
+  dashboard: true
+  insecure: false
+
+# Enable Docker Swarm mode
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    swarmMode: true
+    swarmModeRefreshSeconds: 30
+    exposedByDefault: true
+    network: application
+
+# Configure the routers and services for the walletm service

@@ -1,0 +1,67 @@
+version: "3"
+services:
+  controller:
+    image: traefik:v2.6
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.thisproxylocal.rule=Host(`185.213.164.105`)"
+        - "traefik.http.routers.thisproxylocal.entryPoints=console,websecure"
+        - "traefik.http.routers.thisproxylocal.service=api@internal"
+        - "traefik.http.routers.thisproxylocal.middlewares=admin"
+        - "traefik.http.services.thisproxytls.loadbalancer.server.port=8080"
+        - "traefik.http.routers.thisproxytls.rule=Host(`your.domain.com`)"
+        - "traefik.http.routers.thisproxytls.entrypoints=websecure"
+        - "traefik.http.routers.thisproxytls.service=api@internal"
+        - "traefik.http.routers.thisproxytls.middlewares=admin"
+        - "traefik.http.routers.thisproxytls.tls.certresolver=letsencrypt"
+      #mode: global
+      placement:
+        constraints:
+          - node.role == manager
+    environment:
+      - CF_API_EMAIL=alirezaralireza@gmail.com
+      - CF_API_KEY=a38aeabca7e4203d6cd20b0b99441759a5f68
+    command:
+      # - "--configFile=/traefik.yml"
+      - "--api.dashboard=true"
+      - "--api=true"
+      - "--api.insecure=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.console.address=:8080"
+      - "--certificatesresolvers.letsencrypt.acme.email=alirezaralireza@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=acme/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.web.http.redirections.entrypoint.permanent=true"
+      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.letsencrypt.acme.dnsChallenge.provider=cloudflare"
+      - "--certificatesresolvers.letsencrypt.acme..dnsChallenge=true"
+      - "--log.level=DEBUG"
+      - "--log.filePath=/traefik-logs/logs/traefik.log"
+
+    ports:
+      - "80:80"
+      - "8088:8080"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik.yml:/traefik.yml:ro"
+      # - "/storage/volumes/traefik/acme:/acme"
+      # - "/storage/volumes/traefik/logs:/logs"
+      - traefik:/traefik-logs
+      - traefik:/acme
+    networks:
+      - application
+volumes:
+  traefik:
+    driver: convoy
+networks:
+  application:
+    external: true

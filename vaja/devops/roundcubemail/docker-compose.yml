@@ -1,0 +1,64 @@
+version: '3.7'
+
+services:
+  roundcube:
+    image: roundcube/roundcubemail:latest
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.role == worker
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=mail.vajab.ir
+      - ROUNDCUBEMAIL_SMTP_SERVER=mail.vajab.ir
+      - ROUNDCUBEMAIL_SMTP_PORT=587
+      - ROUNDCUBEMAIL_SMTP_USER=root_vajab
+      - ROUNDCUBEMAIL_SMTP_PASSWORD=vajab@123
+      - ROUNDCUBEMAIL_IMAP_SERVER=mail.vajab.ir
+      - ROUNDCUBEMAIL_IMAP_PORT=993
+      - ROUNDCUBEMAIL_IMAP_USER=root_vajab
+      - ROUNDCUBEMAIL_IMAP_PASSWORD=vajab@123
+      - ROUNDCUBEMAIL_DB_TYPE=mysqli
+      - ROUNDCUBEMAIL_DB_HOST=db
+      - ROUNDCUBEMAIL_DB_PORT=3306
+      - ROUNDCUBEMAIL_DB_USER=root
+      - ROUNDCUBEMAIL_DB_PASSWORD=9lJku0@z4X2JR
+      - ROUNDCUBEMAIL_DB_NAME=roundcubemail
+    ports:
+      - target: 8086
+        published: 8086
+        protocol: tcp
+
+    networks:
+      - application
+    volumes:
+      - /mnt/volumes/roundcube/:/var/www/html
+
+  db:
+    image: mysql:5.7
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.role == worker
+    environment:
+      MYSQL_ROOT_PASSWORD: 9lJku0@z4X2JR
+      MYSQL_DATABASE: roundcubemail
+      MYSQL_USER: roundcube
+      MYSQL_PASSWORD: roundcube
+    networks:
+      - application
+    volumes:
+      - /mnt/volumes/roundcube/db/:/var/lib/mysql
+
+        #volumes:
+        #roundcube_data:
+        #db_data:
+
+networks:
+  application:
+    external: true

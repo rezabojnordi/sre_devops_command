@@ -1,0 +1,49 @@
+version: "3.6"
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:15.9.1-ce.0
+    networks:
+      - application
+    volumes:
+      - data:/var/opt/gitlab
+      - logs:/var/log/gitlab
+      - config:/etc/gitlab 
+      # - data/backups:/var/opt/gitlab/backups
+    environment:
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
+    configs:
+      - source: gitlab
+        target: /omnibus_config.rb
+    secrets:
+      - gitlab_root_password
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=application"
+        - "traefik.http.routers.gitlab.rule=Host(`git2.vajab.ir`)"
+        - "traefik.http.routers.gitlab.entrypoints=websecure"
+        - "traefik.http.routers.gitlab.service=gitlab"
+        - "traefik.http.routers.gitlab.tls.certresolver=letsencrypt"
+        # - "traefik.http.routers.blog-wp.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.gitlab.tls=true"
+        - "traefik.http.services.gitlab.loadbalancer.server.port=80" 
+volumes:
+  data:
+    driver: convoy
+  config:
+    driver: convoy
+  logs:
+    driver: convoy
+
+configs:
+  gitlab:
+    file: gitlab.rb
+secrets:
+  gitlab_root_password:
+    file: root_password.txt
+networks:
+  application:
+    external: true

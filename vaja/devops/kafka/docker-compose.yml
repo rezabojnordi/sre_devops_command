@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  zookeeper:
+    image: zookeeper:3.5
+    networks:
+      - kafka-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+  kafka:
+    image: wurstmeister/kafka:2.13-2.8.1
+    ports:
+      - target: 9092
+        published: 9092
+        protocol: tcp
+        mode: host
+    environment:
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://85.208.253.37:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "test_topic:1:1"
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  kafka-net:
+    driver: overlay
+

@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    ports:
+      - 8094:80
+      - 9043:443    
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+      #container_name: vaultwarden
+      #restart: always
+    environment:
+      - WEBSOCKET_ENABLED=true
+      - ROCKET_TLS="{certs='/ssl/fullchain.pem',key='/ssl/privkey.pem'}"
+    volumes:
+      - vault:/data
+      - /etc/letsencrypt/live/vault.vajab.ir:/ssl
+    networks:
+      - vault
+volumes:
+  vault:
+    driver: convoy
+
+networks:
+  vault:
+    external: true
