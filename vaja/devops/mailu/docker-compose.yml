@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  mailu:
+    image: mailu/mailu:latest
+    environment:
+      HOSTNAME: mail.vajab.ir
+      DISABLE_CLAMAV: 'true'
+      VIRTUAL_HOST: mail.vajab.ir
+      LETSENCRYPT_HOST: mail.vajab.ir
+      LETSENCRYPT_EMAIL: admin@vajab.ir
+      ADDITIONAL_SAN: webmail.vajab.ir
+      SSMTP_HOST: smtp.vajab.ir
+      SSMTP_PORT: "587"
+      SSMTP_USERNAME: admin@vajab.ir
+      SSMTP_PASSWORD: "reza@123"
+      DB_URL: "postgresql://mailu:admin_password@db/mailu"
+    volumes:
+      - /mnt/volume/mailu:/mailu_data
+    networks:
+      - application
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailu.rule=Host(`mail.vajab.ir`) || Host(`webmail.vajab.ir`)"
+      - "traefik.http.routers.mailu.entrypoints=websecure"
+      - "traefik.http.routers.mailu.tls.certresolver=letsencrypt"
+      - "traefik.http.services.mailu.loadbalancer.server.port=2052"
+      - "traefik.docker.network=application"
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: mailu
+      POSTGRES_PASSWORD: reza@123
+      POSTGRES_DB: mailu
+    volumes:
+      - /storage/volume/db:/var/lib/postgresql/data
+    networks:
+      - application
+
+networks:
+  application:
+    external: true
+

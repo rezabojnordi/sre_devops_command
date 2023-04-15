@@ -1,0 +1,70 @@
+version: "3.7"
+
+services:
+  wp-database:
+    image: mariadb:10.6.4-focal
+    command: "--default-authentication-plugin=mysql_native_password"
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=N4HweM2UyPiUuafL62a7
+      - MYSQL_DATABASE=wp_db
+      - MYSQL_USER=blog
+      - MYSQL_PASSWORD=3Dn3QeBsb7pmzgGMc4Wx
+    networks:
+      - application
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - wp:/var/www/html
+    environment:
+      - WORDPRESS_DB_HOST=wp-database
+      - WORDPRESS_DB_USER=blog
+      - WORDPRESS_DB_PASSWORD=3Dn3QeBsb7pmzgGMc4Wx
+      - WORDPRESS_DB_NAME=wp_db
+    networks:
+      - application
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.wordpress.entrypoints=web,websecure"
+        - "traefik.http.routers.wordpress.rule=Host(`test.vajab.ir`) && Path(`/testing`)"
+        - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+        - "traefik.http.routers.wordpress.service=wordpress"
+        - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
+        - "traefik.docker.network=application"
+
+  apache:
+    image: httpd
+    networks:
+      - application
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.apache.entrypoints=web,websecure"
+        - "traefik.http.routers.apache.rule=Host(`test.vajab.ir`)"
+        - "traefik.http.services.apache.loadbalancer.server.port=80"
+        - "traefik.http.routers.apache.service=apache"
+        - "traefik.http.routers.apache.tls.certresolver=letsencrypt"
+        - "traefik.docker.network=application"
+
+networks:
+  application:
+    external: true
+
+volumes:
+  db:
+    driver: convoy
+  wp:
+    driver: convoy

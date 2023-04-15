@@ -1,0 +1,23 @@
+- hosts: master
+  become: yes
+  become_user: root
+  tasks:
+    - name: Build the image
+      ansible.builtin.shell: cd "{{ project_path }}" && docker build -t '{{ registry }}{{ image }}:{{ tag }}' .
+      register: build_image_out
+      changed_when: build_image_out != 1
+    - name: Push the image to registry
+      ansible.builtin.shell: docker push '{{ registry }}{{ image }}:{{ tag }}'
+      register: push_image
+      changed_when: push_image != 1
+    - name: Create Docker compose on Worker
+      community.docker.docker_stack:
+        name: "{{ project_name }}"
+        state: present
+        compose: "{{ project_path }}/docker-compose.yml"
+        with_registry_auth: true
+        resolve_image: always
+      environment:
+        IMAGE_NAME: "{{ registry }}{{ image }}"
+        IMAGE_TAG: "{{ tag }}"
+        DOMAIN: "{{ domain }}"

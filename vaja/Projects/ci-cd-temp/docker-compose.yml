@@ -1,0 +1,34 @@
+version: "3.3"
+
+services:
+  nuxt:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.nuxt.entrypoints=web"
+        - "traefik.http.routers.nuxt.rule=Host(`${DOMAIN}`)"
+        - "traefik.http.services.nuxt.loadbalancer.server.port=3000"
+        - "traefik.default.protocol=http"
+        - "traefik.http.routers.nuxt.service=nuxt"
+        - "traefik.docker.network=application"
+        - "traefik.http.routers.nuxt.tls.certresolver=letsencrypt"
+    volumes:
+      - nuxt:/app:z
+    networks:
+      - application
+
+volumes:
+  nuxt:
+    driver: convoy
+
+networks:
+  application:
+    external: true

@@ -1,0 +1,26 @@
+version: '3.2'
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    deploy:
+      mode: global
+    ports:
+    - :8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+      - redis
+    networks:
+      - monitoring
+  redis:
+    image: redis:latest
+    # ports:
+    # - 6379:6379
+    networks:
+      - monitoring
+networks:
+  monitoring:
+   external: true

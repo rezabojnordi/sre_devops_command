@@ -1,0 +1,1 @@
+for pid in $(lsof +L1 /proc/ | grep deleted | awk '{print $2}'); do kill -9 "$pid"; done

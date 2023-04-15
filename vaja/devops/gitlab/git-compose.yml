@@ -1,0 +1,60 @@
+version: '3'
+services:
+  gitlab:
+    container_name: gitlab
+    image: 'gitlab/gitlab-ce:latest'
+    # restart: always
+    # hostname: 'gitlab.domain.com'
+    labels:
+      - "traefik.docker.network=traefik_network"
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:gitlab.vajab.ir"
+      - "traefik.frontend.entryPoints=https"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.blog-wp.entrypoints=web,websecure"
+        - "traefik.http.routers.blog-wp.rule=Host(`vajab.ir`)" # && Path(`/blog`)"
+        - "traefik.http.services.blog-wp.loadbalancer.server.port=80"
+        - "traefik.http.routers.blog-wp.service=blog-wp"
+        - "traefik.docker.network=application"
+        - "traefik.http.routers.blog-wp.tls.certresolver=letsencrypt"
+    healthcheck:
+      disable: true
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.giftdigging.com'
+        nginx['redirect_http_to_https'] = false
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['proxy_set_headers'] = {
+          'X-Forwarded-Proto' => 'https',
+          'X-Forwarded-Ssl' => 'on'
+        }
+        nginx['client_max_body_size'] = '2G'
+        unicorn['worker_timeout'] = 60
+        unicorn['worker_processes'] = 2
+        sidekiq['concurrency'] = 15
+        postgresql['shared_buffers'] = "512MB"
+        gitlab_rails['artifacts_enabled'] = true
+        gitlab_rails['artifacts_path'] = "/var/opt/gitlab/gitlab-artifacts"
+        gitlab_rails['lfs_enabled'] = true
+        gitlab_rails['backup_keep_time'] = 172600
+        gitlab_ci['backup_keep_time'] = 172600
+    ports:
+      - '22:22'
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab'
+      - '/srv/gitlab/logs:/var/log/gitlab'
+      - '/srv/gitlab/data:/var/opt/gitlab'
+    networks:
+      - traefik_network
+networks:
+    traefik_network:
+        external: true
+    internal_network:
+        external: false

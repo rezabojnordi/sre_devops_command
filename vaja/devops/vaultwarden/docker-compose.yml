@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.vaultwarden.rule=Host(`vault.vajab.ir`)"
+        - "traefik.http.routers.vaultwarden.entrypoints=web,websecure"
+        - "traefik.http.routers.vaultwarden.service=vaultwarden"
+        - "traefik.docker.network=application"
+        - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
+        - "traefik.http.services.vaultwarden.loadbalancer.server.port=2052"
+
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - ROCKET_PORT=2052
+      - SIGNUPS_ALLOWED=true
+      - DOMAIN=https://vault.vajab.ir
+      - ADMIN_TOKEN=ahpied5M
+    volumes:
+      - /mnt/volumes/vaultwarden:/data
+
+    ports:
+      - target: 2052
+        published: 2052
+        protocol: tcp
+      - target: 2053
+        published: 2053
+        protocol: tcp
+    networks:
+      - application
+
+
+
+networks:
+  application:
+    external: true
+

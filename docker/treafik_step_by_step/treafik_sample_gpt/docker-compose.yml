@@ -1,0 +1,51 @@
+version: "3"
+services:
+  traefik:
+    image: traefik:v2.2
+    container_name: traefik
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.network=traefik-net"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - traefik-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  microservice1:
+    build: ./microservice1
+    container_name: microservice1
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.http.routers.microservice1.rule=Host(`microservice1.example.com`)"
+      - "traefik.http.routers.microservice1.entrypoints=web"
+      - "traefik.http.services.microservice1.loadbalancer.server.port=3000"
+
+  microservice2:
+    build: ./microservice2
+    container_name: microservice2
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.http.routers.microservice2.rule=Host(`microservice2.example.com`)"
+      - "traefik.http.routers.microservice2.entrypoints=web"
+      - "traefik.http.services.microservice2.loadbalancer.server.port=3000"
+
+  microservice3:
+    build: ./microservice3
+    container_name: microservice3
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.http.routers.microservice3.rule=Host(`microservice3.example.com`)"
+      - "traefik.http.routers.microservice3.entrypoints=web"
+      - "traefik.http.services.microservice3.loadbalancer.server.port=3000"
+
+networks:
+  traefik-net:
+    external: true

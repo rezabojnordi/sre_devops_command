@@ -1,0 +1,31 @@
+version: '3'
+services:
+  reverse-proxy: 
+    image: traefik:v2.4
+    ports:
+      - 80:80
+      - 8080:8080 #Management UI
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/etc/traefik/traefik.yml
+
+  webservice:
+    image: nginx:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.weebservice.rule=Host(`webservice.softgrand.ir`)"
+      - "treafik.http.services.webservice.loadbalancer.service.port=8000"
+
+    ports:
+      - 8000:80
+
+  webservice1:
+    image: nginx:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webservice1.rule=Host(`webservice.softgrand.ir`)"
+      - "treafik.http.services.webservice1.loadbalancer.service.port=8001"
+
+    ports:
+      - 8001:80
+

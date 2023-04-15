@@ -1,0 +1,75 @@
+version: "3"
+services:
+  wp-database:
+    # We use a mariadb image which supports both amd64 & arm64 architecture
+    image: mariadb:10.6.4-focal
+    # If you really want to use MySQL, uncomment the following line
+    #image: mysql:8.0.27
+    command: "--default-authentication-plugin=mysql_native_password"
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=N4HweM2UyPiUuafL62a7
+      - MYSQL_DATABASE=wp_db
+      - MYSQL_USER=blog
+      - MYSQL_PASSWORD=3Dn3QeBsb7pmzgGMc4Wx
+    networks:
+      - application
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - "traefik.enable=false"
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - wp_data:/var/www/html
+    # ports:
+    #   - 80:80
+    environment:
+      - WORDPRESS_DB_HOST=blog-db
+      - WORDPRESS_DB_USER=blog
+      - WORDPRESS_DB_PASSWORD=3Dn3QeBsb7pmzgGMc4Wx
+      - WORDPRESS_DB_NAME=wp_db
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.wordpress.entrypoints=web,websecure"
+        # - "traefik.http.routers.wordpress.rule=Host(`test.vajab.ir`)" # && Path(`/blog`)"
+        - "traefik.http.routers.wordpress.rule=Host(`test.vajab.ir`) && Path(`/testing`)"
+        - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+        - "traefik.http.routers.wordpress.service=wordpress"
+        - "traefik.docker.network=application"
+        - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.service-b.middlewares=admin@docker"
+        - "traefik.http.middlewares.admin.addprefix.prefix=/testing"
+    networks:
+      - application
+  nginx:
+    image: nginx:latest
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.nginx.entrypoints=web,websecure"
+        - "traefik.http.routers.nginx.rule=Host(`test.vajab.ir`)"
+        - "traefik.http.services.nginx.loadbalancer.server.port=80"
+        - "traefik.http.routers.nginx.service=nginx"
+        - "traefik.docker.network=application"
+        - "traefik.http.routers.nginx.tls.certresolver=letsencrypt"
+    networks:
+      - application
+volumes:
+  db_data:
+    driver: convoy
+  wp_data:
+    driver: convoy
+networks:
+  application:
+    external: true

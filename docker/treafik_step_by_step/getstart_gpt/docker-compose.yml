@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    container_name: flask_app
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flask_app.rule=Host(`flask_app.docker.localhost`)"
+      - "traefik.http.routers.flask_app.entrypoints=web"
+      - "traefik.http.services.flask_app.loadbalancer.server.port=5000"
+    networks:
+      - traefik-net
+
+  traefik:
+    image: traefik:v2.5
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - traefik-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+
+networks:
+  traefik-net:
+    external: true
