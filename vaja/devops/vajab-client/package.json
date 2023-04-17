@@ -1,0 +1,62 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint:js": "eslint --ext \".js,.vue\" --ignore-path .gitignore .",
+    "lint": "npm run lint:js",
+    "lintfix": "npm run lint:js -- --fix"
+  },
+  "devDependencies": {
+    "@nuxtjs/eslint-config": "^12.0.0",
+    "@nuxtjs/eslint-config-typescript": "^12.0.0",
+    "@nuxtjs/i18n": "8.0.0-beta.10",
+    "@types/js-cookie": "^3.0.3",
+    "@types/lodash": "^4.14.191",
+    "@types/uuid": "^9.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "@vue/eslint-config-standard": "^8.0.1",
+    "@vueuse/core": "^9.13.0",
+    "@vueuse/nuxt": "^9.13.0",
+    "nuxt": "^3.2.3",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-nuxt": "^4.0.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.9.0",
+    "prettier": "^2.8.4",
+    "sass": "^1.59.2",
+    "sass-loader": "^13.2.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@chenfengyuan/vue-qrcode": "^2.0.0",
+    "@pinia/nuxt": "^0.4.7",
+    "axios": "^1.3.4",
+    "chart.js": "^4.2.1",
+    "floating-vue": "2.0.0-beta.20",
+    "jalali-moment": "^3.3.11",
+    "js-cookie": "^3.0.1",
+    "lodash": "^4.17.21",
+    "ohmyfetch": "^0.4.21",
+    "pinia": "^2.0.33",
+    "qrcode": "^1.5.1",
+    "swiper": "^9.1.0",
+    "uuid": "^9.0.0",
+    "vee-validate": "^4.8.1",
+    "vite-plugin-vue-type-imports": "^0.2.4",
+    "vue-chartjs": "^5.2.0",
+    "vue-qrcode": "^2.2.0",
+    "vue-toastification": "2.0.0-rc.5",
+    "vue3-persian-datetime-picker": "^1.2.2",
+    "yup": "^1.0.2"
+  },
+  "overrides": {
+    "vue": "latest"
+  }
+}

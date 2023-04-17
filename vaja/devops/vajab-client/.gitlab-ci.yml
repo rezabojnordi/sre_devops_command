@@ -1,0 +1,29 @@
+variables:
+  REGISTRY: "reg.vajab.ir:8443/library/"
+  IMAGE: "vajab_client"
+  TAG: "prodv1"
+  DOMAIN: "vajab.ir"
+
+stages: # List of stages for jobs, and their order of execution
+  - build
+  - deploy
+  - clean
+
+build-job: # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - echo "Compiling the code..."
+    - cd  $CI_PROJECT_DIR
+    - echo $CI_COMMIT_BRANCH
+    - git clone -b $CI_COMMIT_BRANCH git@git.vajab.ir:$CI_PROJECT_PATH
+
+deploy-job: # This job runs in the build stage, which runs first.
+  stage: deploy
+  script:
+    - cd  $CI_PROJECT_DIR
+    - ansible-playbook -i ./deploy/invent.ini --extra-vars "registry=$REGISTRY image=$IMAGE tag=$TAG project_path=$CI_PROJECT_DIR project_name=$CI_PROJECT_NAME-$CI_COMMIT_BRANCH domain=$DOMAIN" ./deploy/run.yaml
+
+clean-job: # This job runs in the build stage, which runs first.
+  stage: clean
+  script:
+    - rm -rf $CI_PROJECT_DIR

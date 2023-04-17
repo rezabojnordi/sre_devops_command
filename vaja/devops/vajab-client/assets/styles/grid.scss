@@ -1,0 +1,97 @@
+.g-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@mixin create-mq($breakpoint) {
+  @if($breakpoint == 0) {
+    @content;
+  } @else {
+    @media screen and (min-width: $breakpoint *1rem) {
+      @content;
+    }
+  }
+}
+
+$grid__cols: 24;
+$grid__bp-sm: 36;
+$grid__bp-md: 48;
+$grid__bp-lg: 62;
+$grid__bp-xl: 75;
+$map-grid-props: (
+      '-xs': 0,
+      '-sm': $grid__bp-sm,
+      '-md': $grid__bp-md,
+      '-lg': $grid__bp-lg,
+      '-xl': $grid__bp-xl
+);
+
+@mixin create-col-classes($modifier, $grid-cols, $breakpoint) {
+  @include create-mq($breakpoint) {
+    .g-col#{$modifier}-offset-0 {
+      margin-left: 0;
+    }
+    @for $i from 1 through $grid-cols {
+      .g-col#{$modifier}-#{$i} {
+        flex-basis: (math.div(100, calc($grid-cols / $i))) * 1%;
+        max-width: (math.div(100, calc($grid-cols / $i))) * 1%;
+
+      }
+      .g-col#{$modifier}-offset-#{$i} {
+        margin-left: (math.div(100, calc($grid-cols / $i))) * 1%;
+      }
+    }
+  }
+}
+
+@each $modifier , $breakpoint in $map-grid-props {
+@include create-col-classes($modifier, $grid__cols, $breakpoint);
+}
+
+.g-justify-center {
+  justify-content: center;
+}
+
+.g-justify-space-around {
+  justify-content: space-around;
+}
+
+.g-justify-space-between {
+  justify-content: space-between;
+}
+
+.g-justify-start {
+  justify-content: start;
+}
+
+.g-justify-end {
+  justify-content: end;
+}
+
+.g-align-center {
+  align-items: center;
+}
+
+.g-align-end {
+  align-items: end;
+}
+
+.g-align-start {
+  align-items: start;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.w-100 {
+  width: 100%;
+}
+.h-100 {
+  height: 100%;
+}
+

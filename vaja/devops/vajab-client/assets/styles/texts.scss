@@ -1,0 +1,204 @@
+.text-title-1 {
+    font-size: 1.5rem;
+    color: $--color-neutral-900;
+    line-height: 2rem;
+}
+
+.color-primary {
+    color: $--color-primary;
+}
+
+.color-base {
+    color: $--color-neutral-900;
+}
+
+.color-white {
+    color: $__color-white;
+}
+
+.text-1-4 {
+    font-size: 10px;
+    color: $--color-neutral-300;
+}
+
+.text-title-1 {
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 4.37rem;
+}
+
+.text-title-2 {
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 3.5rem;
+}
+
+.text-title-3 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 2.6rem;
+}
+
+.text-title-4 {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.75rem;
+}
+
+.text-title-5 {
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 28px;
+}
+
+.text-title-6 {
+    font-weight: 700;
+    font-size: 0.8rem;
+    line-height: 1.31rem;
+}
+
+.text-regular-1 {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.text-regular-2 {
+    font-size: 1.25rem;
+    font-weight: 400;
+}
+
+.text-regular-3 {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.text-regular-4 {
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+.text-regular-5 {
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.text-regular-6 {
+    font-size: 0.625rem;
+    font-weight: 400;
+}
+
+.text-sm-1 {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+}
+
+.text-sm-2 {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.text-sm-3 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.52rem;
+}
+
+.color {
+  &-success {
+    color: $--color-success;
+  }
+  &-warning {
+    color: $--color-warning;
+  }
+  &-danger {
+    color: $--color-danger;
+  }
+  &-placeholder {
+    color: $--color-text-placeholder;
+  }
+}
+
+@media(max-width: 32em) {
+    .text-title-1 {
+        font-weight: 700;
+        font-size: 2.5rem;
+        line-height: 4.37rem;
+    }
+
+    .text-title-2 {
+        font-weight: 700;
+        font-size: 2rem;
+        line-height: 3.5rem;
+    }
+
+    .text-title-3 {
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .text-title-4 {
+        font-weight: 700;
+        font-size: 1rem;
+        line-height: 1.75rem;
+    }
+
+    .text-title-5 {
+        font-weight: 700;
+        font-size: 0.875rem;
+        line-height: 28px;
+    }
+
+    .text-title-6 {
+        font-weight: 700;
+        font-size: 0.8rem;
+        line-height: 1.31rem;
+    }
+
+    .text-regular-1 {
+        font-size: 1.5rem;
+        font-weight: 400;
+    }
+
+    .text-regular-2 {
+        font-size: 1.25rem;
+        font-weight: 400;
+    }
+
+    .text-regular-3 {
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .text-regular-4 {
+        font-size: 0.875rem;
+        font-weight: 400;
+    }
+
+    .text-regular-5 {
+        font-size: 0.8rem;
+        font-weight: 400;
+    }
+
+    .text-regular-6 {
+        font-size: 0.625rem;
+        font-weight: 400;
+    }
+
+    .text-sm-1 {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.75rem;
+    }
+
+    .text-sm-2 {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .text-sm-3 {
+        font-size: 0.8rem;
+        font-weight: 600;
+        line-height: 1.52rem;
+    }
+}

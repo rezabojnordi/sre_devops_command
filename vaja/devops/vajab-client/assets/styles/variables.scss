@@ -1,0 +1,69 @@
+
+$--color-primary-dark: var(--color-primary-dark);
+
+$--color-white: var(--color-white);
+$--pure-black: #000;
+$--border-color-base: var(--border-color-base);
+$--border-color-2: var(--border-color-2);
+$--color-text-placeholder: var(--color-text-placeholder);
+$--disabled-color: var(--disabled-color);
+
+$--color-neutral-900: var(--color-neutral-900);
+$--color-neutral-700: var(--color-neutral-700);
+$--color-neutral-500: var(--color-neutral-500);
+$--color-neutral-300: var(--color-neutral-300);
+$--color-neutral-100: var(--color-neutral-100);
+$--color-neutral-70: var(--color-neutral-70);
+$--color-neutral-50: var(--color-neutral-50);
+$--color-neutral-30: var(--color-neutral-30);
+$--color-neutral-20: var(--color-neutral-20);
+$--color-neutral-10: var(--color-neutral-10);
+
+// primary
+$--color-primary: var(--color-primary);
+$--color-primary-300: var(--color-primary-300);
+$--color-primary-200: var(--color-primary-200);
+$--color-primary-100: var(--color-primary-100);
+$--color-primary-50: var(--color-primary-50);
+
+// secondary
+$--color-secondary-50: var(--color-secondary-50);
+$--color-secondary-100: var(--color-secondary-100);
+$--color-secondary-200: var(--color-secondary-200);
+$--color-secondary-300: var(--color-secondary-300);
+$--color-secondary-400: var(--color-secondary-400);
+
+// warning
+$--color-warning: var(--color-warning);
+$--color-warning-300: var(--color-warning-300);
+$--color-warning-200: var(--color-warning-200);
+$--color-warning-100: var(--color-warning-100);
+$--color-warning-50: var(--color-warning-50);
+
+// success
+$--color-success: var(--color-success);
+$--color-success-300: var(--color-success-300);
+$--color-success-200: var(--color-success-200);
+$--color-success-100: var(--color-success-100);
+$--color-success-50: var(--color-success-50);
+
+//danger
+$--color-danger: var(--color-danger);
+$--color-danger-300: var(--color-danger-300);
+$--color-danger-200: var(--color-danger-200);
+$--color-danger-100: var(--color-danger-100);
+$--color-danger-50: var(--color-danger-50);
+
+// border radius
+
+$--border-radius-small: 0.25rem;
+$--border-radius-base: 0.5rem;
+$--border-radius-lg: 1rem;
+
+$--box-shadow-1: 0px 1px 4px rgba(26, 26, 26, 0.04);
+$--box-shadow-3: 0px 1px 4px rgba(26, 26, 26, 0.04);
+$--box-shadow-4: 0px 1px 8px rgba(26, 26, 26, 0.12);
+
+a {
+    color: $--color-neutral-900;
+}
