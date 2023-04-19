@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    environment:
+      - WEBPASSWORD_FILE=/run/secrets/pihole_webpassword
+    volumes:
+      - 'pihole:/etc/pihole'
+      - 'dnsmasq:/etc/dnsmasq.d'
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=application"
+        - "traefik.http.routers.pihole.entrypoints=websecure"
+        - "traefik.http.routers.pihole.rule=Host(`pihole.admin.vajab.ir`)"
+        - "traefik.http.services.pihole.loadbalancer.server.port=80"
+        - "traefik.http.routers.pihole.service=pihole"
+        - "traefik.http.routers.pihole.tls.certresolver=letsencrypt"
+
+    secrets:
+      - pihole_webpassword
+
+    networks:
+      - application
+
+networks:
+  application:
+    external: true
+
+volumes:
+  pihole:
+    driver: convoy
+  dnsmasq:
+    driver: convoy
+
+secrets:
+  pihole_webpassword:
+    external: true

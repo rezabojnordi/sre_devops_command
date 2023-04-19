@@ -134,3 +134,198 @@ kubectl -n kube-system get deployment coredns -o yaml | \
   sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | \
   kubectl apply -f -
 ```
+
+## import command on kubernetes
+
+```
+kubectl get pods
+```
+
+```
+kubectl get nodes
+```
+
+### replication controller and replica set
+
+* replication contoller is older technolugay 
+
+```
+kubectl create -f rc-definition.yml
+
+kubectl get pods
+
+kubectl get replicationcontroller
+```
+
+### replicaset
+```
+kubectl create -f replicaset-definition.yml
+kubectl get replicaset
+```
+
+## labels and selectors
+ 
+
+ ### How to scale replicaset
+
+ ```
+ kubectl replace -f replicaset-definition.yml  ## change the replicas
+
+ or
+
+ kubectl scale --replicas=6 -f replicaset-definition.yml
+
+ or
+
+ kubectl scale --replicas=6 replicaset myapp-replicaset
+
+ Type = replicaset
+ Name = myapp-replicaset
+
+ ```
+
+### Deployment  
+Note: rooling updates, under changes and pause and resume changes as required
+
+```
+kubectl create -f deployment-definition.yml
+
+kubectl get deployments
+
+kubectl get pods
+
+kubectl get replicaset
+
+kubectl get all
+
+kubectl create deployment redis-deployment --image=redis --namespace=dev-ns -dry-run=client -o yaml > redis.yaml
+
+kubectl apply -f redis.yml
+
+kubectl get deployment.apps -n dev-ns
+
+
+```
+
+### Namespace 
+
+
+```
+kubectl get pods
+
+kubectl get pods --namespace=kube-system
+
+kubectl create -f pod-dfinition.yml
+
+kubectl create namespace dev
+
+
+kubectl create ns dev-ns
+
+or
+create namespace with yml file
+
+
+kubectl create -f pod-definition.yml --namespace=dev
+
+kubectl create -f pod-definition-namespace.yml
+
+kubectl get pods --namesapce=dev
+
+kubectl get pods --namespace=proc
+```
+
+### switch namespace
+
+```
+kubectl config set-context $(kubectl config current-context) --namespace=dev
+
+kubectl get pods --namespace=default
+
+kubectl get pods --all-namespaces
+
+```
+
+### REsource Quota
+
+```
+kubectl crete-f compute-quota.yml
+
+kubectl get ns
+
+kubectl get ns --no-headers
+
+kubectl get ns --no-headers |wc -l
+
+kubectl -n dev get pods --no-headers 
+
+or
+
+kubectl -n dev get pods --no-headers |wc -l
+
+```
+
+```
+kubectl run reis --image=redis --dry-run=client -o yaml > pod.yaml
+```
+* create pod.yaml
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: reis
+  name: reis
+  namespace: finance
+spec:
+  containers:
+  - image: redis
+    name: reis
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+```
+
+```
+kubectl get pods --all-namespaces |grep blue
+```
+
+
+### create nginx apine
+```
+kubectl run nginx-pod --image=nignx:alpine
+
+kubectl run custome-nginx --image=nginx --port 8080
+
+kubectl describe pods custome-nginx
+```
+
+### run redis with lables
+```
+
+kubectl run redis --image=redis:alpine --labels=tier=db
+
+kubectl expose pod redis --name redis-service --port 6379 --target-port 6379
+
+kubectl describe svc redis-service
+
+kubectl deployment webapp --image=kodekloud/webapp-color
+
+kubectl scale deployment --replicas=3 webapp
+
+```
+
+### create yml for http
+
+```
+kubectl run httpd --image=httpd:alpine --port 80 --expose --dry-run=client -o yaml
+
+kubectl run httpd --image=httpd:alpine --port 80 --expose
+
+kubectl get pod httpd
+
+
+```
