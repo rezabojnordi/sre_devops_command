@@ -329,3 +329,282 @@ kubectl get pod httpd
 
 
 ```
+
+
+### creating container with run command
+
+```
+kubectl apply -f pod-ubuntu-sleeper
+
+kubectl describe pod ubuntu-sleeper-2
+
+
+kubectl run webapp-green --image=kodekloud/webapp-color --restart=Never --dry-run=client -o yaml > pod-webapp.yaml
+
+
+```
+
+### Creating config map
+
+```
+config-map create
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  key: value
+```
+
+## other exam
+
+Note: 1 and 2 are the same
+```
+1. docker run -e APP_COLOR=pink simple-webapp-color
+
+
+
+2. 
+apiVersion: v1
+kind: Pod
+ma:
+  name: simple-webapp-color
+spec:
+  containers:
+  - name: simple-webapp-color
+    image: simple-webapp-color
+    ports:
+      - containerPort: 8080
+    env:
+      - name: APP_COLOR
+        value: pink
+
+```
+
+## How many configmap on the cluster
+
+```
+kubectl get cm
+
+kubectl describe cm kube-root-ca.crt
+
+kubectl create cm webapp-color --from-literal=APP_COLOR=darkblue
+
+kubectl explain pods --recursive | grep envFrom -A3
+
+```
+
+### secret
+
+```
+kubectl create -f secret-data.yaml
+
+kubectl ger secrets
+   
+kubectl describe secrets app-secret
+
+kubectl get secret app-secret -o yaml
+
+kubectl create -f pod-definition.yaml
+
+kubectl get pods
+
+kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123
+
+kubectl describe secrets db-secret
+
+
+```
+
+### Encode Secrets
+```
+echo -n 'mysql' | base64
+
+echo -n 'root' | base64
+
+echo -n 'paswrd' |base64
+```
+
+### Decode Secrets
+```
+echo -n 'bXlzcW=' | base64 --decode
+```
+
+
+### create dashboard on kuber
+```
+kubectl create serviceaccount dashboard-sa
+
+kubectl get serviceaccount
+
+kubectl describe serviceaccount dashboard-sa
+```
+
+### exec on container with kubectl
+
+```
+kubectl exec -it my-kubernetes-dashboard ls /etc/
+```
+
+
+### Respurce Requests
+```
+
+kubectl apply -f resource-request.yml
+```
+
+
+### Taints - Node
+Note Noschedule | PrefereNoschedule | NoExecute
+```
+kubectl taint nodes node-name key=value:taint-effect
+
+kubectl taint nodes node1 app=blue:NoSchedule
+
+kubectl apply -f taint.yaml
+
+kubectl describe node master | grep Taint  # prevant kubernetes deploy pod on master node
+
+kubectl taint node worker1 spray=mortein:NoSchedule
+
+kubectl describe node worker1 |grep -i taint
+
+```
+
+
+### Node Selectors
+
+
+```
+kubectl label nodes <node-name> <labe1-key>=<label-value>
+
+kubectl label nodes worker1 size=Large
+
+kubectl apply -f node-selector.yaml
+
+```
+
+### node Affinity
+
+```
+kubectl create -f affinity.yaml
+kubectl create -f affinity-nolabel.yaml
+kubectl create -f affinity-small.yaml
+
+kubectl get nodes worker1 --show-labels
+
+kubectl label nodes worker1 color=blue  # afther tha run previus command
+
+
+kubectl create deployment blue --image=nginx
+kubectl scale deployment blue --replicas=6
+kubectl get deployment
+kubectl get pods -o wide
+
+kubectl get deployment.apps blue -o yaml > blue.yaml
+vim blue.yaml # I changed the blue.yaml with this link  (https://kubernetes.io/docs/tasks/configure-pod-container assign-pods-nodes-using-node-affinity/)
+
+kubectl apply -f blue.yaml  
+
+
+```
+
+### Taint and Toleration vs node Affinity
+
+```
+
+```
+
+### Multiy container Pods
+```
+kubectl apply -f multiy-container.yaml
+ 
+kubectl run yellow --image=busybox --restart=Never --dry-run=client -o yaml > yellow.yaml
+kubectl apply -f yellow.pod
+
+kubectl describe pods yellow.yaml
+
+kubectl -n elastic-stack get pod,svc   # n is argumant for namespaces
+
+kubectl -n elastick-stack logs app
+
+kubectl -n elastic-stack get pod  app -o yaml > app.yaml
+
+
+
+```
+
+### Pod conditions
+
+
+```
+kubectl describe pod
+```
+
+### Readiness Probe
+
+```
+
+kubectl apply -f reading_probe_http.yaml
+kubectl apply -f reading_probe_tcp.yaml
+kubectl apply -f reading_probe_command.yaml
+
+```
+
+
+### Liveness Probes
+
+```
+
+
+```
+
+
+
+### Logs
+
+```
+kubectl create -f event-similator.yaml
+
+kubectl logs -f event-similator-pod
+
+kubectl logs -f event-simulator-pod event-similator  # if you deploye multipod you will need to clarify your container's name
+
+```
+
+
+#### Monitoring Kubernetes cluster
+```
+
+minikube addons enable metrics-server
+
+git clone https://github.com/kubernetes-sigs/metrics-server
+
+kubectl create -f deploy/1.8+/
+
+kubectl top node
+
+```
+
+
+### How to work with containerd
+
+```
+sudo ctr image pull docker.io/library/nginx:latest
+```
+* Note: This will download the latest version of the Nginx image from Docker Hub and store it in the containerd image store.
+
+* Note: Create a container: Once you have the Nginx image, you can create a container using the following command:
+‍‍‍
+‍‍‍```
+sudo ctr run --rm docker.io/library/nginx:latest my-nginx \
+  nginx -g "daemon off;"
+```
+
+* Note: This will create a new container running the Nginx software with the name "my-nginx". The "-g" option is used to specify the Nginx configuration.
+
+* Note: Access the Nginx server: Once the container is running, you can access the Nginx server by opening a web browser and navigating to http://localhost. You should see the default Nginx welcome page.
+
+* Stop the container: When you are finished using the Nginx container, you can stop it using the following command:
+
