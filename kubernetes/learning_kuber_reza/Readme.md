@@ -329,3 +329,21 @@ kubectl get pod httpd
 
 
 ```
+
+
+## Configuration
+
+‍‍``` 
+FROM Ubuntu
+entrypoint ["sleep"]
+CMD ["5"]
+```
+```
+kubectl create -f pod_command_definition.yml
+
+kubectl describe pod ubuntu-sleep-pod
+
+kubectl delete pod ubuntu-sleep-pod 
+```
+
+
