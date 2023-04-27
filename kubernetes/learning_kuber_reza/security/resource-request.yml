@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-webadd-color
+  labels:
+    name: simple-webapp-color
+spec:
+  containers:
+  - name: simple-webapp-color
+    image: simple-webapp-color
+    resources:
+      limits:
+        memory: "128Mi" # or 2Gi
+        cpu: "500m"  # or 2G
+    ports:
+      - containerPort: 8080

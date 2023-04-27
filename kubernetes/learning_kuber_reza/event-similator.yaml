@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: event-simulator-pod
+  labels:
+    name: event-simulator-pod
+spec:
+  containers:
+  - name: event-similator
+    image: kodekloud/event-simulator
+    
