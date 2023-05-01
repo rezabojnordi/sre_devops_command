@@ -684,7 +684,13 @@ sudo ctr image pull docker.io/library/nginx:latest
 sudo ctr run --rm docker.io/library/nginx:latest my-nginx \
   nginx -g "daemon off;"
 ```
-
+* Note: list container with choose namespace
+```
+ctr --namespace=k8s.io container ls
+```
+* Note change namespace on containerd
+‍‍‍```
+alias ctr="ctr --address=/run/containerd/containerd.sock --namespace k8s.io"
 * Note: This will create a new container running the Nginx software with the name "my-nginx". The "-g" option is used to specify the Nginx configuration.
 
 * Note: Access the Nginx server: Once the container is running, you can access the Nginx server by opening a web browser and navigating to http://localhost. You should see the default Nginx welcome page.
@@ -747,6 +753,34 @@ kubectl rollout status deployment/myapp-deployment
 kubectl rollout history deployment/myapp-deployment
     REVISION  CHANGE-CAUSE
          kubectl create --filename=deployment-definition.yml --record=true
+
+
+Note: change the nginx's version after that run blow command
+
+kubectl apply -f deployment-definition.yml
+Note: You can see status update with blow command
+
+kubectl rollout status deployment/myapp-deployment
+Waiting for deployment "myapp-deployment" rollout to finish: 1 out of 3 new replicas have been updated...
+
+kubectl describe deployment
+
+kubectl rollout history deployment/myapp-deployment
+
+ctr --namespace=k8s.io container ls
+alias ctr="ctr --address=/run/containerd/containerd.sock --namespace k8s.io"
+
+kubectl set image deployment/myapp-deployment nginx-contaoner=nginx:1.12-perl
+
+kubectl rollout history deployment/myapp-deployment
+
+kubectl rollout undo deployment/myapp-deployment
+   Note: deployment.apps/myapp-deployment rolled back
+
+kubectl describe deployment
+
+kubectl create -f deployment-definition.yml --record
+
 
 ```
 <img src="./image/rollback.png" width="600" height="300" />
