@@ -355,7 +355,7 @@ kubectl get pod httpd
 ```
 
 
-<<<<<<< HEAD
+
 ## Configuration
 
 ‍‍``` 
@@ -371,7 +371,7 @@ kubectl describe pod ubuntu-sleep-pod
 kubectl delete pod ubuntu-sleep-pod 
 ```
 
-=======
+
 ### creating container with run command
 
 ```
@@ -690,5 +690,50 @@ sudo ctr run --rm docker.io/library/nginx:latest my-nginx \
 * Note: Access the Nginx server: Once the container is running, you can access the Nginx server by opening a web browser and navigating to http://localhost. You should see the default Nginx welcome page.
 
 * Stop the container: When you are finished using the Nginx container, you can stop it using the following command:
->>>>>>> f37a17860ca4937ed60f23861085389b750ce524
 
+
+
+## Label, Selectors & Annotations
+
+
+```
+kubectl get pods --selector app=App1
+
+```
+<img src="./image/labels.png" width="600" height="300" />
+<img src="./image/selectors.png" width="600" height="300" />
+<img src="./image/labels_selector.png" width="600" height="300" />
+<img src="./image/labels_kubernetes.png" width="600" height="300" />
+<img src="./image/labels2.png" width="600" height="300" />
+<img src="./image/selector2.png" width="600" height="300" />
+
+
+
+## rollout and Versioning
+
+```
+kubectl rollout status deployment/myapp-deployemnt
+kubectl rollout history deployment/myapp-deployemnt
+
+
+```
+
+## Upgrades deployment
+
+```
+kubectl get replicasets
+```
+<img src="./image/replicaset_label.png" width="600" height="300" />
+<img src="./image/deployment2.png" width="600" height="300" />
+<img src="./image/deployment_upgrade.png" width="600" height="300" />
+
+## Rollback
+
+```
+kubectl rollout undo deployment/myapp-deployment
+
+kubectl get replicasets
+
+```
+<img src="./image/rollback.png" width="600" height="300" />
+<img src="./image/summay_deployment_rollback.png" width="600" height="300" />
