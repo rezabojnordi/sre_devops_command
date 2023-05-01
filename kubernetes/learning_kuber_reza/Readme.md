@@ -734,6 +734,22 @@ kubectl rollout undo deployment/myapp-deployment
 
 kubectl get replicasets
 
+kubectl rollout status deployment/myapp-deployment
+
+kubectl rollout history deployment/myapp-deployment
+
+kubectl delete deployment myapp-deployment
+
+kubectl create -f deployment-definition.yml --record
+
+kubectl rollout status deployment/myapp-deployment
+
+kubectl rollout history deployment/myapp-deployment
+    REVISION  CHANGE-CAUSE
+         kubectl create --filename=deployment-definition.yml --record=true
+
 ```
 <img src="./image/rollback.png" width="600" height="300" />
 <img src="./image/summay_deployment_rollback.png" width="600" height="300" />
+
+
