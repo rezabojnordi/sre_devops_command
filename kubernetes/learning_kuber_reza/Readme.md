@@ -757,7 +757,7 @@ kubectl rollout history deployment/myapp-deployment
 
 Note: change the nginx's version after that run blow command
 
-kubectl apply -f deployment-definition.yml
+kubectl apply -f deployment-definition.ymlن
 Note: You can see status update with blow command
 
 kubectl rollout status deployment/myapp-deployment
@@ -787,3 +787,31 @@ kubectl create -f deployment-definition.yml --record
 <img src="./image/summay_deployment_rollback.png" width="600" height="300" />
 
 
+
+## JOB
+
+```
+docker run ubuntu expr 3 + 2
+docker ps -a
+
+kubectl create -f pod_expr_definition.yaml
+
+kubectl create -f job-definition.yaml
+
+kubectl get pods
+
+kubectl logs math-add-job-8b9mz
+
+kubectl delete job math-add-job
+```
+<img src="./image/jobs.png" width="600" height="300" />
+<img src="./image/job2.png" width="600" height="300" />
+
+## CronJob
+
+```
+kubectl create -f cronjob.yaml
+kubectl get cronjob
+
+```
+<img src="./image/cronjob.png" width="600" height="300" />
