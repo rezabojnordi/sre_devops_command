@@ -815,3 +815,143 @@ kubectl get cronjob
 
 ```
 <img src="./image/cronjob.png" width="600" height="300" />
+
+
+
+## Service
+Services is helping to connect pods together
+
+If pods want to connect other pods that they need to use clusterip and 
+If client want to connect to service or microservice on pod they need to use NodePort.
+You can use loadbalance on cloud provider likes AWS and GCP.
+
+<img src="./image/service.png" width="600" height="300" />
+<img src="./image/services2.png" width="600" height="300" />
+<img src="./image/service3.png" width="600" height="300" />
+<img src="./image/service4.png" width="600" height="300" />
+<img src="./image/service5.png" width="600" height="300" />
+<img src="./image/service6.png" width="600" height="300" />
+
+### NodePort
+
+```
+kubectl create -f service-definition.yaml
+
+kubectl get service 
+```
+<img src="./image/nodeport.png" width="600" height="300" />
+<img src="./image/nodeport1.png" width="600" height="300" />
+<img src="./image/nodeport4.png" width="600" height="300" />
+<img src="./image/nodeport5.png" width="600" height="300" />
+<img src="./image/nodeport6.png" width="600" height="300" />
+<img src="./image/nodeport7.png" width="600" height="300" />
+
+
+### ClusterIp
+```
+kubectl create -f service-definiti-clusterip.yaml
+
+kubectl get services
+kubectl get svc
+kubectl describe service kubernetes
+
+```
+<img src="./image/clusterip.png" width="600" height="300" />
+
+
+### Ingress
+```
+kubectl create -f ingrees_nginx.yaml
+
+kubectl get deployment
+
+kubectl get ingress
+
+kubectl describe ingress ingress-wear-watch
+
+```
+
+* Note: Create a service for the Nginx ingress controller:
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress
+  namespace: ingress-nginx
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 443
+    targetPort: 443
+    name: https
+  selector:
+    app: nginx-ingress-controller
+
+```
+
+* Note: Now you can create an Ingress resource to define your routing rules:
+yaml
+
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /foo
+        pathType: Prefix
+        backend:
+          service:
+            name: my-service
+            port:
+              name: http
+
+```
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /path1
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service1
+            port:
+              name: http
+      - path: /path2
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service2
+            port:
+              name: http
+
+```
+<img src="./image/ingress.png" width="600" height="300" />
+<img src="./image/ingress1.png" width="600" height="300" />
+<img src="./image/ingress5.png" width="600" height="300" />
+<img src="./image/ingress7.png" width="600" height="300" />
+<img src="./image/ingress8.png" width="600" height="300" />
+<img src="./image/ingress9.png" width="600" height="300" />
+<img src="./image/ingress10.png" width="600" height="300" />
+<img src="./image/ingress11.png" width="600" height="300" />
+<img src="./image/ingress12.png" width="600" height="300" />
+<img src="./image/ingress13.png" width="600" height="300" />
