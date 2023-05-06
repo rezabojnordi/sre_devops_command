@@ -963,3 +963,22 @@ spec:
 <img src="./image/ingress11.png" width="900" height="300" />
 <img src="./image/ingress12.png" width="900" height="300" />
 <img src="./image/ingress13.png" width="900" height="300" />
+
+
+
+## On kmaster
+* Initialize Kubernetes Cluster
+* Update the below command with the ip address of kmaster
+
+```
+kubeadm init --apiserver-advertise-address=172.16.16.100 --pod-network-cidr=192.168.0.0/16  --ignore-preflight-errors=all
+```
+
+### Deploy Calico network
+```
+kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
+```
+### Cluster join command
+```
+kubeadm token create --print-join-command
+```
