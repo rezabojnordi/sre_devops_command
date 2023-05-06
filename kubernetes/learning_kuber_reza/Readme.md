@@ -1,6 +1,14 @@
 ## how to install kubernetes without docker on ubuntu 20.4.5
 
 
+Kubernetes--> Self-Healing, Automated Rollbacks, Horizontal Scaling
+
+<img src="./image/k-architecture.png" width="900" height="300" />
+<img src="./image/k-architecture1.png" width="900" height="300" />
+<img src="./image/k-architecture2.png" width="900" height="300" />
+
+
+
 To install Kubernetes without Docker on Ubuntu 20.04.5, you can follow the below steps:
 
 Install the dependencies required by Kubernetes:
