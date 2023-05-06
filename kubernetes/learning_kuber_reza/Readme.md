@@ -156,11 +156,11 @@ kubectl get pods
 
 kubectl get replicationcontroller
 ```
-<img src="./image/replication_controller.png" width="600" height="300" />
-<img src="./image/replication_controller1.png" width="600" height="300" />
-<img src="./image/replication_controller3.png" width="600" height="300" />
-<img src="./image/replication_controller4.png" width="600" height="300" />
-<img src="./image/replication_controller5.png" width="600" height="300" />
+<img src="./image/replication_controller.png" width="900" height="300" />
+<img src="./image/replication_controller1.png" width="900" height="300" />
+<img src="./image/replication_controller3.png" width="900" height="300" />
+<img src="./image/replication_controller4.png" width="900" height="300" />
+<img src="./image/replication_controller5.png" width="900" height="300" />
 
 
 
@@ -169,12 +169,12 @@ kubectl get replicationcontroller
 kubectl create -f replicaset-definition.yml
 kubectl get replicaset
 ```
-<img src="./image/replicaset.png" width="600" height="300" />
+<img src="./image/replicaset.png" width="900" height="300" />
 
 
 ## labels and selectors
  
-<img src="./image/lables_selector.png" width="600" height="300" />
+<img src="./image/lables_selector.png" width="900" height="300" />
 
  ### How to scale replicaset
 
@@ -193,7 +193,7 @@ kubectl get replicaset
  Name = myapp-replicaset
 
  ```
-<img src="./image/scale.png" width="600" height="300" />
+<img src="./image/scale.png" width="900" height="300" />
 
 ### Deployment  
 Note: rooling updates, under changes and pause and resume changes as required
@@ -217,9 +217,9 @@ kubectl get deployment.apps -n dev-ns
 
 
 ```
-<img src="./image/deployment.png" width="600" height="300" />
-<img src="./image/deployment1.png" width="600" height="300" />
-<img src="./image/deployment1.png" width="600" height="300" />
+<img src="./image/deployment.png" width="900" height="300" />
+<img src="./image/deployment1.png" width="900" height="300" />
+<img src="./image/deployment1.png" width="900" height="300" />
 
 
 ### Namespace 
@@ -249,12 +249,12 @@ kubectl get pods --namesapce=dev
 
 kubectl get pods --namespace=proc
 ```
-<img src="./image/nmap.png" width="600" height="300" />
-<img src="./image/nmap3.png" width="600" height="300" />
-<img src="./image/nmap4.png" width="600" height="300" />
-<img src="./image/namespace5.png" width="600" height="300" />
-<img src="./image/namespace6.png" width="600" height="300" />
-<img src="./image/namespace7.png" width="600" height="300" />
+<img src="./image/nmap.png" width="900" height="300" />
+<img src="./image/nmap3.png" width="900" height="300" />
+<img src="./image/nmap4.png" width="900" height="300" />
+<img src="./image/namespace5.png" width="900" height="300" />
+<img src="./image/namespace6.png" width="900" height="300" />
+<img src="./image/namespace7.png" width="900" height="300" />
 
 
 ### switch namespace
@@ -267,7 +267,7 @@ kubectl get pods --namespace=default
 kubectl get pods --all-namespaces
 
 ```
-<img src="./image/switch_container.png" width="600" height="300" />
+<img src="./image/switch_container.png" width="900" height="300" />
 
 ### REsource Quota
 
@@ -398,11 +398,11 @@ data:
   key: value
 ```
 
-<img src="./image/configmap.png" width="600" height="300" />
-<img src="./image/configmap2.png" width="600" height="300" />
-<img src="./image/configmap3.png" width="600" height="300" />
-<img src="./image/configmap4.png" width="600" height="300" />
-<img src="./image/configmap4.png" width="600" height="300" />
+<img src="./image/configmap.png" width="900" height="300" />
+<img src="./image/configmap2.png" width="900" height="300" />
+<img src="./image/configmap3.png" width="900" height="300" />
+<img src="./image/configmap4.png" width="900" height="300" />
+<img src="./image/configmap4.png" width="900" height="300" />
 
 ## other exam
 
@@ -463,10 +463,10 @@ kubectl describe secrets db-secret
 
 
 ```
-<img src="./image/secret.png" width="600" height="300" />
-<img src="./image/secret2.png" width="600" height="300" />
-<img src="./image/resource.png" width="600" height="300" />
-<img src="./image/resource2.png" width="600" height="300" />
+<img src="./image/secret.png" width="900" height="300" />
+<img src="./image/secret2.png" width="900" height="300" />
+<img src="./image/resource.png" width="900" height="300" />
+<img src="./image/resource2.png" width="900" height="300" />
 
 
 ### Encode Secrets
@@ -523,12 +523,12 @@ kubectl taint node worker1 spray=mortein:NoSchedule
 kubectl describe node worker1 |grep -i taint
 
 ```
-<img src="./image/taint_toleration.png" width="600" height="300" />
-<img src="./image/taint_toleration2.png" width="600" height="300" />
-<img src="./image/taint_toleration2.png" width="600" height="300" />
-<img src="./image/taint_toleration3.png" width="600" height="300" />
-<img src="./image/taint_toleration4.png" width="600" height="300" />
-<img src="./image/taint_toleration5.png" width="600" height="300" />
+<img src="./image/taint_toleration.png" width="900" height="300" />
+<img src="./image/taint_toleration2.png" width="900" height="300" />
+<img src="./image/taint_toleration2.png" width="900" height="300" />
+<img src="./image/taint_toleration3.png" width="900" height="300" />
+<img src="./image/taint_toleration4.png" width="900" height="300" />
+<img src="./image/taint_toleration5.png" width="900" height="300" />
 
 ### Node Selectors
 
@@ -541,11 +541,11 @@ kubectl label nodes worker1 size=Large
 kubectl apply -f node-selector.yaml
 
 ```
-<img src="./image/nodeselector.png" width="600" height="300" />
-<img src="./image/NodeSelector1.png" width="600" height="300" />
-<img src="./image/NodeSelector2.png" width="600" height="300" />
-<img src="./image/NodeSelector3.png" width="600" height="300" />
-<img src="./image/NodeSelector4.png" width="600" height="300" />
+<img src="./image/nodeselector.png" width="900" height="300" />
+<img src="./image/NodeSelector1.png" width="900" height="300" />
+<img src="./image/NodeSelector2.png" width="900" height="300" />
+<img src="./image/NodeSelector3.png" width="900" height="300" />
+<img src="./image/NodeSelector4.png" width="900" height="300" />
 
 ### node Affinity
 
@@ -571,23 +571,23 @@ kubectl apply -f blue.yaml
 
 
 ```
-<img src="./image/affinity.png" width="600" height="300" />
-<img src="./image/affinity1.png" width="600" height="300" />
-<img src="./image/affinity3.png" width="600" height="300" />
-<img src="./image/affinity4.png" width="600" height="300" />
+<img src="./image/affinity.png" width="900" height="300" />
+<img src="./image/affinity1.png" width="900" height="300" />
+<img src="./image/affinity3.png" width="900" height="300" />
+<img src="./image/affinity4.png" width="900" height="300" />
 
 ### Taint and Toleration vs node Affinity
 
 ```
 
 ```
-<img src="./image/afinity_vs_taint.png" width="600" height="300" />
-<img src="./image/afinity_vs_taint1.png" width="600" height="300" />
-<img src="./image/afinity_vs_taint3.png" width="600" height="300" />
-<img src="./image/afinity_vs_taint4.png" width="600" height="300" />
-<img src="./image/afinity_vs_taint5.png" width="600" height="300" />
-<img src="./image/afinity_vs_taint6.png" width="600" height="300" />
-<img src="./image/afinity_vs_taint9.png" width="600" height="300" />
+<img src="./image/afinity_vs_taint.png" width="900" height="300" />
+<img src="./image/afinity_vs_taint1.png" width="900" height="300" />
+<img src="./image/afinity_vs_taint3.png" width="900" height="300" />
+<img src="./image/afinity_vs_taint4.png" width="900" height="300" />
+<img src="./image/afinity_vs_taint5.png" width="900" height="300" />
+<img src="./image/afinity_vs_taint6.png" width="900" height="300" />
+<img src="./image/afinity_vs_taint9.png" width="900" height="300" />
 
 ### Multiy container Pods
 ```
@@ -607,8 +607,8 @@ kubectl -n elastic-stack get pod  app -o yaml > app.yaml
 
 
 ```
-<img src="./image/multi_container.png" width="600" height="300" />
-<img src="./image/multy_container_ambassador.png" width="600" height="300" />
+<img src="./image/multi_container.png" width="900" height="300" />
+<img src="./image/multy_container_ambassador.png" width="900" height="300" />
 
 ### Pod conditions
 
@@ -616,9 +616,9 @@ kubectl -n elastic-stack get pod  app -o yaml > app.yaml
 ```
 kubectl describe pod
 ```
-<img src="./image/pod_condition.png" width="600" height="300" />
-<img src="./image/pod_condition1.png" width="600" height="300" />
-<img src="./image/pod_condition3.png" width="600" height="300" />
+<img src="./image/pod_condition.png" width="900" height="300" />
+<img src="./image/pod_condition1.png" width="900" height="300" />
+<img src="./image/pod_condition3.png" width="900" height="300" />
 
 ### Readiness Probe
 
@@ -637,8 +637,8 @@ kubectl apply -f reading_probe_command.yaml
 
 
 ```
-<img src="./image/liveness_probes.png" width="600" height="300" />
-<img src="./image/liveness_probes1.png" width="600" height="300" />
+<img src="./image/liveness_probes.png" width="900" height="300" />
+<img src="./image/liveness_probes1.png" width="900" height="300" />
 
 
 
@@ -667,9 +667,9 @@ kubectl create -f deploy/1.8+/
 kubectl top node
 
 ```
-<img src="./image/monitoring.png" width="600" height="300" />
-<img src="./image/monitoring1.png" width="600" height="300" />
-<img src="./image/monitor_container.png" width="600" height="300" />
+<img src="./image/monitoring.png" width="900" height="300" />
+<img src="./image/monitoring1.png" width="900" height="300" />
+<img src="./image/monitor_container.png" width="900" height="300" />
 
 ### How to work with containerd
 
@@ -706,12 +706,12 @@ alias ctr="ctr --address=/run/containerd/containerd.sock --namespace k8s.io"
 kubectl get pods --selector app=App1
 
 ```
-<img src="./image/labels.png" width="600" height="300" />
-<img src="./image/selectors.png" width="600" height="300" />
-<img src="./image/labels_selector.png" width="600" height="300" />
-<img src="./image/labels_kubernetes.png" width="600" height="300" />
-<img src="./image/labels2.png" width="600" height="300" />
-<img src="./image/selector2.png" width="600" height="300" />
+<img src="./image/labels.png" width="900" height="300" />
+<img src="./image/selectors.png" width="900" height="300" />
+<img src="./image/labels_selector.png" width="900" height="300" />
+<img src="./image/labels_kubernetes.png" width="900" height="300" />
+<img src="./image/labels2.png" width="900" height="300" />
+<img src="./image/selector2.png" width="900" height="300" />
 
 
 
@@ -729,9 +729,9 @@ kubectl rollout history deployment/myapp-deployemnt
 ```
 kubectl get replicasets
 ```
-<img src="./image/replicaset_label.png" width="600" height="300" />
-<img src="./image/deployment2.png" width="600" height="300" />
-<img src="./image/deployment_upgrade.png" width="600" height="300" />
+<img src="./image/replicaset_label.png" width="900" height="300" />
+<img src="./image/deployment2.png" width="900" height="300" />
+<img src="./image/deployment_upgrade.png" width="900" height="300" />
 
 ## Rollback
 
@@ -783,8 +783,8 @@ kubectl create -f deployment-definition.yml --record
 
 
 ```
-<img src="./image/rollback.png" width="600" height="300" />
-<img src="./image/summay_deployment_rollback.png" width="600" height="300" />
+<img src="./image/rollback.png" width="900" height="300" />
+<img src="./image/summay_deployment_rollback.png" width="900" height="300" />
 
 
 
@@ -804,8 +804,8 @@ kubectl logs math-add-job-8b9mz
 
 kubectl delete job math-add-job
 ```
-<img src="./image/jobs.png" width="600" height="300" />
-<img src="./image/job2.png" width="600" height="300" />
+<img src="./image/jobs.png" width="900" height="300" />
+<img src="./image/job2.png" width="900" height="300" />
 
 ## CronJob
 
@@ -814,7 +814,7 @@ kubectl create -f cronjob.yaml
 kubectl get cronjob
 
 ```
-<img src="./image/cronjob.png" width="600" height="300" />
+<img src="./image/cronjob.png" width="900" height="300" />
 
 
 
@@ -825,12 +825,12 @@ If pods want to connect other pods that they need to use clusterip and
 If client want to connect to service or microservice on pod they need to use NodePort.
 You can use loadbalance on cloud provider likes AWS and GCP.
 
-<img src="./image/service.png" width="600" height="300" />
-<img src="./image/services2.png" width="600" height="300" />
-<img src="./image/service3.png" width="600" height="300" />
-<img src="./image/service4.png" width="600" height="300" />
-<img src="./image/service5.png" width="600" height="300" />
-<img src="./image/service6.png" width="600" height="300" />
+<img src="./image/service.png" width="900" height="300" />
+<img src="./image/services2.png" width="900" height="300" />
+<img src="./image/service3.png" width="900" height="300" />
+<img src="./image/service4.png" width="900" height="300" />
+<img src="./image/service5.png" width="900" height="300" />
+<img src="./image/service6.png" width="900" height="300" />
 
 ### NodePort
 
@@ -839,12 +839,12 @@ kubectl create -f service-definition.yaml
 
 kubectl get service 
 ```
-<img src="./image/nodeport.png" width="600" height="300" />
-<img src="./image/nodeport1.png" width="600" height="300" />
-<img src="./image/nodeport4.png" width="600" height="300" />
-<img src="./image/nodeport5.png" width="600" height="300" />
-<img src="./image/nodeport6.png" width="600" height="300" />
-<img src="./image/nodeport7.png" width="600" height="300" />
+<img src="./image/nodeport.png" width="900" height="300" />
+<img src="./image/nodeport1.png" width="900" height="300" />
+<img src="./image/nodeport4.png" width="900" height="300" />
+<img src="./image/nodeport5.png" width="900" height="300" />
+<img src="./image/nodeport6.png" width="900" height="300" />
+<img src="./image/nodeport7.png" width="900" height="300" />
 
 
 ### ClusterIp
@@ -856,7 +856,7 @@ kubectl get svc
 kubectl describe service kubernetes
 
 ```
-<img src="./image/clusterip.png" width="600" height="300" />
+<img src="./image/clusterip.png" width="900" height="300" />
 
 
 ### Ingress
@@ -945,13 +945,13 @@ spec:
               name: http
 
 ```
-<img src="./image/ingress.png" width="600" height="300" />
-<img src="./image/ingress1.png" width="600" height="300" />
-<img src="./image/ingress5.png" width="600" height="300" />
-<img src="./image/ingress7.png" width="600" height="300" />
-<img src="./image/ingress8.png" width="600" height="300" />
-<img src="./image/ingress9.png" width="600" height="300" />
-<img src="./image/ingress10.png" width="600" height="300" />
-<img src="./image/ingress11.png" width="600" height="300" />
-<img src="./image/ingress12.png" width="600" height="300" />
-<img src="./image/ingress13.png" width="600" height="300" />
+<img src="./image/ingress.png" width="900" height="300" />
+<img src="./image/ingress1.png" width="900" height="300" />
+<img src="./image/ingress5.png" width="900" height="300" />
+<img src="./image/ingress7.png" width="900" height="300" />
+<img src="./image/ingress8.png" width="900" height="300" />
+<img src="./image/ingress9.png" width="900" height="300" />
+<img src="./image/ingress10.png" width="900" height="300" />
+<img src="./image/ingress11.png" width="900" height="300" />
+<img src="./image/ingress12.png" width="900" height="300" />
+<img src="./image/ingress13.png" width="900" height="300" />
