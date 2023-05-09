@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: random-error-job
+spec:
+  #ttlSecondsAfterFinished: 100
+  completions: 3
+  parallelism: 3
+  template:
+    spec:
+      containers:
+      - name: prandom-error
+        image: kodekloud/random-error
+      restartPolicy: Never
