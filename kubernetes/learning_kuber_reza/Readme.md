@@ -1301,6 +1301,13 @@ kubeadm certs certificate-key
 
 
 kubeadm join 172.16.16.100:6443 --token smc1ws.8bey6mkqz86sgxlf --discovery-token-ca-cert-hash sha256:90b287cb329be6e586f8a22fa0326aa241f6b32ade378320b0850a6aa555ee53 --certificate-key c2b2e0b5a4ff13e1f758fe30a9906ea5a9c3096d93b2ca4bef7d20fc06011688
+
+
+if you want to add new master, You must add controle-plan's parametr
+
+kubeadm init phase upload-certs --upload-certs
+
+kubeadm join 172.16.16.100:6443 --token smc1ws.8bey6mkqz86sgxlf --discovery-token-ca-cert-hash sha256:90b287cb329be6e586f8a22fa0326aa241f6b32ade378320b0850a6aa555ee53 --control-plane --certificate-key 540ba8d81c927ba2e0930df5cca5ca24ae9b54d4ea6b35ba49423d90b63b61e2
 ```
 
 ## Vagrant Environment
