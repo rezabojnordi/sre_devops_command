@@ -1285,6 +1285,22 @@ afther that
 kubectl -n kube-system get deployment coredns -o yaml | \
   sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | \
   kubectl apply -f -
+
+
+
+   kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+```
+
+
+
+### How to add new master on kubernetes
+```
+kubeadm token create --print-join-command
+
+kubeadm certs certificate-key
+
+
+kubeadm join 172.16.16.100:6443 --token smc1ws.8bey6mkqz86sgxlf --discovery-token-ca-cert-hash sha256:90b287cb329be6e586f8a22fa0326aa241f6b32ade378320b0850a6aa555ee53 --certificate-key c2b2e0b5a4ff13e1f758fe30a9906ea5a9c3096d93b2ca4bef7d20fc06011688
 ```
 
 ## Vagrant Environment
