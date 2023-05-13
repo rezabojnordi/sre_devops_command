@@ -152,6 +152,13 @@ kubectl get pods
 ```
 kubectl get nodes
 ```
+### How to access on your master with personal pc or laptop
+‍‍‍```
+complete -F __start_kubectl k
+source <(kubectl completion bash)
+export KUBECONFIG=/root/kube-aws.yaml
+source <(kubectl completion bash)
+```
 
 ### replication controller and replica set
 
