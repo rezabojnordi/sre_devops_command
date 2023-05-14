@@ -166,15 +166,16 @@ kubectl get nodes
    mv ./kubectl ~/.local/bin/kubectl
    # and then append (or prepend) ~/.local/bin to $PATH
    kubectl version --client
-
 ```
+
 ### How to access on your master with personal pc or laptop
+
 ‍‍‍```
 complete -F __start_kubectl k
 source <(kubectl completion bash)
 export KUBECONFIG=/root/kube-aws.yaml
 source <(kubectl completion bash)
-```
+
 
 ### replication controller and replica set
 
@@ -187,6 +188,7 @@ kubectl get pods
 
 kubectl get replicationcontroller
 ```
+
 <img src="./image/replication_controller.png" width="900" height="300" />
 <img src="./image/replication_controller1.png" width="900" height="300" />
 <img src="./image/replication_controller3.png" width="900" height="300" />
@@ -386,21 +388,19 @@ kubectl get pod httpd
 ```
 
 
-
 ## Configuration
 
-‍‍``` 
+‍‍``
 FROM Ubuntu
 entrypoint ["sleep"]
 CMD ["5"]
-```
-```
+
 kubectl create -f pod_command_definition.yml
 
 kubectl describe pod ubuntu-sleep-pod
 
-kubectl delete pod ubuntu-sleep-pod 
-```
+kubectl delete pod ubuntu-sleep-pod
+``
 
 
 ### creating container with run command
@@ -1547,4 +1547,60 @@ kubectl cluster-info
 kubectl get nodes
 kubectl get nodes -o wide
 kubectl get pods -A
+```
+
+
+
+
+## How to install microk8s
+
+```
+apt install snapd
+sudo snap install microk8s --classic
+ 
+sudo snap list
+
+kubectl cluster-ifno
+
+
+microk8s.kubectl cluster-info
+
+microk8s.kubectl version --short
+
+alias kubectl='microk8s.kubectl
+
+
+kubectl get nodes -o wide
+
+dpkg -l docker |grep docker
+
+kubectl run nginx
+
+kubectl get namespaces
+
+kubectl get --all-namespaces -o wide
+
+watch kubectl get all -o wide
+
+kubectl run nginx --i mage=nignx
+
+microk8s.docker images
+microk8s.inspect
+
+microk8s.reset
+
+kubectl scale deploy nignx --replicas=2
+
+or
+
+microk8s.kubectl scale deploy nignx --replicas=2
+
+
+kubectl expose deploy nginx --port 80 --target-port 80 type Cluster-Ip
+
+apt install elinks
+
+microk8s.reset
+
+microk8s.enable dashboard
 ```
