@@ -152,6 +152,22 @@ kubectl get pods
 ```
 kubectl get nodes
 ```
+
+### Installing kubectl on your private pc
+```
+   curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+   curl -LO https://dl.k8s.io/release/v1.27.1/bin/linux/amd64/kubectl
+   curl -LO https://dl.k8s.io/release/v1.27.0/bin/linux/arm64/kubectl
+   curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+   echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   chmod +x kubectl
+   mkdir -p ~/.local/bin
+   mv ./kubectl ~/.local/bin/kubectl
+   # and then append (or prepend) ~/.local/bin to $PATH
+   kubectl version --client
+
+```
 ### How to access on your master with personal pc or laptop
 ‍‍‍```
 complete -F __start_kubectl k
