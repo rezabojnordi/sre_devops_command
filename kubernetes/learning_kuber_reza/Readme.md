@@ -664,10 +664,7 @@ kubectl apply -f reading_probe_command.yaml
 
 ### Liveness Probes
 
-```
 
-
-```
 <img src="./image/liveness_probes.png" width="900" height="300" />
 <img src="./image/liveness_probes1.png" width="900" height="300" />
 
@@ -704,21 +701,27 @@ kubectl top node
 
 ### How to work with containerd
 
+
 ```
 sudo ctr image pull docker.io/library/nginx:latest
 ```
+
+
 * Note: This will download the latest version of the Nginx image from Docker Hub and store it in the containerd image store.
 
 * Note: Create a container: Once you have the Nginx image, you can create a container using the following command:
 ‍‍‍
-‍‍‍```
+```
 sudo ctr run --rm docker.io/library/nginx:latest my-nginx \
-  nginx -g "daemon off;"
+nginx -g "daemon off;"
 ```
+
 * Note: list container with choose namespace
-```
+‍‍```
+
 ctr --namespace=k8s.io container ls
-```
+
+
 * Note change namespace on containerd
 ‍‍‍```
 alias ctr="ctr --address=/run/containerd/containerd.sock --namespace k8s.io"
@@ -816,7 +819,6 @@ kubectl create -f deployment-definition.yml --record
 ```
 <img src="./image/rollback.png" width="900" height="300" />
 <img src="./image/summay_deployment_rollback.png" width="900" height="300" />
-
 
 
 ## JOB
@@ -1179,8 +1181,8 @@ This documentation guides you in setting up a cluster with three master nodes, o
 To install Kubernetes without Docker on Ubuntu 20.04.5, you can follow the below steps:
 
 Install the dependencies required by Kubernetes:
-```
 
+```
 sudo apt update
 sudo apt install -y containerd
 sudo mkdir -p /etc/containerd
@@ -1191,12 +1193,15 @@ sudo systemctl restart containerd
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 ```
+
 Add the Kubernetes signing key:
+
 ```
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 
 ```
+
 Add the Kubernetes repository:
 
 ```
@@ -1603,4 +1608,8 @@ apt install elinks
 microk8s.reset
 
 microk8s.enable dashboard
+
+kubectl describe pod nignx-dfg66ec
+
+kubectl describe node ubuntuvm0 | grep Taint
 ```
