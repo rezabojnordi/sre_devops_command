@@ -299,6 +299,8 @@ kubectl get pods --namespace=default
 
 kubectl get pods --all-namespaces
 
+kubectl get ns
+
 ```
 <img src="./image/switch_container.png" width="900" height="300" />
 
@@ -1595,7 +1597,7 @@ microk8s.inspect
 microk8s.reset
 
 kubectl scale deploy nignx --replicas=2
-
+ 
 or
 
 microk8s.kubectl scale deploy nignx --replicas=2
@@ -1612,4 +1614,111 @@ microk8s.enable dashboard
 kubectl describe pod nignx-dfg66ec
 
 kubectl describe node ubuntuvm0 | grep Taint
+```
+
+
+
+### How to deploy Dashboard on Kubernetes
+
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+kubectl get ns
+kubectl -n kubernetes-dashboard get all
+kubectl -n kubernetes-dashboard describe service kubernetes-dashboard
+kubectl -n kubernetes-dashboard  port-forward kubernetes-dashboard-6967859bff-9qr5g 8000:8443
+kubectl proxy
+```
+* Note: Change kubernetes dashboard cluster ip to nodeport
+```
+ kubectl -n kubernetes-dashboard edit svc kubernetes-dashboard
+```
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"kubernetes-dashboard"},"name":"kubernetes-dashboard","namespace":"kubernetes-dashboard"},"spec":{"ports":[{"port":443,"targetPort":8443}],"selector":{"k8s-app":"kubernetes-dashboard"}}}
+  creationTimestamp: "2023-05-28T05:50:32Z"
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+  resourceVersion: "3125811"
+  uid: b07f2ee9-3b62-4780-a359-5f42ddd47bc0
+spec:
+  clusterIP: 10.107.126.22
+  clusterIPs:
+  - 10.107.126.22
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 8443
+  selector:
+    k8s-app: kubernetes-dashboard
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+```
+```
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"kubernetes-dashboard"},"name":"kubernetes-dashboard","namespace":"kubernetes-dashboard"},"spec":{"ports":[{"port":443,"targetPort":8443}],"selector":{"k8s-app":"kubernetes-dashboard"}}}
+  creationTimestamp: "2023-05-28T05:50:32Z"
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+  resourceVersion: "3131229"
+  uid: b07f2ee9-3b62-4780-a359-5f42ddd47bc0
+spec:
+  clusterIP: 10.107.126.22
+  clusterIPs:
+  - 10.107.126.22
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 32323
+    port: 443
+    protocol: TCP
+    targetPort: 8443
+  selector:
+    k8s-app: kubernetes-dashboard
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+
+```
+
+* Note: afther than save the file
+```
+kubectl -n kubernetes-dashboard get svc
+kubectl get node -o wide
+
+curl https://172.16.16.67:32323/
+
+kubectl -n kubernetes-dashboard get sa
+
+kubectl -n kubernetes-dashboard create token kubernetes-dashboard
+
+```
+* Note: If you deploy dashboard and got error You will deploy this config yaml on your clutser
+```
+kubectl create sa_cluster_admin.yaml
+
 ```
