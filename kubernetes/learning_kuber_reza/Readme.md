@@ -756,8 +756,6 @@ kubectl get pods --selector app=App1
 ```
 kubectl rollout status deployment/myapp-deployemnt
 kubectl rollout history deployment/myapp-deployemnt
-
-
 ```
 
 ## Upgrades deployment
@@ -1719,6 +1717,139 @@ kubectl -n kubernetes-dashboard create token kubernetes-dashboard
 ```
 * Note: If you deploy dashboard and got error You will deploy this config yaml on your clutser
 ```
-kubectl create sa_cluster_admin.yaml
+kubectl create -f sa_cluster_admin.yaml
+
+```
+
+### create myshell with image on the kubernetes cluster
+```
+kubectl run myshell --rm -it --image busybox -- sh
+
+kubectl run nginx --image nginx   ## lunch nginx on kubernetes
+
+kubectl get all -o wide
+
+kubectl port-forward nginx 8080:80
+
+kubectl describe pod nginx
+
+kubectl describe pods -o wide
+
+kubectl logs nginx
+
+kubectl run nginx -- image nginx --replicas 2
+
+kubectl scale deploy nginx --replicas 2
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+
+```
+kubectl get deployment  # get information about nginx-deployment
+kubectl scale deploy nginx-deployment --replicas 3
+
+kubectl expose deployment nginx --type NodePort --port 80
+
+kubectl get deploy nginx - o yaml > /tmp/nginx.yaml
+
+kubectl get svc nginx - o yaml > /tmp/nginx-service.yaml
+
+kubectl delete deploy nginx-deployment
+
+
+```
+
+## Kubernetes pod replicasets deployment
+
+* 1-nginx-deployment.yaml
+```
+ apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+ 
+```  
+* 1-nginx-pod.yaml
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+```
+* 1-nginx-replicaset.yaml
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    run: nginx
+  name: nginx-replicaset
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+```
+
+```
+kubectl create -f 1-nginx-pod.yml
+kubectl get events
+kubectl describe pods nginx
+kubectl delete -f 1-nginx-pod.yaml
+
+kubectl create -f 1-nginx-replicaset.yaml
+
+kubectl delete pod nignx-replicaset
+
+kubectl delete -f 1-nginx-replicaset.yaml
+kubectl get all -o wide
+
 
 ```
