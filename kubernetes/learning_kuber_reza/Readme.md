@@ -1851,5 +1851,184 @@ kubectl delete pod nignx-replicaset
 kubectl delete -f 1-nginx-replicaset.yaml
 kubectl get all -o wide
 
+kubectl create -f 1-nginx-deployment.yaml
+
+kubctl scale deploy nginx-deploy --replicas=3
+kubectl delete -f 1-nginx-deployment.yaml
+kubectl delete deploy nginx-deploy
+
+
+kubectl -n kube-system get pod kube-proxy-dfllj -o yaml > mypod.yaml
 
 ```
+
+## Kubernetes Namespace and contexts
+
+```
+kubectl get ns
+
+kubectl --namespace  kube-system get pods
+
+kubectl create namespace demo
+
+kubectl config view
+
+kubectl config get-contexts
+
+kubectl config set-context kubesys --namespace=kube-system --user=kubernetes-admin --cluster=kubernetes
+
+kubectl config get-contexts
+
+kubectl config current-context
+
+kubectl config set-context demo --namespace=demo --user=kubernetes-admin --cluster=kubernetes
+
+kubectl config get-contexts
+kubectl config use-context demo
+alias kcc='kubectl config current-context'
+alias kuc='kubectl config use-context'
+kuc demo
+kubectl config use-context kubernetes-admin@kubernetes 
+
+
+
+```
+
+## Node Selector 
+
+```
+kubectl label node worker disktype=fast 
+kubectl label node worker demoserver=true
+kubectl get node worker --show-labels
+
+kubectl scale deploy nginx-deploy --replicas=3
+```
+* Note: change deployment config for labels
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+      nodeSelector:
+        demoserver: "true"
+  
+```
+```
+kubectl create -f 1-nginx-deployment.yml
+
+kubectl describe pod nignx-deployment-85dsdcd-sasa | less
+```
+
+### Pod Node Selector admission 
+
+* NOTE: worker1 = dev
+* NOTE: worker2 = prod
+* NOTE: create namespace for dev and prod
+ 
+```
+kubectl label node worker env=prod
+kubectl label node worker env- # remove lable on controller
+kubectl label node worker1 env= dev
+
+kubectl create ns dev
+kubectl create ns prod
+kubectl get ns
+
+
+```
+* NOTE: add PodNodeSelector admission on the api file in the /etc/kubernetes/manifests
+
+```
+vim  /etc/kubernetes/manifests/kube-apiserver.yaml
+- --enable-admission-plugins=NodeRestriction,PodNodeSelector
+
+```
+
+* How to edit namespace
+```
+kubectl edit ns dev
+run his command on the vim = :syntax off
+
+```
+
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: "2023-05-31T13:28:47Z"
+  labels:
+    kubernetes.io/metadata.name: dev
+  name: dev
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "env=dev"
+  resourceVersion: "3707135"
+  uid: 67ae885c-3cb1-4c64-8b13-774c5e2d3a35
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+```
+
+* Note edit namespace for prod
+```
+kubectl edit ns prod
+
+* change the edit namespace
+
+  name: dev
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "env=prod"
+
+```
+* NOTE: crate nginx-deployment on dev's namespace
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+  namespace: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+```
+
+```
+kubectl -n dev get pods
+kubectl -n dev get deployment
+
+kubectl -n dev get deploy nginx-deploy -o yaml | less
+
+kubectl -n dev delete deploy nginx-deploy
+
+```
+
+
