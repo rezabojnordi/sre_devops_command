@@ -51,7 +51,41 @@ You can run this command on your client or server for connectiing AWS Cloud
 ```
 aws configure
 
+Note: if you run aws configure that you get this paramteres or variable to input you'r accesskey
+AWS Access Key ID [None]: AKIASMXTWGVDDEDEDOHZYUD
+AWS Secret Access Key [None]: ejQnXEy/l6TU73Pj7fVg         
+Default region name [None]: eu-west-1
+
+
 ```
+* How to test it awscli
+
+```
+aws iam list-users
+
+aws iam list-users --resion
+
+```
+
+### IAM Guidelines & Best Practices
+
+* Don't use the root account except for AWS account setup
+* One physical user =One AWS user
+* Assign Users to groups and assign permission to groups
+* Create a strong password policy
+* Use and enforce the use of Multi Factor Authentication (MFA)
+* Create and use Roles for giving permissions to AWS services
+* Use Access keys for programmatic Access (CLI /  SDK)
+* Audit permission of your account with theIAM Credential Report
+
+### IAM Section - Summary
+* Users: mapped to a physical user.has a password for AWS Console
+* Groups: contains users only
+* Policies: Json document that outline permission for users or groups
+* Roles: for EC2 instances or AWS services
+* Security: MFA + Password Policy
+* Access Keys: access AWS using the CLI or SDK
+* Audit: IAM Credential Reports & IAM Access Advisor
 
 ### Importand command with Terraform
 
