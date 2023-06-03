@@ -756,8 +756,6 @@ kubectl get pods --selector app=App1
 ```
 kubectl rollout status deployment/myapp-deployemnt
 kubectl rollout history deployment/myapp-deployemnt
-
-
 ```
 
 ## Upgrades deployment
@@ -1719,6 +1717,318 @@ kubectl -n kubernetes-dashboard create token kubernetes-dashboard
 ```
 * Note: If you deploy dashboard and got error You will deploy this config yaml on your clutser
 ```
-kubectl create sa_cluster_admin.yaml
+kubectl create -f sa_cluster_admin.yaml
 
 ```
+
+### create myshell with image on the kubernetes cluster
+```
+kubectl run myshell --rm -it --image busybox -- sh
+
+kubectl run nginx --image nginx   ## lunch nginx on kubernetes
+
+kubectl get all -o wide
+
+kubectl port-forward nginx 8080:80
+
+kubectl describe pod nginx
+
+kubectl describe pods -o wide
+
+kubectl logs nginx
+
+kubectl run nginx -- image nginx --replicas 2
+
+kubectl scale deploy nginx --replicas 2
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+
+```
+kubectl get deployment  # get information about nginx-deployment
+kubectl scale deploy nginx-deployment --replicas 3
+
+kubectl expose deployment nginx --type NodePort --port 80
+
+kubectl get deploy nginx - o yaml > /tmp/nginx.yaml
+
+kubectl get svc nginx - o yaml > /tmp/nginx-service.yaml
+
+kubectl delete deploy nginx-deployment
+
+
+```
+
+## Kubernetes pod replicasets deployment
+
+* 1-nginx-deployment.yaml
+```
+ apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+ 
+```  
+* 1-nginx-pod.yaml
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+```
+* 1-nginx-replicaset.yaml
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    run: nginx
+  name: nginx-replicaset
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+```
+
+```
+kubectl create -f 1-nginx-pod.yml
+kubectl get events
+kubectl describe pods nginx
+kubectl delete -f 1-nginx-pod.yaml
+
+kubectl create -f 1-nginx-replicaset.yaml
+
+kubectl delete pod nignx-replicaset
+
+kubectl delete -f 1-nginx-replicaset.yaml
+kubectl get all -o wide
+
+kubectl create -f 1-nginx-deployment.yaml
+
+kubctl scale deploy nginx-deploy --replicas=3
+kubectl delete -f 1-nginx-deployment.yaml
+kubectl delete deploy nginx-deploy
+
+
+kubectl -n kube-system get pod kube-proxy-dfllj -o yaml > mypod.yaml
+
+```
+
+## Kubernetes Namespace and contexts
+
+```
+kubectl get ns
+
+kubectl --namespace  kube-system get pods
+
+kubectl create namespace demo
+
+kubectl config view
+
+kubectl config get-contexts
+
+kubectl config set-context kubesys --namespace=kube-system --user=kubernetes-admin --cluster=kubernetes
+
+kubectl config get-contexts
+
+kubectl config current-context
+
+kubectl config set-context demo --namespace=demo --user=kubernetes-admin --cluster=kubernetes
+
+kubectl config get-contexts
+kubectl config use-context demo
+alias kcc='kubectl config current-context'
+alias kuc='kubectl config use-context'
+kuc demo
+kubectl config use-context kubernetes-admin@kubernetes 
+
+
+
+```
+
+## Node Selector 
+
+```
+kubectl label node worker disktype=fast 
+kubectl label node worker demoserver=true
+kubectl get node worker --show-labels
+
+kubectl scale deploy nginx-deploy --replicas=3
+```
+* Note: change deployment config for labels
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+      nodeSelector:
+        demoserver: "true"
+  
+```
+```
+kubectl create -f 1-nginx-deployment.yml
+
+kubectl describe pod nignx-deployment-85dsdcd-sasa | less
+```
+
+### Pod Node Selector admission 
+
+* NOTE: worker1 = dev
+* NOTE: worker2 = prod
+* NOTE: create namespace for dev and prod
+ 
+```
+kubectl label node worker env=prod
+kubectl label node worker env- # remove lable on controller
+kubectl label node worker1 env= dev
+
+kubectl create ns dev
+kubectl create ns prod
+kubectl get ns
+
+
+```
+* NOTE: add PodNodeSelector admission on the api file in the /etc/kubernetes/manifests
+
+```
+vim  /etc/kubernetes/manifests/kube-apiserver.yaml
+- --enable-admission-plugins=NodeRestriction,PodNodeSelector
+
+```
+
+* How to edit namespace
+```
+kubectl edit ns dev
+run his command on the vim = :syntax off
+
+```
+
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: "2023-05-31T13:28:47Z"
+  labels:
+    kubernetes.io/metadata.name: dev
+  name: dev
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "env=dev"
+  resourceVersion: "3707135"
+  uid: 67ae885c-3cb1-4c64-8b13-774c5e2d3a35
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+```
+
+* Note edit namespace for prod
+```
+kubectl edit ns prod
+
+* change the edit namespace
+
+  name: dev
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "env=prod"
+
+```
+* NOTE: crate nginx-deployment on dev's namespace
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+  namespace: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+```
+
+```
+kubectl -n dev get pods
+kubectl -n dev get deployment
+
+kubectl -n dev get deploy nginx-deploy -o yaml | less
+
+kubectl -n dev delete deploy nginx-deploy
+
+```
+
+
