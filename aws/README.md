@@ -87,6 +87,36 @@ aws iam list-users --resion
 * Access Keys: access AWS using the CLI or SDK
 * Audit: IAM Credential Reports & IAM Access Advisor
 
+
+
+### EC2
+
+```
+https://aws.amazon.com/ec2/instance-types/
+
+https://instances.vantage.sh/
+```
+
+### How to connect to AWS Instance
+```
+chmod 400 ec2.pem
+or
+chmod 0400 ec2.pem
+
+ssh -i ect.pem ec2-user@54.34.23.4
+```
+# Adding on user data when You want to deploy EC2 Instance
+```
+#!/bin/bash
+# Use this for your user data (script from top to bottom
+# install httpd (Linux 2 version) 
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+echo "<h1>Hello World from $(hostname -f)</h1> " > /var/www/html/index.html
+```
+
 ### Importand command with Terraform
 
 ```
