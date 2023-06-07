@@ -2029,6 +2029,78 @@ kubectl -n dev get deploy nginx-deploy -o yaml | less
 
 kubectl -n dev delete deploy nginx-deploy
 
+kubectl -n prod run nginx --image nginx --replicas 3
+
+kubectl describe ns dev
+
+
 ```
 
+### Kubernetes DaemonSets
 
+DeamonSets - Node Affinity
+```
+kubectl create -f daemon.yaml 
+
+kubectl describe daemonsets nginx-daemonset 
+
+kubectl describe pod nginx-deploy-cf67dbb86-95mbx 
+
+kubectl delete daemonsets nginx-daemonset
+
+kubectl get daemonsets -n kube-system 
+
+kubectl get daemonsets kube-proxy -n kube-system  -o yaml |less
+
+kubectl get nodes -l gpupresent=true
+
+kubectl label node worker gpupresent=true
+
+kubectl create -f daemon2.yaml ## add labels this yamls file
+kubectl get daemonsets
+
+```
+
+### Kubernetes Jobs and Cronjobs
+```
+kubectl create -f job.yaml
+kubectl get jobds
+kubectl get all
+
+kubectl logs helloworld-d82fh 
+
+kubectl describe jobs helloworld 
+
+kubectl delete job helloworld
+
+kubectl create -f job2.yaml
+
+kubectl create -f job3.yaml
+
+kubectl create -f job_activedeadlineseconds.yaml
+
+
+```
+
+### Kubernetes Cronjob
+
+```
+kubectl create -f crontab.yaml
+
+kubectl describe cronjobs helloworld-cron
+
+kubectl delete cronjobs helloworld-cron
+
+Cron wiki @hourly, @weekly, @monthly
+deleting cronjobs
+successfulJobHistoryLimit
+failedJobHistoryLimit
+suspending cron jobs (kubectl apply, patch)
+concurrencyPolicy (Allow, Forbid & Replace)
+idempotency
+
+kubectl create -f crontab_job_history.yaml
+
+
+
+```
