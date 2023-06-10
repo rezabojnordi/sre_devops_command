@@ -2101,6 +2101,56 @@ idempotency
 
 kubectl create -f crontab_job_history.yaml
 
+kubectl patch cronjobs helloworld-cron-suspend -p '{"spec":{"suspend":false}}'
 
+kubectl -n kube-system get pods
+```
+
+### How to add TTLAfterFinished
+```
+cd /etc/kubernetes/manifests/
+
+vim kube-apiserver.yaml
+
+adding blow command on the kube-apiserver.yaml
+
+    - --authorization-mode=Node,RBAC
+    - --feature-gates=TTLAfterFinished=true
+  kubectl create -f job_ttl.yam
 
 ```
+
+### Init Containers 
+
+* Note: If I want to accees to the cluster with my pc I will run blow command
+* Note: init container is cotainer for copying file on volume befor up nginx or product containers
+
+```
+mkdir ~/.kube
+scp root@ip:/etc/kubernetes/admin.conf ~/.kube/config
+
+kubectl cluster-info
+
+kubectl get node
+
+kubectl create -f init_container.yaml
+
+kubectl describe deployments nginx-deploy |less 
+
+kubectl expose deployment nginx-deploy --type NodePort --port 80
+
+kubectl get all
+
+curl http://172.16.16.67:31379/
+
+kubectl scale deployment nginx-deploy --replicas=3
+
+kubectl delete svc nginx-deploy 
+
+kubectl delete deployments nginx-deploy
+
+```
+
+
+
+
