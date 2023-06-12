@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hostpath
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  persistentVolumeReclaimPolicy: Delete #Retain
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce  # ReadWriteMany
+  hostPath:
+    server: 172.16.16.67
+    path: "/srv/nfs/kube"
