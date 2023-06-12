@@ -2029,6 +2029,405 @@ kubectl -n dev get deploy nginx-deploy -o yaml | less
 
 kubectl -n dev delete deploy nginx-deploy
 
+kubectl -n prod run nginx --image nginx --replicas 3
+
+kubectl describe ns dev
+
+
+```
+
+### Kubernetes DaemonSets
+
+DeamonSets - Node Affinity
+```
+kubectl create -f daemon.yaml 
+
+kubectl describe daemonsets nginx-daemonset 
+
+kubectl describe pod nginx-deploy-cf67dbb86-95mbx 
+
+kubectl delete daemonsets nginx-daemonset
+
+kubectl get daemonsets -n kube-system 
+
+kubectl get daemonsets kube-proxy -n kube-system  -o yaml |less
+
+kubectl get nodes -l gpupresent=true
+
+kubectl label node worker gpupresent=true
+
+kubectl create -f daemon2.yaml ## add labels this yamls file
+kubectl get daemonsets
+
+```
+
+### Kubernetes Jobs and Cronjobs
+```
+kubectl create -f job.yaml
+kubectl get jobds
+kubectl get all
+
+kubectl logs helloworld-d82fh 
+
+kubectl describe jobs helloworld 
+
+kubectl delete job helloworld
+
+kubectl create -f job2.yaml
+
+kubectl create -f job3.yaml
+
+kubectl create -f job_activedeadlineseconds.yaml
+
+
+```
+
+### Kubernetes Cronjob
+
+```
+kubectl create -f crontab.yaml
+
+kubectl describe cronjobs helloworld-cron
+
+kubectl delete cronjobs helloworld-cron
+
+Cron wiki @hourly, @weekly, @monthly
+deleting cronjobs
+successfulJobHistoryLimit
+failedJobHistoryLimit
+suspending cron jobs (kubectl apply, patch)
+concurrencyPolicy (Allow, Forbid & Replace)
+idempotency
+
+kubectl create -f crontab_job_history.yaml
+
+kubectl patch cronjobs helloworld-cron-suspend -p '{"spec":{"suspend":false}}'
+
+kubectl -n kube-system get pods
+```
+
+### How to add TTLAfterFinished
+```
+cd /etc/kubernetes/manifests/
+
+vim kube-apiserver.yaml
+
+adding blow command on the kube-apiserver.yaml
+
+    - --authorization-mode=Node,RBAC
+    - --feature-gates=TTLAfterFinished=true
+  kubectl create -f job_ttl.yam
+
+```
+
+### Init Containers 
+
+* Note: If I want to accees to the cluster with my pc I will run blow command
+* Note: init container is cotainer for copying file on volume befor up nginx or product containers
+
+```
+mkdir ~/.kube
+scp root@ip:/etc/kubernetes/admin.conf ~/.kube/config
+
+kubectl cluster-info
+
+kubectl get node
+
+kubectl create -f init_container.yaml
+
+kubectl describe deployments nginx-deploy |less 
+
+kubectl expose deployment nginx-deploy --type NodePort --port 80
+
+kubectl get all
+
+curl http://172.16.16.67:31379/
+
+kubectl scale deployment nginx-deploy --replicas=3
+
+kubectl delete svc nginx-deploy 
+
+kubectl delete deployments nginx-deploy
+
 ```
 
 
+### persistent Volumes and Claims
+```
+1. create a pv (persistent volume)
+2. Create a PVC (persistent volume claim)
+3. Pod that uses the pvc -> pv
+
+
+ReclaimPolicy
+1. Retain
+2. Recycle
+3. Delete
+
+Access Mode:
+1. RWO
+2. RWM
+3. RO
+
+
+PersistentVolume types are implemented as plugins. Kubernetes currently supports the following plugins:
+
+cephfs - CephFS volume
+csi - Container Storage Interface (CSI)
+fc - Fibre Channel (FC) storage
+hostPath - HostPath volume (for single node testing only; WILL NOT WORK in a multi-node cluster; consider using local volume instead)
+iscsi - iSCSI (SCSI over IP) storage
+local - local storage devices mounted on nodes.
+nfs - Network File System (NFS) storage
+rbd - Rados Block Device (RBD) volume
+
+he following types of PersistentVolume are deprecated. This means that support is still available but will be removed in a future Kubernetes release.
+
+awsElasticBlockStore - AWS Elastic Block Store (EBS) (deprecated in v1.17)
+azureDisk - Azure Disk (deprecated in v1.19)
+azureFile - Azure File (deprecated in v1.21)
+cinder - Cinder (OpenStack block storage) (deprecated in v1.18)
+flexVolume - FlexVolume (deprecated in v1.23)
+gcePersistentDisk - GCE Persistent Disk (deprecated in v1.17)
+portworxVolume - Portworx volume (deprecated in v1.25)
+vsphereVolume - vSphere VMDK volume (deprecated in v1.19)
+Older versions of Kubernetes also supported the following in-tree PersistentVolume types:
+
+photonPersistentDisk - Photon controller persistent disk. (not available starting v1.15)
+scaleIO - ScaleIO volume (not available starting v1.21)
+flocker - Flocker storage (not available starting v1.25)
+quobyte - Quobyte volume (not available starting v1.25)
+storageos - StorageOS volume (not available starting v1.25)
+
+```
+
+
+### loca type in PersistentVolume
+
+```
+ssh worker
+mkdir /kube
+chmod 777 /kube
+
+kubectl create pv-hostpath.yaml
+
+kubectl get pv
+
+kubectl get pvc
+kubectl create pvc-hostpath.yaml  ## pvc connect to pv for container or pod
+
+kubectl get pvc
+
+kubectl get pvc-hostpath.yaml
+```
+
+
+
+### creating container with Volume
+```
+kubectl create busybox-pv-hostpath.yaml
+
+kubectl get all -o wide
+
+kubectl exec busybox ls  ## depricated
+* Note: kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+kubectl exec busybox -- ls
+
+kubectl exec busybox -- ls /mydata
+
+kubectl exec busybox -- touch /mydata/hello.txt
+
+kubectl exec busybox -- ls /mydat
+
+kubectl delete pod busybox.
+
+kubectl get pv,pvc
+
+kubectl delete pvc pvc-hostpath
+
+ssh worker
+
+ls /kube/
+
+kubectl delete pv pv-hostpath
+
+
+kubectl create -f 4-pv-hostpath.yaml 
+
+kubectl create -f pvc-hostpath.yaml
+
+kubectl get pv,pvc
+
+kubectl get nodes -l demoserver=true 
+
+* Note: If there are not worker when you up comand You will run blow command
+
+kubectl label node worker demoserver=true
+
+kubectl get all
+
+kubectl create -f busybox-pv-hostpath_nodeselector.yaml
+
+kubectl exec busybox -- touch /mydata/reza
+
+```
+
+### How to change policy on the claimed
+
+```
+kubectl get pv pv-hostpath -o yaml 
+
+* Note: by the default policy is Retain
+     persistentVolumeReclaimPolicy: Retain
+Note: if you change polict on pv you need to delete pod,pvc and pv
+kubectl delete pod busybox 
+kubectl delete pvc pvc-hostpath
+kubectl delete pv pv-hostpath
+kubectl create -f pv-hostpath_delete.yaml
+kubectl get pv
+kubectl create -f pvc-hostpath.yaml
+kubectl get pvc
+kubectl get pvc,pv
+kubectl delete pvc pvc-hostpath   #if you add policy on the pv and then you delete pvc your pv was changed status 
+kubectl get pv
+kubectl describe pv pv-hostpath 
+kubectl delete pv pv-hostpath
+
+kubectl get pv,pvc
+
+* Note: 
+
+```
+
+### Installing Nfs on server 
+```
+apt install nfs-server,
+vim /etc/exports
+  #/srv/nfs/kube/ 172.16.16.67/24(rw,sync)
+  /srv/nfs/kube/ *(rw,sync)
+
+sudo exportfs -f
+sudo showmount -e
+
+ssh worker and run blow command
+   * mount 172.16.16.67:/srv/nfs/kube /mnt
+
+  
+kubectl create -f pv-hostpath_nfs.yaml
+
+```
+
+
+### pv-nfs.yaml
+
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-pv1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: <nfs server ip>
+    path: "/srv/nfs/kubedata"
+
+```
+
+### pvc-nfs.yaml
+‍‍‍
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs-pv1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+
+```
+
+
+### Using Secrets in Kubernetes
+
+
+‍‍‍‍```
+echo -n 'kubeadmin' | base64  #username
+echo -n 'mypassword' | base64  #password
+```
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-demo
+type: Opaque
+data:
+  username: a3ViZWFkbWlu
+  password: bXlwYXNzd29yZA==
+```
+
+```
+kubectl get secret
+kubectl get secret -o yaml
+kubectl describe secret secret-demo
+
+kubectl delete secrets secret-demo
+
+kubectl create secret --help
+
+kubectl create secret generic --help |less
+
+kubectl create secret generic secret-demo --from-literal=username=kubeadmin --from-literal=password=mypassword
+
+vim username  ## adding kubeadmin
+
+vim password ## adding mypassword
+
+kubectl create secret generic secret-demo --from-file=./username --from-file=./password
+
+kubectl get secrets
+
+kubectl describe secrets secret-demo 
+
+kubectl get secrets secret-demo -o yaml
+
+kubectl describe secrets secret-demo 
+
+kubectl exec -it busybox -c containername
+
+kubectl exec -it busybox -- sh
+  env | grep myusername
+
+
+kubectl delete pod busybox
+
+
+vim pod-secret-volume.yaml
+kubectl create -f pod-secret-volume.yaml
+
+kubectl get pods -o wide
+
+kubectl exec -it busybox -- sh
+   ls /mydata/
+
+
+* Note: How to change secret key You can add parameter or string on secret.yaml
+
+kubectl apply -f secret.yaml
+kubectl describe secrets secret-demo
+
+kubectl exec -it busybox -- sh
+
+* Note: you don't need to recreate pod because automatically updated
+
+kubectl exec -it busybox -- sh
+```

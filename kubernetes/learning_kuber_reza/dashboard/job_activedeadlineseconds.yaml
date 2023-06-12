@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: helloworld
+spec:
+  activeDeadlineSeconds: 10 # terminated automatically
+  completions: 2 # if you job has error it will start immediately
+  parallelism: 2
+  template:
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ["sleep", "60"]
+      restartPolicy: Never 
