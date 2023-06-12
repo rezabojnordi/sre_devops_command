@@ -210,3 +210,37 @@ EBS Volume Types
 * stl (HDD): Lowest cost HDD volume designed for less frequently
 * sc1 (HDD): lowest cost HDD volume designed for less frequently accessed workloads
 
+
+
+### EBS Multi-Attach
+
+io1/io2 family
+* Attach the same EBS volume to multiple EC2 instance in the same AZ
+* Each instance has full read & write permission to the volume
+* Use case: 
+  * Achieve higher application availability in clustered Linux applications (ex:Teradata)
+  * Applications must manage concurrent write operations
+* Must use a file a file system that's cluster-aware ( not XFS,EX4, ect..)
+
+<img src="ebs.png" width="500" height="100" />
+
+### EFS Elastic file system
+* Managed NFS ( network file system) that can be mounted on many EC2
+* EFS Works with EC2 instance in multi-AZ
+* Highly available, scalable, expensive (3x gp2), pay per use
+
+<img src="efs.png" width="500" height="100" />
+
+* Use cases: content management, web serving, data sharing, wordpress
+* Uses NFS4.1. I protocol
+* Uses security group to control access to EFS
+* Compatible with linux base AMI( not Windows)
+* Encryption at rest using KMS
+* Posix file system ( linux ) that has a standard file API
+* file system scales automatically, pay-per-use, no capacity planning
+
+
+
+
+
+
