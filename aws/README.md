@@ -97,6 +97,11 @@ https://aws.amazon.com/ec2/instance-types/
 https://instances.vantage.sh/
 ```
 
+### EBS Snapshot
+* Make a backup (snapshot) of your EBS volume at a point in time 
+* Note necessary to detach volume to do snapshot, but recommended
+* Can copy snapshots across AZ or Region
+
 ### How to connect to AWS Instance
 ```
 chmod 400 ec2.pem
@@ -171,3 +176,37 @@ aws ec2 delete-security-group --group-id sg-09d33d937439474db
 aws ec2 terminate-instances --instance-id i-023f437728b79c
 
 ```
+
+
+## AMI Overview
+
+AMI =Amazon Machine Image
+AMI are a Customer of an EC2 instance
+* You add your own sofware, configuration, operating system, monitoring configuration
+* Fast boot / configuration time becasue all your software is pre- packaged
+  
+
+
+## How to create instance and snapshot from befor instance and then creating instance and use your snapshot for image 
+
+```
+Click right and then click on the Image and templates
+
+```
+
+### EC2 Instance Storage
+* EBS volumes are network drives with good but limited performance
+* if you need a hight-performance hardware disk, use EC2 instance Storage
+* Better I/O performance 
+* EC2 Instance Storage lose their storage if they're stopped (ephemeral)
+* Good for buffer / cache / scratch data / temporay content
+* Risk of data loss if hardware fails
+* Backups and Replication are your responsiblity
+  
+EBS Volume Types
+* EBS Volumes come in 6 types
+* gp2 / gp3 (SSD): General purpose SSD Volume
+* io 1 / io2 (SSD): hight performance SSD Volume for mission critical low latency
+* stl (HDD): Lowest cost HDD volume designed for less frequently
+* sc1 (HDD): lowest cost HDD volume designed for less frequently accessed workloads
+
