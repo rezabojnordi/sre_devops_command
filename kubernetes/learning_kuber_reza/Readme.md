@@ -2375,6 +2375,7 @@ data:
   password: bXlwYXNzd29yZA==
 ```
 
+
 ```
 kubectl get secret
 kubectl get secret -o yaml
@@ -2419,15 +2420,97 @@ kubectl get pods -o wide
 kubectl exec -it busybox -- sh
    ls /mydata/
 
+```
 
 * Note: How to change secret key You can add parameter or string on secret.yaml
-
+```
 kubectl apply -f secret.yaml
 kubectl describe secrets secret-demo
 
 kubectl exec -it busybox -- sh
-
+```
 * Note: you don't need to recreate pod because automatically updated
 
+  kubectl exec -it busybox -- sh
+```
+
+## ConfigMaps
+
+```
+kubectl get configmaps
+kubectl get cm
+
+kubect create -f configmap-1.yaml
+
+kubectl describe configmaps demo-configmap
+
+kubectl get configmaps demo-configmap -o yaml
+kubectl get cm demo-configmap -o yaml
+
+kubectl create configmap demo-configmap-1 --from-literal=channel.name=justmeandopensource --from-literal=channel.owner="Venkat Nagappan"
+
+kubectl get cm demo-configmap-1 -o yaml 
+
+kubectl create -f pod-configmap-env.yaml
+
+kubectl get pods
+
 kubectl exec -it busybox -- sh
+   * env
+   * env |grep -i channel
+* Note: Using pod configmap
+kubectl create -f pod-configmap-volume.yaml
+kubectl get pods
+
+kubectl exec -it busybox -- sh
+  * cd /mydata/
+
+
+kubectl get cm
+
+kubectl edit cm demo-configmap
+
+
+```
+* Mysql config Map
+
+```
+mkdir misc
+vim my.cnf
+```
+* my.ncnf
+```
+[mysqld]
+pid-file	= /var/run/mysqld/mysqld.pid
+socket		= /var/run/mysqld/mysqld.sock
+port		= 9999
+datadir		= /var/lib/mysql
+default-storage-engine = InnoDB
+character-set-server = utf8
+bind-address		= 127.0.0.1
+general_log_file        = /var/log/mysql/mysql.log
+log_error = /var/log/mysql/error.log
+
+```
+
+```
+kubectl create configmap mysql-demo-config --from-file=misc/my.cnf
+
+kubectl get cm mysql-demo-config  -o yaml
+
+kubectl get cm
+
+```
+
+or
+
+```
+kubectl create -f configmap-2.yaml
+
+kubectl crete -f configmap-mysql-volume.yaml
+
+kubectl  get pod
+
+kubectl exec -it busybox -- sh
+
 ```
