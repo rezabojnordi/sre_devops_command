@@ -97,6 +97,11 @@ https://aws.amazon.com/ec2/instance-types/
 https://instances.vantage.sh/
 ```
 
+### EBS Snapshot
+* Make a backup (snapshot) of your EBS volume at a point in time 
+* Note necessary to detach volume to do snapshot, but recommended
+* Can copy snapshots across AZ or Region
+
 ### How to connect to AWS Instance
 ```
 chmod 400 ec2.pem
@@ -171,3 +176,71 @@ aws ec2 delete-security-group --group-id sg-09d33d937439474db
 aws ec2 terminate-instances --instance-id i-023f437728b79c
 
 ```
+
+
+## AMI Overview
+
+AMI =Amazon Machine Image
+AMI are a Customer of an EC2 instance
+* You add your own sofware, configuration, operating system, monitoring configuration
+* Fast boot / configuration time becasue all your software is pre- packaged
+  
+
+
+## How to create instance and snapshot from befor instance and then creating instance and use your snapshot for image 
+
+```
+Click right and then click on the Image and templates
+
+```
+
+### EC2 Instance Storage
+* EBS volumes are network drives with good but limited performance
+* if you need a hight-performance hardware disk, use EC2 instance Storage
+* Better I/O performance 
+* EC2 Instance Storage lose their storage if they're stopped (ephemeral)
+* Good for buffer / cache / scratch data / temporay content
+* Risk of data loss if hardware fails
+* Backups and Replication are your responsiblity
+  
+EBS Volume Types
+* EBS Volumes come in 6 types
+* gp2 / gp3 (SSD): General purpose SSD Volume
+* io 1 / io2 (SSD): hight performance SSD Volume for mission critical low latency
+* stl (HDD): Lowest cost HDD volume designed for less frequently
+* sc1 (HDD): lowest cost HDD volume designed for less frequently accessed workloads
+
+
+
+### EBS Multi-Attach
+
+io1/io2 family
+* Attach the same EBS volume to multiple EC2 instance in the same AZ
+* Each instance has full read & write permission to the volume
+* Use case: 
+  * Achieve higher application availability in clustered Linux applications (ex:Teradata)
+  * Applications must manage concurrent write operations
+* Must use a file a file system that's cluster-aware ( not XFS,EX4, ect..)
+
+<img src="ebs.png" width="500" height="100" />
+
+### EFS Elastic file system
+* Managed NFS ( network file system) that can be mounted on many EC2
+* EFS Works with EC2 instance in multi-AZ
+* Highly available, scalable, expensive (3x gp2), pay per use
+
+<img src="efs.png" width="500" height="100" />
+
+* Use cases: content management, web serving, data sharing, wordpress
+* Uses NFS4.1. I protocol
+* Uses security group to control access to EFS
+* Compatible with linux base AMI( not Windows)
+* Encryption at rest using KMS
+* Posix file system ( linux ) that has a standard file API
+* file system scales automatically, pay-per-use, no capacity planning
+
+
+
+
+
+
