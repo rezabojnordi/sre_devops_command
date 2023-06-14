@@ -2593,6 +2593,39 @@ kubectl -n quota-demo delete cm cm1
 kubectl delete pod -n quota-demo-ns mem-limit
  
 ```
+### Renaming kubernetes Name
+
+```
+ssh worker
+
+hostname set-hostname kubeworker1.example.com
+
+reboot
+
+journalctl --until=kubelet
+
+systemctl status kubelet.service
+
+```
+
+```
+ssh master
+
+kubectl edit node worker
+  :%s/worker/kubeworker1/g
+
+kubect get node
+
+kubectl delete node worker
+
+kubectl get nodes
+
+ssh worker
+
+kubeadm reset
+
+```
+
 
 
 
