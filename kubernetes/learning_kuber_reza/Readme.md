@@ -2514,3 +2514,85 @@ kubectl  get pod
 kubectl exec -it busybox -- sh
 
 ```
+
+
+### Immutable Secrets & ConfigMap
+
+```
+kubectl create secret generic mysecret --from-literal=username=kubeadmin --from-literal=password=mypassword
+
+kubectl get secret
+
+kubectl describe secrets mysecret 
+
+kubectl edit secrets mysecret 
+
+```
+* Note: If you add immutables parameter on the Secret You wont changed it.
+
+```
+apiVersion: v1
+data:
+  password: bXlwYXNzd29yZA==
+  username: YWxpY2UK
+immutable: true
+kind: Secret
+metadata:
+  creationTimestamp: "2023-06-14T06:45:44Z"
+  name: mysecret
+  namespace: default
+  resourceVersion: "6053759"
+  uid: 1601cfc5-822f-40af-a831-4a2a69cefcbb
+type: Opaque
+
+```
+
+
+## Resource Quotas & Limits
+
+```
+kubectl create namespace quota-demo-ns
+kubectl get ns
+kubectl create -f quota-count.yaml
+kubectl get resourcequotas -n quota-demo-ns
+kubectl describe resourcequotas -n quota-demo-ns
+kubectl -n quota-demo-ns describe quota quota-demo1  
+* Note: if you uo command that you see configma aqual one blow command won't run it.
+kubectl -n quota-demo-ns create configmap cm1 --from-literal=name=venkatn
+
+kubectl -n quota-demo-ns create configmap cm1 --from-literal=name=venkatn
+* output: error: failed to create configmap: configmaps "cm1" is forbidden: exceeded quota: quota-demo1, requested: configmaps=1, used: configmaps=1, limited: configmaps=1
+```
+
+
+* pod-quota-mem
+
+
+```
+kubectl create -f pod-quota-mem.yaml
+
+kubectl get pod -n quota-demo-ns
+kubectl describe -n quota-demo-ns resourcequotas quota-demo1 
+
+kubectl -n quota-demo-ns describe quota quota-demo1
+```
+* Limiting mem on the resurce
+```
+ kubectl create -f quota-mem.yaml 
+kubectl get -n quota-demo-ns resourcequotas quota-demo-mem
+or 
+kubectl get -n quota-demo-ns quota quota-demo-mem
+
+```
+
+* Adding limitation on the pods
+```
+kubectl create -f pod-quota-mem-exceed.yaml
+kubectl get pods -n quota-demo-n
+kubectl -n quota-demo delete cm cm1
+kubectl delete pod -n quota-demo-ns mem-limit
+ 
+```
+
+
+
