@@ -2627,5 +2627,70 @@ kubeadm reset
 ```
 
 
+or
+
+```
+kubectl drain worke31  # this command remove worker3 from the kubernetes cluster
+
+kubectl get all -o wide
+ssh worker3
+kubeadm reset
+
+vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  $KUBELET_EXTRA_ARGS --hostname-override=kubeworker
 
 
+systemctl deamon-reload
+
+
+kubeadm reset
+
+ssh master
+
+kubectl get nodes
+
+ssh worker2
+kubeadm join ip --token tokens --descovery-token-ca-cert-hash
+
+ssh master
+kubectl delete node kworker2
+
+kubectl get all -o wide
+```
+
+
+## How to setup Rancher to manage your Kubernetes Cluster
+
+
+* Start the server
+To install and run Rancher, execute the following Docker command on your host:
+```
+sudo docker run --privileged -v /opt/rancher -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+or 
+sudo docker run --privileged --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+
+curl localhost
+
+  
+
+```
+
+## Performing Rolling Updates in Kubernetes
+```
+kubectl create -f nginx-rolling-update.yml
+* Change nginx 1:14 to 1.14.2
+
+kubectl apply -f nginx-rolling-update.yml
+
+
+kubectl rollout status deployment nginx-deploy  #back to old version
+
+kubectl rollout history deployment nginx-deploy
+
+kubectl set image deployment nginx-deploy nginx=nignx:1.15  # set nginx:1.15 insted of 1.14.2
+
+kubectl rollout history deployment nginx-deploy --revision 3
+
+
+
+```
