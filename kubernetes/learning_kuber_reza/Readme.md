@@ -2691,6 +2691,48 @@ kubectl set image deployment nginx-deploy nginx=nignx:1.15  # set nginx:1.15 ins
 
 kubectl rollout history deployment nginx-deploy --revision 3
 
+kubectl rollout status deployment nginx-deploy
 
+ctr image pull docker.io/library/nginx:1.15
+
+kubectl set image deployment nginx-deploy nginx=nginx:latest
+
+
+kubectl rollout status deployment nginx-deploy
+
+kubectl delete deployments.apps nginx-deploy
+
+kubectl annotate deployments.apps nginx-deploy kubernetes.io/change-cause="Update to version latest"
+
+kubectl rollout history deployment nginx-deploy  # up command can help to you that realize your history version
+
+kubectl set image deployment nginx-deploy nginx=nginx:latest --record
+
+kubectl rollout history deployment nginx-deploy 
+
+kubectl create -f nginx-rolling-update-annotation.yaml
+
+kubectl describe deployments.apps nginx-deploy |less
+
+kubectl rollout undo deployment nginx-deploy --to-revision=2 ## reversion 
+
+kubectl rollout pause deployment nginx-deploy
+
+kubectl rollout resume deployment nginx-deploy
+
+kubectl rollout status deployment nginx-deploy
+
+
+* Note: If your image version doesn't work you must run checkout last version
+
+kubectl set image deployment nginx-deployng nginx=nginx:0.0.0.0  # does'nt work
+
+kubectl rollout status deploy nginx-deploy 
+
+kubectl create -f nginx-rolling-update-recreate.yaml  # rollback to recreate
+
+kubectl set image deploy nginx-deploy nginx=nginx:latest  # all of pod terminated
+
+kubectl delete deployments.apps nginx-deploy
 
 ```
