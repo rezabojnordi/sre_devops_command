@@ -2375,6 +2375,7 @@ data:
   password: bXlwYXNzd29yZA==
 ```
 
+
 ```
 kubectl get secret
 kubectl get secret -o yaml
@@ -2419,15 +2420,319 @@ kubectl get pods -o wide
 kubectl exec -it busybox -- sh
    ls /mydata/
 
+```
 
 * Note: How to change secret key You can add parameter or string on secret.yaml
-
+```
 kubectl apply -f secret.yaml
 kubectl describe secrets secret-demo
 
 kubectl exec -it busybox -- sh
-
+```
 * Note: you don't need to recreate pod because automatically updated
 
+  kubectl exec -it busybox -- sh
+```
+
+## ConfigMaps
+
+```
+kubectl get configmaps
+kubectl get cm
+
+kubect create -f configmap-1.yaml
+
+kubectl describe configmaps demo-configmap
+
+kubectl get configmaps demo-configmap -o yaml
+kubectl get cm demo-configmap -o yaml
+
+kubectl create configmap demo-configmap-1 --from-literal=channel.name=justmeandopensource --from-literal=channel.owner="Venkat Nagappan"
+
+kubectl get cm demo-configmap-1 -o yaml 
+
+kubectl create -f pod-configmap-env.yaml
+
+kubectl get pods
+
 kubectl exec -it busybox -- sh
+   * env
+   * env |grep -i channel
+* Note: Using pod configmap
+kubectl create -f pod-configmap-volume.yaml
+kubectl get pods
+
+kubectl exec -it busybox -- sh
+  * cd /mydata/
+
+
+kubectl get cm
+
+kubectl edit cm demo-configmap
+
+
+```
+* Mysql config Map
+
+```
+mkdir misc
+vim my.cnf
+```
+* my.ncnf
+```
+[mysqld]
+pid-file	= /var/run/mysqld/mysqld.pid
+socket		= /var/run/mysqld/mysqld.sock
+port		= 9999
+datadir		= /var/lib/mysql
+default-storage-engine = InnoDB
+character-set-server = utf8
+bind-address		= 127.0.0.1
+general_log_file        = /var/log/mysql/mysql.log
+log_error = /var/log/mysql/error.log
+
+```
+
+```
+kubectl create configmap mysql-demo-config --from-file=misc/my.cnf
+
+kubectl get cm mysql-demo-config  -o yaml
+
+kubectl get cm
+
+```
+
+or
+
+```
+kubectl create -f configmap-2.yaml
+
+kubectl crete -f configmap-mysql-volume.yaml
+
+kubectl  get pod
+
+kubectl exec -it busybox -- sh
+
+```
+
+
+### Immutable Secrets & ConfigMap
+
+```
+kubectl create secret generic mysecret --from-literal=username=kubeadmin --from-literal=password=mypassword
+
+kubectl get secret
+
+kubectl describe secrets mysecret 
+
+kubectl edit secrets mysecret 
+
+```
+* Note: If you add immutables parameter on the Secret You wont changed it.
+
+```
+apiVersion: v1
+data:
+  password: bXlwYXNzd29yZA==
+  username: YWxpY2UK
+immutable: true
+kind: Secret
+metadata:
+  creationTimestamp: "2023-06-14T06:45:44Z"
+  name: mysecret
+  namespace: default
+  resourceVersion: "6053759"
+  uid: 1601cfc5-822f-40af-a831-4a2a69cefcbb
+type: Opaque
+
+```
+
+
+## Resource Quotas & Limits
+
+```
+kubectl create namespace quota-demo-ns
+kubectl get ns
+kubectl create -f quota-count.yaml
+kubectl get resourcequotas -n quota-demo-ns
+kubectl describe resourcequotas -n quota-demo-ns
+kubectl -n quota-demo-ns describe quota quota-demo1  
+* Note: if you uo command that you see configma aqual one blow command won't run it.
+kubectl -n quota-demo-ns create configmap cm1 --from-literal=name=venkatn
+
+kubectl -n quota-demo-ns create configmap cm1 --from-literal=name=venkatn
+* output: error: failed to create configmap: configmaps "cm1" is forbidden: exceeded quota: quota-demo1, requested: configmaps=1, used: configmaps=1, limited: configmaps=1
+```
+
+
+* pod-quota-mem
+
+
+```
+kubectl create -f pod-quota-mem.yaml
+
+kubectl get pod -n quota-demo-ns
+kubectl describe -n quota-demo-ns resourcequotas quota-demo1 
+
+kubectl -n quota-demo-ns describe quota quota-demo1
+```
+* Limiting mem on the resurce
+```
+ kubectl create -f quota-mem.yaml 
+kubectl get -n quota-demo-ns resourcequotas quota-demo-mem
+or 
+kubectl get -n quota-demo-ns quota quota-demo-mem
+
+```
+
+* Adding limitation on the pods
+```
+kubectl create -f pod-quota-mem-exceed.yaml
+kubectl get pods -n quota-demo-n
+kubectl -n quota-demo delete cm cm1
+kubectl delete pod -n quota-demo-ns mem-limit
+ 
+```
+### Renaming kubernetes Name
+
+```
+ssh worker
+
+hostname set-hostname kubeworker1.example.com
+
+reboot
+
+journalctl --until=kubelet
+
+systemctl status kubelet.service
+
+```
+
+```
+ssh master
+
+kubectl edit node worker
+  :%s/worker/kubeworker1/g
+
+kubect get node
+
+kubectl delete node worker
+
+kubectl get nodes
+
+ssh worker
+
+kubeadm reset
+
+```
+
+
+or
+
+```
+kubectl drain worke31  # this command remove worker3 from the kubernetes cluster
+
+kubectl get all -o wide
+ssh worker3
+kubeadm reset
+
+vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  $KUBELET_EXTRA_ARGS --hostname-override=kubeworker
+
+
+systemctl deamon-reload
+
+
+kubeadm reset
+
+ssh master
+
+kubectl get nodes
+
+ssh worker2
+kubeadm join ip --token tokens --descovery-token-ca-cert-hash
+
+ssh master
+kubectl delete node kworker2
+
+kubectl get all -o wide
+```
+
+
+## How to setup Rancher to manage your Kubernetes Cluster
+
+
+* Start the server
+To install and run Rancher, execute the following Docker command on your host:
+```
+sudo docker run --privileged -v /opt/rancher -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+or 
+sudo docker run --privileged --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+
+curl localhost
+
+  
+
+```
+
+## Performing Rolling Updates in Kubernetes
+```
+kubectl create -f nginx-rolling-update.yml
+* Change nginx 1:14 to 1.14.2
+
+kubectl apply -f nginx-rolling-update.yml
+
+
+kubectl rollout status deployment nginx-deploy  #back to old version
+
+kubectl rollout history deployment nginx-deploy
+
+kubectl set image deployment nginx-deploy nginx=nignx:1.15  # set nginx:1.15 insted of 1.14.2
+
+kubectl rollout history deployment nginx-deploy --revision 3
+
+kubectl rollout status deployment nginx-deploy
+
+ctr image pull docker.io/library/nginx:1.15
+
+kubectl set image deployment nginx-deploy nginx=nginx:latest
+
+
+kubectl rollout status deployment nginx-deploy
+
+kubectl delete deployments.apps nginx-deploy
+
+kubectl annotate deployments.apps nginx-deploy kubernetes.io/change-cause="Update to version latest"
+
+kubectl rollout history deployment nginx-deploy  # up command can help to you that realize your history version
+
+kubectl set image deployment nginx-deploy nginx=nginx:latest --record
+
+kubectl rollout history deployment nginx-deploy 
+
+kubectl create -f nginx-rolling-update-annotation.yaml
+
+kubectl describe deployments.apps nginx-deploy |less
+
+kubectl rollout undo deployment nginx-deploy --to-revision=2 ## reversion 
+
+kubectl rollout pause deployment nginx-deploy
+
+kubectl rollout resume deployment nginx-deploy
+
+kubectl rollout status deployment nginx-deploy
+
+
+* Note: If your image version doesn't work you must run checkout last version
+
+kubectl set image deployment nginx-deployng nginx=nginx:0.0.0.0  # does'nt work
+
+kubectl rollout status deploy nginx-deploy 
+
+kubectl create -f nginx-rolling-update-recreate.yaml  # rollback to recreate
+
+kubectl set image deploy nginx-deploy nginx=nginx:latest  # all of pod terminated
+
+kubectl delete deployments.apps nginx-deploy
+
 ```

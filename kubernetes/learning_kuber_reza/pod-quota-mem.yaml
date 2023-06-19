@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: quota-demo-ns
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    resources:
+      limits:
+        memory: "100Mi" # the maximume amoung the container  can use
+      requests:
+        memory: "200Mi"   ## reserve for a container
+
