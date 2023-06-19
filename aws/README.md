@@ -240,7 +240,14 @@ io1/io2 family
 * file system scales automatically, pay-per-use, no capacity planning
 
 
+```
+sudo yum install -y amazon-efs-utils
 
+mkdir efs
+
+sudo mount -t efs -o tls fs-0936c16856ab57f28:/ efs 
+
+```
 
 
 
