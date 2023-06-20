@@ -2736,3 +2736,79 @@ kubectl set image deploy nginx-deploy nginx=nginx:latest  # all of pod terminate
 kubectl delete deployments.apps nginx-deploy
 
 ```
+
+
+## NFS Persistent Volume
+
+<img src="./image/persistent_volume.png" width="1024" height="300" />
+
+```
+sudo mkdir -p /srv/nfs/kubedata
+
+sudo chmod -R 777 /srv/nfs
+
+sudo vim /etc/exports
+  /srv/nfs/kubedata   *(rw,sync,no_subtree_check,insecure)
+
+
+sudo exportfs -rav
+
+sudo exportfs -v
+showmount -e
+
+ssh worker
+ping nfs-server(ip)
+showmount -e nfs-server(ip)
+mount -t nfs ip:/srv/nfs/kubedata /mnt
+
+mount |grep kube
+
+
+kubectl create -f pv-nfs.yaml
+
+kubectl get pv
+
+kubectl create -f pvc-nfs.yaml
+
+kubectl get pvc
+
+kubectl create -f nfs-nginx.yaml
+kubectl get all -o wide
+
+kubectl exec -it nginx-deploy-559c7cff6c-h65nq -- sh
+
+kubectl expose nginx-deploy --port 80 --type NodePort
+
+kubectl delete svc nginx-deploy 
+
+kubectl delete deploy nginx-deploy
+
+```
+
+
+## How to use Statefulsets in Kubernetes Cluster
+
+<img src="./image/Statefulsets.png" width="1024" height="300" />
+<img src="./image/Statefulsets2.png" width="1024" height="300" />
+
+
+```
+installing nfs server on storage server
+
+cd /srv/nfs/kubedata/
+ mkdir {pv0,pv1,pv2,pv3,pv4}
+chmod 777 -R /srv/nfs/kubedata/*
+
+sudo exportfs -rav
+sudo exportfs -v
+sudo showmount -e
+
+kubectl create -f sts-pv.yaml
+
+kubectl get pv
+
+
+
+````
+
+<img src="./image/StatefulSets.webp" width="1024" height="300" />
