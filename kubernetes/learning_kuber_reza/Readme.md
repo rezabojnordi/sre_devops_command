@@ -2812,3 +2812,82 @@ kubectl get pv
 ````
 
 <img src="./image/StatefulSets.webp" width="1024" height="300" />
+
+```
+kubectl create -f sts-nginx.yaml
+
+kubectl get all -o wide
+
+kubectl get pv,pvc
+ 
+kubectl exec -it nginx-sts-0 -- /bin/sh
+  cd /var/www/
+  touch hello
+  exit
+kubectl delete pod nginx-sts-0
+  cd /var/www/
+  touch hello
+
+kubectl scale sts nginx-sts --replicas=0
+
+kubectl delete pvc --all
+kubectl delete pv --all
+kubectl delete svc nginx-headless
+kubectl delete sts nginx-sts
+
+```
+
+
+## Containerd and Docker
+
+<img src="./image/docker_containerd.png" width="1024" height="300" />
+
+
+#### Docker to containerd transition
+* better performance
+* less overhead
+* docker cli ->crictl
+* existing image work
+* no changes to build images
+
+
+```
+kubectl run nginx --iamge nginx
+kubectl get all
+kubectl scale deploy nginx replicas=3
+kubectl scale deploy nginx-deploy --replicas=3 
+
+```
+
+<img src="./image/docker_to_containerd.png" width="1024" height="300" />
+
+* if you installed docker then containerd is installed so you needed to change kubelet config
+
+```
+kubectl cordon worker2   # disable your worker
+kubectl drain worker2 --ignore-deamonsets
+ssh worker2 or ssh master
+  ctr namespace list
+  ctr --namespace moby container list
+  systemctl stop kubelet
+  systemctl stop docker
+  apt remove --purge docker*
+  ctr namespace list
+  ctr --namespace moby container list
+  dpkg -L containerd.io |grep toml
+  vim /etc/containerd/config.toml
+   #disabled_plugins = ["cri"]
+  systemctl restart containerd
+  vim /var/lib/kubelet/kubeadm-flags.env
+   *Note: adding blow string the end of line
+   --container-runtime=remote  --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
+  systemctl restart kubelet
+  kubectl uncordon worker2
+ctr namespace list
+ctr --namespace k8s.io container list
+```
+
+<img src="./image/docker_to_containerd2.png" width="1024" height="300" />
+<img src="./image/docker_to_containerd3.png" width="1024" height="300" />
+<img src="./image/docker_to_containerd4.png" width="1024" height="300" />
+
