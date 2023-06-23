@@ -2918,6 +2918,8 @@ sudo exportfs -rav
 
 sudo exportfs -v
 ```
+
+
 ```
 kubectl get clusterrole,clusterrolebinding,role,rolebind
 
