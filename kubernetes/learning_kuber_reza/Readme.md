@@ -2891,3 +2891,76 @@ ctr --namespace k8s.io container list
 <img src="./image/docker_to_containerd3.png" width="1024" height="300" />
 <img src="./image/docker_to_containerd4.png" width="1024" height="300" />
 
+
+
+## Dynamic NFS Provisioning
+
+<img src="./image/provision.png" width="1024" height="300" />
+
+```
+kubectl cluster-info
+kubectl get nodes
+kubectl get cs
+kubernetes version --shourt
+
+ssh storage-server
+apt install nfs-server && apt install nfs-commond
+sudo mkdir /srv/nfs/kubedata -p
+systemctl enable nfs-server
+systemctl status nfs-server
+```
+```
+vim /etc/exports
+
+/srv/nfs/kubedata *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)
+
+sudo exportfs -rav
+
+sudo exportfs -v
+```
+```
+kubectl get clusterrole,clusterrolebinding,role,rolebind
+
+kubectl create -f rbac.yaml
+kubectl get clusterrole,clusterrolebinding,role,rolebind |grep nfs
+
+kubectl create -f class.yaml
+
+kubectl get storageclass
+
+kubectl create -f deployment.yaml
+
+kubectl describe pod nfs-client-provisioner-74cb946769-zqghs |less
+
+kubectl get pv,pvc
+
+vim pvc
+
+```
+
+
+## Prometheus and Grafana
+
+<img src="./image/prometheus.png" width="1024" height="300" />
+<img src="./image/prometheus2.png" width="1024" height="300" />
+<img src="./image/prometheus3.png" width="1024" height="300" />
+
+
+* Secret
+* ConfigMap
+* service Account
+* pvc (perssiten volume Claim)
+* Deployment
+* Replicaset
+* Pod
+* DeamonSet
+* role Binding or Clutser Role Binding
+
+```
+kubectl cluster-ifno
+kubectl get nodes
+kubectl get pods
+kubectl get namespace
+kubectl version --short
+
+```
