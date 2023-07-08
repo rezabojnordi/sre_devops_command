@@ -2784,7 +2784,14 @@ kubectl delete svc nginx-deploy
 kubectl delete deploy nginx-deploy
 
 ```
+### How to install NFS provisioner
 
+```
+$ helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+$ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+    --set nfs.server=x.x.x.x \
+    --set nfs.path=/exported/path
+```
 
 ## How to use Statefulsets in Kubernetes Cluster
 
@@ -2966,6 +2973,113 @@ kubectl get namespace
 kubectl version --short
 
 ```
+
+
+
+## How to change persistent volume to default storage
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-client
+  uid: ee0ac2f8-0605-4af7-88f9-f9baebf79124
+  resourceVersion: '474287'
+  creationTimestamp: '2023-06-30T18:34:09Z'
+  labels:
+    app: nfs-subdir-external-provisioner
+    app.kubernetes.io/managed-by: Helm
+    chart: nfs-subdir-external-provisioner-4.0.18
+    heritage: Helm
+    k8slens-edit-resource-version: v1
+    release: nfs-subdir-external-provisioner
+  annotations:
+    meta.helm.sh/release-name: nfs-subdir-external-provisioner
+    meta.helm.sh/release-namespace: default
+    storageclass.kubernetes.io/is-default-class: 'true'
+  managedFields:
+    - manager: helm
+      operation: Update
+      apiVersion: storage.k8s.io/v1
+      time: '2023-06-30T18:34:09Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:allowVolumeExpansion: {}
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:chart: {}
+            f:heritage: {}
+            f:release: {}
+        f:parameters:
+          .: {}
+          f:archiveOnDelete: {}
+        f:provisioner: {}
+        f:reclaimPolicy: {}
+        f:volumeBindingMode: {}
+    - manager: node-fetch
+      operation: Update
+      apiVersion: storage.k8s.io/v1
+      time: '2023-07-01T06:34:14Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:storageclass.kubernetes.io/is-default-class: {}
+          f:labels:
+            f:k8slens-edit-resource-version: {}
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/nfs-client
+provisioner: cluster.local/nfs-subdir-external-provisioner
+parameters:
+  archiveOnDelete: 'true'
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate
+```
+
+```
+storageclass.kubernetes.io/is-default-class: 'true'
+
+or
+
+kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+```
+
+## Ingress and LoadBalancer
+
+
+### Nginx Ingree controller
+
+if you want to deploy haproxy for sending trrafic beetwen workers nodes
+
+
+```
+frontend http_front
+  bind *:80
+  stats uri /haproxy?stats
+  default_backend http_back
+
+backend http_back
+  balance roundrobin
+  server kube <worker-node1-ip>:80
+  server kube <worker-node2-ip>:80
+
+
+```
+
+
+
+
+
+
+
+
 
 
 
