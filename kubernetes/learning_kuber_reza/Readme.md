@@ -3059,7 +3059,9 @@ kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storagec
 if you want to deploy haproxy for sending trrafic beetwen workers nodes
 
 
-```
+<img src="./image/haproxy_worker.png"/>
+
+``` bash
 frontend http_front
   bind *:80
   stats uri /haproxy?stats
@@ -3067,16 +3069,49 @@ frontend http_front
 
 backend http_back
   balance roundrobin
-  server kube <worker-node1-ip>:80
-  server kube <worker-node2-ip>:80
+  server worker1 <worker-node1-ip>:80
+  server worker2 <worker-node2-ip>:80
 
 
 ```
+```
+https://github.com/kubernetes/ingress-nginx
+
+https://github.com/kubernetes/ingress-nginx.git
+```
 
 
+## Installing wordpress with Helmchart
+```
+helm install my-release oci://registry-1.docker.io/bitnamicharts/nginx-ingress-controller
+kubectl create -f ingress-resource.yaml
+helm upgrade -i my-release --values values_ingree.yaml oci://registry-1.docker.io/bitnamicharts/nginx-ingress-controller --namespace ingress-nginx
+
+* cheacking the webhook in ingress
+
+kubectl get validatingwebhookconfigurations.admissionregistration.k8s.io
 
 
+helm install wordpress  oci://registry-1.docker.io/bitnamicharts/wordpress --namespace wordpress --create-namespace
 
+echo Username: reza
+echo Password: $(kubectl get secret --namespace wordpress wordpress -o jsonpath="{.data.wordpress-password}" | base64 -d)
+
+```
+
+## Using nerdctl on your new kubernetes' version
+
+```
+wget https://github.com/containerd/nerdctl/releases/download/v1.4.0/nerdctl-1.4.0-linux-amd64.tar.gz
+
+tar xvf nerdctl-1.4.0-linux-amd64.tar.gz
+
+cp nerdctl /bin/
+
+vim ~/.bashrc
+  alias docker="nerdctl --namespace k8s.io
+source ~/.bashrc
+```
 
 
 
@@ -3092,9 +3127,6 @@ backend http_back
 
 
 # Kubeconf2022
-![RX-M, llc.](http://rx-m.io/rxm-cnc.svg)
-
-
 # Kubernetes Networking 101
 
 Welcome to the Kubernetes Networking 101 lab!!
