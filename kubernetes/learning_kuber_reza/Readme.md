@@ -3098,7 +3098,7 @@ echo Username: reza
 echo Password: $(kubectl get secret --namespace wordpress wordpress -o jsonpath="{.data.wordpress-password}" | base64 -d)
 
 ```
-
+* Note: if you unistall wordpress and other applications that you must remove your application's volumes
 ## Using nerdctl on your new kubernetes' version
 
 ```
