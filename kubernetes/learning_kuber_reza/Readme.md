@@ -3060,6 +3060,13 @@ kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storagec
 
 <img src="./image/ingress-service.png"/>
 
+
+<img src="./image/ingress_controller.png"/>
+
+<img src="./image/ingress_controller.png"/>
+<img src="./image/clusterip_service.png"/>
+<img src="./image/service_communicate.png"/>
+
 ### Nginx Ingree controller
 
 if you want to deploy haproxy for sending trrafic beetwen workers nodes
@@ -3086,6 +3093,29 @@ https://github.com/kubernetes/ingress-nginx
 https://github.com/kubernetes/ingress-nginx.git
 ```
 
+
+
+
+<img src="./image/database_service.png"/>
+
+<img src="./image/multi_port.png"/>
+
+<img src="./image/cockroachdb.png"/>
+
+
+
+<img src="./image/headless.png"/>
+
+
+<img src="./image/node_port.png"/>
+
+<img src="./image/node_port2.png"/>
+
+```
+Range 30000 - 32767
+```
+
+<img src="./image/wrap_up.png"/>
 
 ## Installing wordpress with Helmchart
 ```
