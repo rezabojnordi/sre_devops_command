@@ -3054,6 +3054,12 @@ kubectl patch storageclass nfs-client -p '{"metadata": {"annotations":{"storagec
 ## Ingress and LoadBalancer
 
 
+
+
+
+
+<img src="./image/ingress-service.png"/>
+
 ### Nginx Ingree controller
 
 if you want to deploy haproxy for sending trrafic beetwen workers nodes
