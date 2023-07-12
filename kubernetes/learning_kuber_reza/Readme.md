@@ -3227,6 +3227,9 @@ kubectl delete namespace ingress
 
 ```
 
+
+
+
 IMPORTANT NOTE: The Ingress and the Services should be inside the same Namespace.
 Otherwise, the Ingress won't find the Service even with its full name:
 <service-name>.<namespace>.svc.local
@@ -3244,10 +3247,7 @@ helm repo add jetstack https://charts.jetstack.io
 helm repo update
 
 # Install Cert Manager using Helm charts
-helm install cert-manager jetstack/cert-manager `
-    --namespace cert-manager `
-    --version v0.14.0 `
-    --set installCRDs=true
+kubectl apply --validate=false -f https://github.com/cert-manager/cert-manager/releases/download/v1.12.2/cert-manager.yaml
 
 # Check the created Pods
 kubectl get pods --namespace cert-manager
