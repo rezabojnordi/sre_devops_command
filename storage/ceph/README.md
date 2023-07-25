@@ -645,3 +645,48 @@ ceph orch ps --daemon_type=DAEMON_NAME
 ceph orch ps --daemon_type=mds
 ```
 
+## Removing OSD in the ceph
+To remove a failed OSD and add it back to the Ceph cluster, you can follow these steps. Before proceeding, please ensure you have a recent backup of your Ceph cluster, as removing an OSD can result in data redistribution and potential data loss.
+
+Out and Down the OSD:
+First, you need to mark the OSD as "out" and "down" in the Ceph cluster to prevent data loss during the removal process. Run the following commands:
+```bash
+ceph osd out <osd-id>
+ceph osd down <osd-id>
+```
+
+Replace <osd-id> with the ID of the OSD you want to remove.
+
+Crush Remove and Mark the OSD as 'Out' and 'Lost':
+Next, you should remove the OSD from the CRUSH map and mark it as "out" and "lost":
+
+``` bash
+ceph osd crush remove osd.<osd-id>
+ceph osd lost <osd-id>
+```
+Remove the OSD from the Cluster:
+Once the OSD is marked as "lost," you can safely remove it from the cluster:
+```bash
+ceph osd rm <osd-id>
+```
+This command will permanently remove the OSD from the Ceph cluster.
+
+Check the OSD Status:
+Ensure that the OSD is no longer present in the cluster by checking the status:
+```bash
+ceph osd status
+
+```
+Re-Create the OSD:
+After removing the OSD, you can add it back to the cluster. Use the cephadm utility or the relevant Ceph orchestrator command to create a new OSD on the node where the removed OSD was running. For example, using cephadm:
+``` bash
+ceph orch apply osd --all-available-devices
+```
+This command will create new OSDs using all available devices on the node.
+
+Check OSD Status Again:
+Verify that the new OSDs are added to the cluster and have a "up" status:
+``` bash
+ceph osd status
+ceph -s
+```
