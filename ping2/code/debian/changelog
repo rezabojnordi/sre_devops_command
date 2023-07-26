@@ -1,0 +1,13 @@
+ping2 (1.0) focal; urgency=medium
+
+  * New features:
+    - Added support for specifying custom packet size.
+    - Implemented IPv6 ping functionality.
+
+  * Bug fixes:
+    - Fixed a rare crash when parsing certain IP addresses.
+
+  * Performance improvements:
+    - Optimized network request handling for faster pings.
+
+ -- Maintainer Name <RezaBojnordi2012@gmail.com>  Mon, 01 Jan 2023 00:00:00 +0000

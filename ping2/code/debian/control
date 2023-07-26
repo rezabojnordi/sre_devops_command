@@ -1,0 +1,16 @@
+Source: ping2
+Section: misc
+Priority: optional
+Maintainer: Reza Bojnordi <rezabojnordi2012@gmail.com>
+Build-Depends: debhelper-compat (= 13)
+
+Package: ping2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: IP Address Ping Utility
+ ping2 is a Python-based command-line utility that allows users to perform
+ ping tests on one or multiple IP addresses. It sends ICMP echo requests to the
+ specified IP addresses and displays detailed information about packet loss,
+ round-trip times (RTT), and time-to-live (TTL). The ping results are presented
+ in a well-organized table format, making it easy to analyze the network health
+ of various destinations at a glance.

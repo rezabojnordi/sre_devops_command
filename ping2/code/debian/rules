@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+%:
+    dh $@
+
+override_dh_auto_clean:
+    dh_auto_clean
+
+override_dh_auto_build:
+    dh_auto_build
+
+override_dh_auto_test:
+    dh_auto_test
+
+override_dh_auto_install:
+    dh_auto_install
+
+override_dh_install:
+    dh_install
+
+override_dh_gencontrol:
+    dh_gencontrol
+
+override_dh_md5sums:
+    dh_md5sums
+
+override_dh_builddeb:
+    dh_builddeb
