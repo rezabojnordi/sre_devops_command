@@ -89,3 +89,59 @@ systemctl start lxd
 
 lxd init
 ```
+
+
+### listing package on Snap
+```
+sudo snap list
+```
+```
+lxc list
+lxc profile list
+lxc luanch ubuntu:18.04 ubunt
+lxc info ubuntu |grep Profile
+lxc profile show default
+lxc profile delete default
+lxc profile rename default sometimes
+lxc profile get default limit.cpu\
+lxc profile create custome
+lxc profile list
+lxc profile delete custom
+lxc profile copy default custome
+lxc profile edit custome
+lxcexec ubunut bash
+ nproc
+ free -g
+
+lxc profile list
+lxc profile edit custome
+ config:
+   limit.cpu: 1
+   limit.memory: 2G
+
+lxc profile get custome limit.cpu
+lxc profile set custome limit.cpu 2
+lxc info |grep Profiles
+lxc list
+lxc profile add ubuntu custome
+lxc exec ubuntu nproc
+lxc profile set custome limit.memory "2GB"
+lxc profile show custome
+lxc profile remove ubuntu custome
+
+lxc launch ubuntu:18.04 myubuntu --profile custome
+lxc profile add myubuntu custome1
+
+lxc info myubuntu |grep Profiles
+  Profiles: custome, custome1
+lxc profile remove myubuntu custome1
+
+lxc profile show custome
+
+lxc profile list
+
+lxc profile set custome boot.autostart "true"
+
+lxc profile show custome
+
+```
