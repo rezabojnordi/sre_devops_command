@@ -145,3 +145,49 @@ lxc profile set custome boot.autostart "true"
 lxc profile show custome
 
 ```
+
+
+## LXD Containers backup, import, export, migrate between lxd instances
+
+```
+lxc image list images:debian
+
+lxc init ubuntu:18.04 myubuntu
+lxc list
+lxc start myubuntu
+lxc list
+lxc exec myubuntu bash
+ touch hello
+
+lxc stop myubuntu
+lxc snapshot myubuntu snap1
+lxc list
+lxc info myubuntu
+lxc remote list
+lxc remote add ubuntuvm02 172.42.42.102
+
+lxc remote list
+
+lxc copy myubuntu/snap1 ubuntuvm02:myubuntu
+
+lxc remote remove ubuntuvm02
+lxc remote list
+
+Note: publish containers as images
+lxc publish myubuntu/snap1 --alias myubuntu-image
+lxc image list
+lxc image export myubuntu-image
+
+scp imagefile.tar.gz 172.42.42.102:/root
+
+ssh 172.42.42.102
+lxc image import imagefile.tar.gz --aliase myubuntu-image
+lxc image list
+lxc init myubuntu-image myubuntu
+lxc list
+lxc start myubuntu
+
+lxc exec myubuntu bash
+
+
+```
