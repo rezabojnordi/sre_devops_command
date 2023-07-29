@@ -368,3 +368,190 @@ lxc exec myubuntu bash
 
 
 ```
+
+## LXC Clustering
+
+```
+ssh server1
+root@lxc-lxd:~# lxd init
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What IP address or DNS name should be used to reach this node? [default=185.213.165.80]:
+Are you joining an existing cluster? (yes/no) [default=no]:
+What name should be used to identify this node in the cluster? [default=lxc-lxd]:
+Setup password authentication on the cluster? (yes/no) [default=no]: yes
+Trust password for new clients:
+Again:
+Do you want to configure a new local storage pool? (yes/no) [default=yes]:
+Name of the storage backend to use (dir, lvm, zfs, btrfs) [default=zfs]: dir
+Do you want to configure a new remote storage pool? (yes/no) [default=no]:
+Would you like to connect to a MAAS server? (yes/no) [default=no]:
+Would you like to configure LXD to use an existing bridge or host interface? (yes/no) [default=no]:
+Would you like to create a new Fan overlay network? (yes/no) [default=yes]:
+What subnet should be used as the Fan underlay? [default=auto]:
+Would you like stale cached images to be updated automatically? (yes/no) [default=yes]
+Would you like a YAML "lxd init" preseed to be printed? (yes/no) [default=no]: yes
+config:
+  core.https_address: 185.213.165.80:8443
+  core.trust_password: reza@123
+networks:
+- config:
+    bridge.mode: fan
+    fan.underlay_subnet: auto
+  description: ""
+  name: lxdfan0
+  type: ""
+storage_pools:
+- config: {}
+  description: ""
+  name: local
+  driver: dir
+profiles:
+- config: {}
+  description: ""
+  devices:
+    eth0:
+      name: eth0
+      network: lxdfan0
+      type: nic
+    root:
+      path: /
+      pool: local
+      type: disk
+  name: default
+cluster:
+  server_name: lxc-lxd
+  enabled: true
+  member_config: []
+  cluster_address: ""
+  cluster_certificate: ""
+  server_address: ""
+  cluster_password: ""
+  cluster_certificate_path: ""
+  cluster_token: ""
+```
+
+### connect to another server
+
+```
+ssh server2
+apt install lxc lxd
+ssh server1
+ lxc cluster list
+root@lxc-lxd:~# lxc cluster list
++---------+-----------------------------+----------+--------+-------------------+--------------+
+|  NAME   |             URL             | DATABASE | STATE  |      MESSAGE      | ARCHITECTURE |
++---------+-----------------------------+----------+--------+-------------------+--------------+
+| lxc-lxd | https://185.213.165.80:8443 | YES      | ONLINE | Fully operational | x86_64       |
++---------+-----------------------------+----------+--------+-------------------+--------------+
+
+ssh server2
+lxd init
+ yes
+ enter
+ enter or add your privateip
+Are you joining an existing cluster? (yes/no) [default=no]: yes
+IP address or FQDN of an existing cluster node: 185.213.165.80
+typing your password on server1
+All existig data is lost when joining a cluster, continue yes
+
+
+lxc cluster list
+
+```
+
+### server2
+```
+root@lxc-lxd2:~# lxd init
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What IP address or DNS name should be used to reach this node? [default=185.213.165.49]:
+Are you joining an existing cluster? (yes/no) [default=no]: yes
+Do you have a join token? (yes/no) [default=no]:
+What name should be used to identify this node in the cluster? [default=lxc-lxd2]:
+IP address or FQDN of an existing cluster member: 185.213.165.80
+Cluster fingerprint: 8497e9e398f0c20c2f8e60cb23f1c0554e659b7373dc53b49b5075480116d02d
+You can validate this fingerprint by running "lxc info" locally on an existing node.
+Is this the correct fingerprint? (yes/no) [default=no]: yes
+Cluster trust password:
+Invalid input, try again.
+
+Cluster trust password:
+All existing data is lost when joining a cluster, continue? (yes/no) [default=no] yes
+Choose "size" property for storage pool "default":
+Choose "source" property for storage pool "default":
+Choose "zfs.pool_name" property for storage pool "default": ^C
+root@lxc-lxd2:~# lxd init
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What IP address or DNS name should be used to reach this node? [default=185.213.165.49]:
+Are you joining an existing cluster? (yes/no) [default=no]: yes
+Do you have a join token? (yes/no) [default=no]:
+What name should be used to identify this node in the cluster? [default=lxc-lxd2]:
+IP address or FQDN of an existing cluster member: 185.213.165.80
+Cluster fingerprint: 8497e9e398f0c20c2f8e60cb23f1c0554e659b7373dc53b49b5075480116d02d
+You can validate this fingerprint by running "lxc info" locally on an existing node.
+Is this the correct fingerprint? (yes/no) [default=no]:
+Error: User aborted configuration
+root@lxc-lxd2:~# lxd init
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What IP address or DNS name should be used to reach this node? [default=185.213.165.49]:
+Are you joining an existing cluster? (yes/no) [default=no]: yes
+Do you have a join token? (yes/no) [default=no]:
+What name should be used to identify this node in the cluster? [default=lxc-lxd2]:
+IP address or FQDN of an existing cluster member: 185.213.165.80
+Cluster fingerprint: 8497e9e398f0c20c2f8e60cb23f1c0554e659b7373dc53b49b5075480116d02d
+You can validate this fingerprint by running "lxc info" locally on an existing node.
+Is this the correct fingerprint? (yes/no) [default=no]: yes
+Cluster trust password:
+All existing data is lost when joining a cluster, continue? (yes/no) [default=no] yes
+Choose "size" property for storage pool "default":
+Choose "source" property for storage pool "default":
+Choose "zfs.pool_name" property for storage pool "default":
+Choose "source" property for storage pool "local":
+Would you like a YAML "lxd init" preseed to be printed? (yes/no) [default=no]: yes
+config: {}
+networks: []
+storage_pools: []
+profiles: []
+cluster:
+  server_name: lxc-lxd2
+  enabled: true
+  member_config:
+  - entity: storage-pool
+    name: default
+    key: size
+    value: ""
+    description: '"size" property for storage pool "default"'
+  - entity: storage-pool
+    name: default
+    key: source
+    value: ""
+    description: '"source" property for storage pool "default"'
+  - entity: storage-pool
+    name: default
+    key: zfs.pool_name
+    value: ""
+    description: '"zfs.pool_name" property for storage pool "default"'
+  - entity: storage-pool
+    name: local
+    key: source
+    value: ""
+    description: '"source" property for storage pool "local"'
+  cluster_address: 185.213.165.80:8443
+  cluster_certificate: |
+    -----BEGIN CERTIFICATE-----
+    MIICBzCCAY2gAwIBAgIRAOsEtVCxSB+SaRGqU95j6I8wCgYIKoZIzj0EAwMwNTEc
+    MBoGA1UEChMTbGludXhjb250YWluZXJzLm9yZzEVMBMGA1UEAwwMcm9vdEBseGMt
+    bHhkMB4XDTIzMDcyOTA4NDYyMFoXDTMzMDcyNjA4NDYyMFowNTEcMBoGA1UEChMT
+    bGludXhjb250YWluZXJzLm9yZzEVMBMGA1UEAwwMcm9vdEBseGMtbHhkMHYwEAYH
+    KoZIzj0CAQYFK4EEACIDYgAEoOFm0HJjMM9NA26siD1PSxBzRmEkKUcvyMcXvDdX
+    GUkgdspYLd5mHwH3WYao2W8pQQJmLytPIYCEwr8cn3ovp+EvZ93nNZVFOVR0tRzT
+    2ACGYY4Wv6ApBw4LFj0hhAEBo2EwXzAOBgNVHQ8BAf8EBAMCBaAwEwYDVR0lBAww
+    CgYIKwYBBQUHAwEwDAYDVR0TAQH/BAIwADAqBgNVHREEIzAhggdseGMtbHhkhwR/
+    AAABhxAAAAAAAAAAAAAAAAAAAAABMAoGCCqGSM49BAMDA2gAMGUCMQDjY1/USiER
+    xKw+/bkk4v0/DduFFEJnPbgwGvIl+sVl7CgDkXUt405pu0y1AwpjV3ICMGqRk9fK
+    LXluQdHsroSyo/wo9rFpV/Ry+CF9Z/v/6GZ67zHhxZvPdJShr4SVDrplRg==
+    -----END CERTIFICATE-----
+  server_address: 185.213.165.49:8443
+  cluster_password: ""
+  cluster_certificate_path: ""
+  cluster_token: ""
+```
