@@ -555,3 +555,16 @@ cluster:
   cluster_certificate_path: ""
   cluster_token: ""
 ```
+
+```
+lxc cluster list
+lxc image list
+lxc init ubuntu:20.04 myvm
+lxc list
+lxc start myvm
+ssh server2
+lxc list
+lxc image list
+
+
+```
