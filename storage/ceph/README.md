@@ -74,9 +74,9 @@ mkdir -p /etc/ceph
 ## Create a new cluster
 This command will ：
 
-* 1)  Create monitor and manager daemons on the local host for the new cluster 
+* 1)  Create monitor and manager daemons on the local host for the new cluster
 
-* 2)  by Ceph The cluster generates a new SSH secret key , And add it to root User /root/.ssh/authorized_keys In file 
+* 2)  by Ceph The cluster generates a new SSH secret key , And add it to root User /root/.ssh/authorized_keys In file
 
 * 3)  Write the minimum configuration file to /etc/ceph/ceph.conf
 
@@ -88,7 +88,7 @@ This command will ：
 cephadm bootstrap --mon-ip 172.16.112.110
 ```
 
-# you can conenct openstack with ceph storage 
+# you can conenct openstack with ceph storage
 ```
 ceph osd pool create cinder-volumes 128
 ceph osd pool create images 128
@@ -98,7 +98,7 @@ ceph osd pool create vms 128
 rbd pool init cinder-volumes
 
 ssh 172.16.104.101 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
-cat ~/.ssh/id_rsa.pub 
+cat ~/.ssh/id_rsa.pub
 ssh 172.16.104.101 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
 ssh 172.16.104.102 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
 ssh 172.16.104.103 sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
@@ -109,17 +109,17 @@ ceph auth get-or-create client.cinder mon 'profile rbd' osd 'profile rbd pool=ci
 ls
 #ceph auth get-or-create client.cinder mon 'profile rbd' osd 'profile rbd pool=cinder-volumes, profile rbd pool=vms, profile rbd pool=images'
 ls
-cat ceph.client.admin.keyring 
+cat ceph.client.admin.keyring
 ceph auth get-or-create client.cinder | ssh 172.16.104.110 sudo tee /etc/ceph/ceph.client.cinder.keyring
 ls
 
 ceph auth get-or-create client.glance mon 'profile rbd' osd 'profile rbd pool=images' mgr 'profile rbd pool=images'
 ceph auth get-or-create client.glance | ssh {your-glance-api-server} sudo tee /etc/ceph/ceph.client.glance.keyring
 
-cat ceph.client.cinder.keyring 
-vim ceph.client.cinder.keyring 
-cat ~/.ssh/id_rsa.pub 
-vim ceph.client.cinder.keyring 
+cat ceph.client.cinder.keyring
+vim ceph.client.cinder.keyring
+cat ~/.ssh/id_rsa.pub
+vim ceph.client.cinder.keyring
 scp * mon2:/etc/ceph/
 scp * mon3:/etc/ceph/
 scp * osd1:/etc/ceph/
@@ -137,7 +137,7 @@ ceph -s
                 caps mgr = "allow *"
                 caps mon = "allow *"
                 caps osd = "allow *"
-#----------------------------------                
+#----------------------------------
 ```
 
 ## network cluster
@@ -177,7 +177,7 @@ cephadm shell -- ceph orch host add mon2
 cephadm shell -- ceph orch host add mon3
 cephadm shell -- ceph orch apply mon --unmanaged
 
-or 
+or
 
 host.yml
 ---
@@ -212,7 +212,7 @@ ceph orch apply mgr mon3
 ceph orch host ls
 ```
 
-## update schedule in cephadm 
+## update schedule in cephadm
 
 ```
 ceph orch apply mon 5
@@ -220,7 +220,7 @@ ceph orch apply mon 5
 ceph orch apply mon"mon1,mon2,mon3"
 ```
 
-## cehck status in cephadm 
+## cehck status in cephadm
 
 ```
 cephadm shell -- ceph status
@@ -266,10 +266,10 @@ ceph orch daemon add osd ceph01:/dev/sdb
 
 ##### If all of the following conditions are met , The storage device is considered available
 
-* 1)  The device must have no partitions 
-* 2)  The equipment must not have any LVM state 
-* 3)  The device must not be mounted 
-* 4)  The device must not contain a file system 
+* 1)  The device must have no partitions
+* 2)  The equipment must not have any LVM state
+* 3)  The device must not be mounted
+* 4)  The device must not contain a file system
 * 5)  The equipment must not contain Ceph BlueStore OSD
 * 6)  The device must be larger than 5 GB
 
@@ -689,4 +689,13 @@ Verify that the new OSDs are added to the cluster and have a "up" status:
 ``` bash
 ceph osd status
 ceph -s
+```
+
+### How to fix osd
+* Note: osd doen't restart
+
+```
+ceph-volume lvm list
+ceph osd metadata osd.9
+ceph-volume lvm zap --destroy /dev/sdb
 ```
