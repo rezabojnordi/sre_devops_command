@@ -566,5 +566,67 @@ ssh server2
 lxc list
 lxc image list
 
+lxc init ubuntu:20.04 myvm3
+
+lxc ubuntu:20.04 myvm --target lxc-lxd # host or server
+
+lxc init ubuntu:18.04 myvm4
+
+lxc exec myvm bash
+
+
+
+```
+
+## getting information from interface
+
+```
+lxc network list
+lxc network show lxdfan0
+
+lxc network edit lxdfan0
+```
+
+```
+### This is a YAML representation of the network.
+### Any line starting with a '# will be ignored.
+###
+### A network consists of a set of configuration items.
+###
+### An example would look like:
+### name: lxdbr0
+### config:
+###   ipv4.address: 10.62.42.1/24
+###   ipv4.nat: true
+###   ipv6.address: fd00:56ad:9f7a:9800::1/64
+###   ipv6.nat: true
+### managed: true
+### type: bridge
+###
+### Note that only the configuration can be changed.
+
+config:
+  bridge.mode: fan
+  fan.underlay_subnet: 185.213.165.0/24
+  ipv4.nat: "true"
+description: ""
+name: lxdfan0
+type: bridge
+used_by:
+- /1.0/profiles/default
+- /1.0/instances/my-container
+- /1.0/instances/myvm
+managed: true
+status: Created
+locations:
+- lxc-lxd
+- lxc-lxd2
+
+```
+
+* NOte: if you want to change IP you can use up command line arguments
+
+```
+lxc delete -f myvm3
 
 ```
