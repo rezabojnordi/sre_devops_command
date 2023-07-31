@@ -2,6 +2,26 @@
 
 ## installing LXC and LXD
 
+# Installing LXC and LXD
+
+This document provides a step-by-step guide on how to install and configure LXC (Linux Containers) and LXD (LXC Daemon) on a Linux server. LXC is an operating-system-level virtualization method for running multiple isolated Linux systems (containers) on a single host. LXD is a system container manager that provides a high-level API to manage LXC containers.
+
+## Prerequisites
+
+Before proceeding with the installation, ensure you have the following:
+
+- A Linux server (e.g., Ubuntu, Debian) with root or sudo privileges.
+- An internet connection to download and install the required packages.
+
+## Installation
+
+1. Update the package list and upgrade existing packages:
+
+```bash
+sudo apt update
+sudo apt upgrade
+
+
 ```
 apt update
 apt upgrade
