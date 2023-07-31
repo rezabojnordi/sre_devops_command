@@ -42,7 +42,52 @@ cephadm install ceph-common
 
 
 
-## 
+## create cinder and cinder backup pool 
+```
+#create
+ceph osd pool create backups 128
+ceph osd pool create cinder-volumes 128
+
+# init
+rbd pool init backups
+rbd pool init cinder-volumes
+
+# enable rbd
+sudo ceph osd pool application enable cinder-volumes rbd
+sudo ceph osd pool application enable backups rbd
+
+# ceph auth create user
+ceph auth get-or-create client.cinder mon 'profile rbd' osd 'profile rbd pool=cinder-volumes,profile rbd pool=backups'
+ceph auth get-or-create client.cinder-backup mon 'profile rbd' osd 'profile rbd pool=backups' mgr 'profile rbd pool=backups'
+
+# move to infra client cinder
+ceph auth get-or-create client.cinder | ssh infra1 sudo tee /etc/ceph/ceph.client.cinder.keyring
+ceph auth get-or-create client.cinder | ssh infra2 sudo tee /etc/ceph/ceph.client.cinder.keyring
+ceph auth get-or-create client.cinder | ssh infra3 sudo tee /etc/ceph/ceph.client.cinder.keyring
+
+#set owner
+ssh infra1 sudo chown cinder:cinder /etc/ceph/ceph.client.cinder.keyring
+ssh infra2 sudo chown cinder:cinder /etc/ceph/ceph.client.cinder.keyring
+ssh infra3 sudo chown cinder:cinder /etc/ceph/ceph.client.cinder.keyring
+
+# move to infra client cinder backup
+ceph auth get-or-create client.cinder-backup | ssh infra1 sudo tee /etc/ceph/ceph.client.cinder-backup.keyring
+ceph auth get-or-create client.cinder-backup | ssh infra2 sudo tee /etc/ceph/ceph.client.cinder-backup.keyring
+ceph auth get-or-create client.cinder-backup | ssh infra3 sudo tee /etc/ceph/ceph.client.cinder-backup.keyring
+
+#set owner
+ssh infra1 sudo chown cinder:cinder /etc/ceph/ceph.client.cinder-backup.keyring
+ssh infra2 sudo chown cinder:cinder /etc/ceph/ceph.client.cinder-backup.keyring
+ssh infra3 sudo chown cinder:cinder /etc/ceph/ceph.client.cinder-backup.keyring
+
+
+
+# add to  all file client keyring 
+                caps mds = "allow *"
+                caps mgr = "allow *"
+                caps mon = "allow *"
+                caps osd = "allow *"
+```
 
 
 
