@@ -20,18 +20,18 @@ Before proceeding with the installation, ensure you have the following:
 ```bash
 sudo apt update
 sudo apt upgrade
-
-
-```
 apt update
 apt upgrade
 apt install lxc lxd
 ```
 
-```
+### LXD Initialization
+After installing LXC and LXD, you need to initialize LXD using the lxd init command. This will guide you through a series of questions to configure the LXD environment.
+
+``` bash
 lxd init
 ```
-```
+``` bash
 root@lxd:~# lxd init
 Would you like to use LXD clustering? (yes/no) [default=no]:
 Do you want to configure a new storage pool? (yes/no) [default=yes]:
@@ -48,6 +48,8 @@ Would you like a YAML "lxd init" preseed to be printed? (yes/no) [default=no]:
 
 ```
 
+### Verify Installation
+To check if LXC and LXD are installed and running, you can use the following command:
 ```
 root@lxd:~# lxc version
 To start your first container, try: lxc launch ubuntu:20.04
@@ -57,8 +59,12 @@ Client version: 4.0.9
 Server version: 4.0.
 
 ```
-### lxc method
-```
+This will display the client and server versions of LXC.
+
+### LXC Management
+Once LXC and LXD are set up, you can use various commands to manage containers. Below are some common LXC management commands:
+
+``` bash
 root@lxd:~# lxc help
 Description:
   Command line client for LXD
@@ -650,3 +656,7 @@ locations:
 lxc delete -f myvm3
 
 ```
+
+
+
+

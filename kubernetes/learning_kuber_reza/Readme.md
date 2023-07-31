@@ -5463,3 +5463,15 @@ Congratulations you have completed the lab! Amazing work!!
 <br>
 
 _Copyright (c) 2022 RX-M LLC, Cloud Native Consulting, all rights reserved_
+
+
+
+##  Set up Kubernetes with external Etcd cluster
+
+<img src="image/etcd.png"/>
+<img src="image/etcd2.png"/>
+<img src="image/etcd3.png"/>
+<img src="image/etcd4.png"/>
+
+
+
