@@ -18,11 +18,13 @@ Before proceeding with the installation, ensure you have the following:
 1. Update the package list and upgrade existing packages:
 
 ```bash
+
 sudo apt update
 sudo apt upgrade
 apt update
 apt upgrade
 apt install lxc lxd
+
 ```
 
 ### LXD Initialization
@@ -32,6 +34,7 @@ After installing LXC and LXD, you need to initialize LXD using the lxd init comm
 lxd init
 ```
 ``` bash
+
 root@lxd:~# lxd init
 Would you like to use LXD clustering? (yes/no) [default=no]:
 Do you want to configure a new storage pool? (yes/no) [default=yes]:
