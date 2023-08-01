@@ -59,7 +59,7 @@ kubectl get pod
 kubectl get services
 kubectl get deployment
 kubectl get replicaset
-kubectl logs nginx-depl1.... (pod name) 
+kubectl logs nginx-depl1.... (pod name)
 kubectl logs
 ```
 ## deployment nginx with out yam files
@@ -69,7 +69,7 @@ kubrctl create deployment name image option1 opntion2 ...
 kubectl create deployment nginx-depl --image=nginx
 
 ```
-## connect to container 
+## connect to container
 
 ```
 kubectl exec -it podname -- bin/bash
@@ -102,7 +102,7 @@ spec:  #deployment
         app: nginx
     spec:   #pod
       containers:
-        - name: nginx   
+        - name: nginx
           image: nginx:1.16
           ports:
             - containerPort: 80
@@ -160,7 +160,7 @@ kubectl get deployment nginx-deployment -o yaml > nginx-deployment-result.yaml
 ```
 ## deleting file with yaml file
 ```
-kubectl delete -f nginx-service.yaml 
+kubectl delete -f nginx-service.yaml
 
 kubectl delete -f nginx-deployment.yaml
 ```
@@ -325,11 +325,11 @@ spec:
 The next steps will prepare the VM for kube setup.
 
 * Install Docker:
-  
+
 ```
 ```
 apt install docker.io -y
-or 
+or
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 ```
@@ -362,7 +362,7 @@ rm -rf kubernetes kubernetes-server-linux-amd64.tar.gz
 #### Set up kubelet
 ```
 * The next steps will get kubelet working and show it in action.
-  
+
 Create a directory for kubelet manifests:
 
 ```
@@ -652,7 +652,7 @@ kubectl apply -f mongo-express.yaml
 
 
 
-## namespace 
+## namespace
 
 ```
 kubectl get namespaces
@@ -660,7 +660,7 @@ kubectl get namespaces
 ### create namespace
 ```
 kubectl create namespace my-namespace
-``` 
+```
 
 ### ## create a namespace with a configuration file
 
@@ -674,7 +674,7 @@ data:
   database_url: mongodb-service
 ```
 
-## install kubectx 
+## install kubectx
 ```
 https://github.com/ahmetb/kubectx#installation
 
@@ -821,7 +821,7 @@ spec:
     app: replica-test
 ```
 ```
-EOF 
+EOF
 ```
 ```
 kubectl create -f service-test.yaml
@@ -865,4 +865,7 @@ curl {CLUSTER IP}:80
 <img src="images/k18.png" width="500" height="200" />
 <img src="images/k19.png" width="500" height="200" />
 <img src="images/k20.png" width="500" height="200" />
+
+
+
 
