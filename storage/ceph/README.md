@@ -9,6 +9,7 @@ sh get-docker.sh
 ## install ceph
 
 #### version reef
+```bash
 CEPH_RELEASE=18.2.0 # replace this with the active release
 curl --silent --remote-name --location https://download.ceph.com/rpm-${CEPH_RELEASE}/el9/noarch/cephadm
 
@@ -16,9 +17,10 @@ chmod +x cephadm
 ./cephadm add-repo --release reef
 ./cephadm install
 which cephadm
+```
 
 #### version quincy
-```
+```bash
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
 chmod +x cephadm
 sudo ./cephadm add-repo --release quincy
@@ -36,7 +38,7 @@ cephadm install ceph-common
 -------------------------------------
 ```
 #### or version pacific
-```
+```bash
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/pacific/src/cephadm/cephadm
 chmod +x cephadm
 sudo ./cephadm add-repo --release pacific
@@ -58,13 +60,13 @@ cephadm install ceph-common
 
 ## install cephadm in other monitor's servera
 
-```
+```bash
 ssh mon2
 ssh mon3
 ```
 
 ## after than you must add ip address to host in ther Servers
-```
+```bash
 vim /etc/hosts
 172.16.112.110 mon1
 172.16.112.111 mon2
@@ -77,7 +79,7 @@ vim /etc/hosts
 ```
 
 ## you must create directory ceph in all of server
-```
+```bash
 mkdir -p /etc/ceph
 -----------------------------------------
 ```
@@ -96,7 +98,7 @@ This command will ：
 
 ```
 cephadm bootstrap --mon-ip 172.16.112.110
-```
+```bash
 
 # you can conenct openstack with ceph storage
 ```
@@ -148,25 +150,25 @@ ceph -s
                 caps mon = "allow *"
                 caps osd = "allow *"
 #----------------------------------
-```
+```bash
 
 ## network cluster
 
-```
+```bash
 cat <<EOF > /root/ceph.conf
  [global]
  public network = 172.16.112.0/22
  cluster network = 172.20.104.0/24
   EOF
  ```
-```
+```bash
 
 cephadm bootstrap -c /root/ceph.conf --mon-ip 172.16.112.110
 ```
 
 ## Add host
 
-```
+```bash
 
 ssh-copy-id -f -i /etc/ceph/ceph.pub root@mon2
 ssh-copy-id -f -i /etc/ceph/ceph.pub root@mon3
@@ -176,13 +178,13 @@ ssh-copy-id -f -i /etc/ceph/ceph.pub root@osd3
 ```
 ## The new node is Ceph Part of the cluster
 
-```
+```bash
 
 cephadm shell -- ceph config set mon public_network 172.16.112.0/22
 cephadm shell -- ceph config set mon cluster_network 172.20.104.0/24
 ```
 ## Or through YAML file , have access to ceph orch apply -i host.yml Add many hosts at a time
-```
+```bash
 cephadm shell -- ceph orch host add mon2
 cephadm shell -- ceph orch host add mon3
 cephadm shell -- ceph orch apply mon --unmanaged
@@ -206,7 +208,7 @@ labels:
 ```
 
 ## you can add lable for Servers
-```
+```bash
 
 cephadm shell -- ceph orch host label add mon1 mon
 cephadm shell -- ceph orch host label add mon2 mon
@@ -214,17 +216,17 @@ cephadm shell -- ceph orch host label add mon3 mon
 ```
 
 ## add new mgr
-```
+```bash
 ceph orch apply mgr mon3
 ```
 ## check hosts in ceph structure
-```
+```bash
 ceph orch host ls
 ```
 
 ## update schedule in cephadm
 
-```
+```bash
 ceph orch apply mon 5
 
 ceph orch apply mon"mon1,mon2,mon3"
@@ -232,12 +234,12 @@ ceph orch apply mon"mon1,mon2,mon3"
 
 ## cehck status in cephadm
 
-```
+```bash
 cephadm shell -- ceph status
 ```
 
 ## add osd in ceph cluster
-```
+```bash
 cephadm shell -- ceph orch host add osd1
 cephadm shell -- ceph orch host add osd2
 cephadm shell -- ceph orch host add osd3
@@ -245,7 +247,7 @@ cephadm shell -- ceph orch host add osd3
 
 ## add monitor in ceph cluster
 
-```
+```bash
 
 cephadm shell -- ceph orch host label add  osd1 osd
 cephadm shell -- ceph orch host label add  osd2 osd
@@ -254,12 +256,12 @@ cephadm shell -- ceph orch host label add  osd3 osd
 
 ## search cluster for find new osd
 
-```
+```bash
 cephadm shell -- ceph orch apply osd --all-available-devices
 ```
 
 ## List disk devices
-```
+```bash
 ceph orch device ls [--wide]
 ```
 
