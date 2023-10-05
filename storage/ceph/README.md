@@ -7,6 +7,16 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 ```
 ## install ceph
+
+#### version reef
+CEPH_RELEASE=18.2.0 # replace this with the active release
+curl --silent --remote-name --location https://download.ceph.com/rpm-${CEPH_RELEASE}/el9/noarch/cephadm
+
+chmod +x cephadm
+./cephadm add-repo --release reef
+./cephadm install
+which cephadm
+
 #### version quincy
 ```
 curl --silent --remote-name --location https://github.com/ceph/ceph/raw/quincy/src/cephadm/cephadm
