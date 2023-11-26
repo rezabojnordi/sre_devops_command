@@ -1,5 +1,6 @@
 # RBD Mirroring
 ## Cluster 1
+``` bash
 ceph osd pool create rbdrep 32 32
 
 ceph osd pool application enable rbdrep rbd
@@ -34,8 +35,10 @@ rsync -avP /root/mirror/bootstrap_token_prod cluster2:/root/bootstrap_token_prod
 rbd mirror pool info rbdrep
 
 rbd mirror pool status -p rbdrep
+```
 
 ## cluster 2
+``` bash
 ceph osd pool rbdrep 32 32
 ceph osd pool application enable rbdrep rbd
 
@@ -58,5 +61,5 @@ rbd ls -p rbdrep
 rbd mirror pool info rbdrep
 
 rbd mirror pool status -p rbdrep
-
+```
 
