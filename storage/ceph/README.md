@@ -712,3 +712,21 @@ ceph-volume lvm list
 ceph osd metadata osd.9
 ceph-volume lvm zap --destroy /dev/sdb
 ```
+
+
+
+### adding new storage to the ceph
+
+```
+
+ceph osd set norebalance
+
+cephadm shell -- ceph orch host add new_osd
+
+ceph osd crush ls new_osd
+
+ceph osd crush ls new_osd | xargs -l -I{}  ceph osd crush reweight {} 0
+
+ceph osd unset norebalance
+
+```
