@@ -255,3 +255,4 @@ NOTES: Journaling doesn’t apply to old and existing files. You can enable jour
 ```bash
 [site-a]$ rbd feature enable vms/myoldfiles1 journaling 
 ```
+

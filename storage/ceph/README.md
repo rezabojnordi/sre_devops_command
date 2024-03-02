@@ -730,3 +730,12 @@ ceph osd crush ls new_osd | xargs -l -I{}  ceph osd crush reweight {} 0
 ceph osd unset norebalance
 
 ```
+
+
+### changing reweight on the ceph
+
+```bash
+ceph osd df
+ceph osd crush reweight osd.402 2.5
+
+```
