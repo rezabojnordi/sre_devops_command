@@ -737,5 +737,25 @@ ceph osd unset norebalance
 ```bash
 ceph osd df
 ceph osd crush reweight osd.402 2.5
+ceph osd tree
 
 ```
+
+### trobleshoting ceph
+
+```bash
+ceph orch ps
+netstat -ntlp
+ip -br -c a
+
+ceph orch ls
+
+ceph orch apply osd --all-available-devices --dry-run #simolate
+
+ceph orch status
+
+ceph pg ls
+
+ceph osd pool ls
+```
+
