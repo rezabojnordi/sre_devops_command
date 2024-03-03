@@ -806,3 +806,96 @@ following commands:
 
  ceph osd unset pause
  ```
+
+### OSD maintenance,
+
+```bash
+sudo docker container exec -it <mon container> bash
+ceph osd set noout
+```
+
+#### OSD is Down & Storage Node is Down
+
+There are two probable scenarios:
+* disk hardware encounters a failure:
+* There is no issue with the disk and we need to reboot the server or we went through power failure or etc
+* Storage node is Down
+
+* disk hardware encounters a failure:
+
+```
+ssh <ceph mon node>
+sudo docker container exec -it <mon container> bash
+ceph osd find <number>
+ceph osd metadata <number> | grep "device"
+
+ssh fr1-storage3001
+sudo docker exec -it ceph-mon-fr1-storage3001 bash
+ceph osd find osd.64 --cluster ceph-fr1
+ceph osd metadata osd.64 --cluster ceph-fr1 | grep "mount"
+
+ssh fr1-storage3104
+sudo docker ps -a
+sudo docker container logs -f ceph-osd-64
+```
+* remove manualy osd
+```bash
+ssh <target storage node>
+sudo systemctl | grep ceph
+sudo systemctl disable ceph-osd@<number>.service
+sudo systemctl stop ceph-osd@<number>.service
+sudo rm -rf /var/lib/ceph/osd/ceph-<dc_nam>-<number>
+sudo rm -rf /var/run/ceph/ceph-osd.<number>.asok
+
+for instance
+ssh fr1-storage3104
+sudo systemctl | grep ceph
+sudo systemctl disable ceph-osd@64.service
+sudo systemctl stop ceph-osd@114.service
+rm -rf /var/lib/ceph/osd/ceph-fr1-114
+rm -rf/var/run/ceph/ceph-osd.114.asok
+```
+* Also, you need to zap the lvm by following these commands please heed that you need to do the following for all of the osds
+that you tried to purge:
+``` bash
+#ssh to one of the osd daemons doesn't matter which one
+sudo docker container exec -it < osd daemon container > bash
+ceph-volume lvm list
+ceph-volume lvm zap < devices > --destroy
+###example
+ssh fr1-storage3022
+sudo docker container exec -it ceph-osd-220 bash
+ceph-volume lvm zap /dev/sdj --destroy
+```
+
+* make sure that the values under REWEIGHT SIZE column are equal to 0 , if they are not equal to 0 there must be some user
+data on it by using the command below:
+
+```bash
+ssh <ceph mon node>
+ceph osd crush reweight {osd-num} {weight}
+###example
+ssh fr1-storage3001
+ceph osd crush reweight 167 0
+# Heed that it is better to reweight OSDs in small steps
+```
+* If you approved that those values are equal to 0 then follow along:
+
+```bash
+
+#make sure that ceph is doing okay and also pay attention to osd counts
+ceph -s
+#if everything looks good
+ceph osd purge <osd.number>
+###example
+ceph -s --cluster ceph-fr1
+ceph osd purge osd.132
+```
+
+* Storage node is Down
+
+```bash
+ceph osd set noout
+
+```
+
