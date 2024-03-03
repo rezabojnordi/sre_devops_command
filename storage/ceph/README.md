@@ -736,10 +736,33 @@ ceph osd unset norebalance
 
 ```bash
 ceph osd df
-ceph osd crush reweight osd.402 2.5
+ceph osd crush reweight osd.402 2.5  # per cluster
+ceph osd reweight osd.14 0.9 # if you want to fix trobleshot or manage and mantenance per server
 ceph osd tree
 
+ceph osd crush reweight osd.14 9
+ceph osd find 14
 ```
+* Find the server on which the disk is placed and find the volume of the disk from the disks on that server
+
+Stop all clients from using the RBD images/Rados Gateway on this cluster. Ensure any other clients are not using this
+Cluster.
+
+Ensure all PGs are active+clean by checking ceph -s from an admin node.
+
+From an admin node, set these flags noout, norecover, norebalance, nobackfill, nodown and pause using the
+following commands:
+
+Shutdown OSD nodes one by one.
+```bash
+ceph osd set noout
+ceph osd set norecover
+ceph osd set norebalance
+ceph osd set nobackfill
+ceph osd set nodown
+ceph osd set pause
+```
+
 
 ### trobleshoting ceph
 
@@ -759,3 +782,27 @@ ceph pg ls
 ceph osd pool ls
 ```
 
+For powering up the Ceph Cluster, follow the steps below in order:
+* If network equipment was involved, ensure it is powered on and stable prior to powering on any Ceph hosts/nodes
+* Power on the admin node
+* Power on the monitor nodes
+* Power on the OSD nodes
+* Wait for all the nodes to come up , Verify all the services are up and the connectivity is fine between the nodes.
+* If on their own nodes, power on the MDS and RGW nodes.
+* From an admin node, unset these flags: noout,norecover,noreblance, nobackfill, nodown and pause using the
+following commands:
+
+
+```bash
+ ceph osd unset noout
+
+ ceph osd unset norecover
+
+ ceph osd unset norebalance
+
+ ceph osd unset nobackfill
+
+ ceph osd unset nodown
+
+ ceph osd unset pause
+ ```
