@@ -97,11 +97,14 @@ This command will ：
 
 * 5)  Write the public key to /etc/ceph/ceph.pub
 
-```
-cephadm bootstrap --mon-ip 172.16.112.110
-```bash
 
+
+
+```bash
+cephadm bootstrap --mon-ip 172.16.112.110
+```
 # you can conenct openstack with ceph storage
+
 ```
 ceph osd pool create cinder-volumes 128
 ceph osd pool create images 128
