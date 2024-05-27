@@ -151,6 +151,7 @@ ceph -s
                 caps mon = "allow *"
                 caps osd = "allow *"
 #----------------------------------
+```
 ```bash
 
 ## network cluster
