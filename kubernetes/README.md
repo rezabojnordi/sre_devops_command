@@ -1,4 +1,13 @@
-
+## Installing k9s
+```bash
+wget https://github.com/derailed/k9s/releases/download/v0.32.4/k9s_Linux_amd64.tar.gz
+tar xvf k9s_Linux_amd64.tar.gz
+sudo cp k9s /usr/local/bin/
+k9s version
+echo "export KUBECONFIG=~/.kube/config" >> ~/.bashrc
+source ~/.bashrc
+k9s
+```
 
 
 ## deployment kubenetes fro
