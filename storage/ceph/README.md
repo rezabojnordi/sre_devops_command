@@ -903,4 +903,592 @@ ceph osd set noout
 
 ```
 
- 
+
+### Removing hosts
+
+
+Procedure
+Log into the Cephadm shell:
+
+Example
+
+```bash
+[root@host01 ~]# cephadm shell
+```
+Fetch the host details:
+
+Example
+
+```bash
+ceph orch host ls
+```
+
+Drain all the daemons from the host:
+
+Syntax
+
+```bash
+ceph orch host drain HOSTNAME
+```
+Example
+
+```bash
+ceph orch host drain host02
+
+```
+The _no_schedule label is automatically applied to the host which blocks deployment.
+
+Check the status of OSD removal:
+
+Example
+
+```bash
+ceph orch osd rm status
+```
+
+When no placement groups (PG) are left on the OSD, the OSD is decommissioned and removed from the storage cluster.
+
+Check if all the daemons are removed from the storage cluster:
+
+Syntax
+
+```bash
+ceph orch ps HOSTNAME
+```
+
+Example
+
+```bash
+ceph orch ps host02
+```
+Remove the host:
+
+Syntax
+
+ceph orch host rm HOSTNAME
+
+Example
+
+```bash
+ceph orch host rm host02
+```
+
+### Deploying the manager daemons
+
+Procedure
+Log into the Cephadm shell:
+
+Example
+
+```bash
+cephadm shell
+```
+
+You can deploy manager daemons in two different ways:
+
+Method 1
+
+Deploy manager daemons using placement specification on specific set of hosts:
+
+Note: IBM recommends that you use the --placement option to deploy on specific hosts.
+Syntax
+
+```bash
+ceph orch apply mgr --placement=" HOST_NAME_1 HOST_NAME_2 HOST_NAME_3"
+```
+
+Example
+
+```bash
+ceph orch apply mgr --placement="host01 host02 host03"
+```
+Method 2
+
+Deploy manager daemons randomly on the hosts in the storage cluster:
+
+Syntax
+
+```bash
+ceph orch apply mgr NUMBER_OF_DAEMONS
+```
+Example
+
+```bash
+ceph orch apply mgr 3
+
+```
+Verification
+List the service:
+
+Example
+
+```bash
+ceph orch ls
+```
+List the hosts, daemons, and processes:
+
+Syntax
+
+```bash
+ceph orch ps --daemon_type=DAEMON_NAME
+```
+
+Example
+```bash
+ceph orch ps --daemon_type=mgr
+```
+
+
+Procedure
+Log into the Cephadm shell:
+
+Example
+
+Syntax
+
+```bash
+ceph orch apply mgr "NUMBER_OF_DAEMONS HOST_NAME_1 HOST_NAME_3"
+```
+If you want to remove manager daemons from host02, then you can redeploy the manager daemons on other hosts.
+
+Example
+
+```bash
+ceph orch apply mgr "2 host01 host03"
+```
+Verification
+List the hosts,daemons, and processes:
+
+Syntax
+
+```bash
+ceph orch ps --daemon_type=DAEMON_NAME
+```
+Example
+
+```bash
+ceph orch ps --daemon_type=mgr
+```
+
+
+
+
+## Creating the NFS-Ganesha cluster
+
+You can create an NFS-Ganesha cluster using the mgr/nfs module of the Ceph Orchestrator. This module deploys the NFS cluster using Cephadm in the backend.
+
+This creates a common recovery pool for all NFS-Ganesha daemons, new user based on clusterid, and a common NFS-Ganesha config RADOS object.
+
+For each daemon, a new user and a common configuration is created in the pool. Although all the clusters have different namespaces with respect to the cluster names, they use the same recovery pool.
+
+Prerequisites
+* A running IBM Storage Ceph cluster.
+
+* Hosts are added to the cluster.
+
+* All manager, monitor and OSD daemons are deployed.
+
+Log into the Cephadm shell:
+
+Example
+```bash
+cephadm shell
+```
+Enable the mgr/nfs module:
+
+Example
+```bash
+ceph mgr module enable nfs
+```
+Create the cluster:
+
+Syntax
+
+```bash
+ceph nfs cluster create CLUSTER_NAME ["HOST_NAME_1 HOST_NAME_2 HOST_NAME_3"]
+```
+The CLUSTER_NAME is an arbitrary string and HOST_NAME_1 is an optional string signifying the hosts to deploy NFS-Ganesha daemons.
+
+Example
+```bash
+ceph nfs cluster create nfsganesha "host01 host02"
+```
+NFS Cluster Created Successful
+
+This creates an NFS_Ganesha cluster nfsganesha with one daemon on host01 and host02.
+
+
+* Verification
+List the cluster details:
+
+Example
+```bash
+ceph nfs cluster ls
+```
+Show NFS-Ganesha cluster information:
+
+Syntax
+
+```bash
+ceph nfs cluster info CLUSTER_NAME
+```
+Example
+```bash
+ceph nfs cluster info nfsganesha
+```
+
+
+### Deploying the NFS-Ganesha gateway using the command line interface
+
+You can use the Ceph Orchestrator with Cephadm in the backend to deploy the NFS-Ganesha gateway using the placement specification. In this case, you have to create a RADOS pool and create a namespace before deploying the gateway.
+
+Note: IBM supports CephFS exports only over the NFS v4.0+ protocol.
+
+Prerequisites
+* A running IBM Storage Ceph cluster.
+
+* Hosts are added to the cluster.
+
+* All manager, monitor and OSD daemons are deployed.
+
+Procedure
+Log into the Cephadm shell:
+
+Example
+```bash
+cephadm shell
+```
+Create the RADOS pool namespace, and enable the application. For RBD pools, enable RBD.
+
+Syntax
+
+```bash
+ceph osd pool create POOL_NAME
+ceph osd pool application enable POOL_NAME freeform/rgw/rbd/cephfs/nfs
+rbd pool init -p POOL_NAME
+```
+Example
+
+```bash
+ceph osd pool create nfs-ganesha
+ceph osd pool application enable nfs-ganesha nfs
+rbd pool init -p nfs-ganesha
+```
+
+Deploy NFS-Ganesha gateway using placement specification in the command line interface:
+
+Syntax
+```bash
+ceph orch apply nfs SERVICE_ID --placement="NUMBER_OF_DAEMONS HOST_NAME_1 HOST_NAME_2 HOST_NAME_3"
+```
+
+Example
+
+```bash
+ceph orch apply nfs foo --placement="2 host01 host02"
+```
+This deploys an NFS-Ganesha cluster nfsganesha with one daemon on host01 and host02.
+
+Verification
+List the service:
+
+Example
+```bash
+ceph orch ls
+```
+List the hosts, daemons, and processes:
+
+Syntax
+```bash
+ceph orch ps --daemon_type=DAEMON_NAME
+```
+Example
+```bash
+ceph orch ps --daemon_type=nfs
+```
+
+
+### Deploying the NFS-Ganesha gateway using the service specification
+
+Prerequisites
+A running IBM Storage Ceph cluster.
+
+Hosts are added to the cluster.
+
+Procedure
+Create the nfs.yaml file:
+
+Example
+
+```bash
+touch nfs.yaml
+```
+
+Edit the nfs.yaml file to include the following details:
+
+Syntax
+```bash
+service_type: nfs
+service_id: SERVICE_ID
+placement:
+  hosts:
+    - HOST_NAME_1
+    - HOST_NAME_2
+```
+Example
+
+```bash
+service_type: nfs
+service_id: foo
+placement:
+  hosts:
+    - host01
+    - host02
+```
+
+Mount the YAML file under a directory in the container:
+
+Example
+
+```bash
+cephadm shell --mount nfs.yaml:/var/lib/ceph/nfs.yaml
+```
+Create the RADOS pool, namespace, and enable RBD:
+
+Syntax
+
+```bash
+ceph osd pool create POOL_NAME
+ceph osd pool application enable POOL_NAME rbd
+rbd pool init -p POOL_NAME
+```
+
+Example
+
+```bash
+ceph osd pool create nfs-ganesha
+ceph osd pool application enable nfs-ganesha rbd
+rbd pool init -p nfs-ganesha
+```
+
+Navigate to the directory:
+
+Example
+```bash
+cd /var/lib/ceph/
+```
+
+Deploy NFS-Ganesha gateway using service specification:
+
+Syntax
+
+```bash
+ceph orch apply -i FILE_NAME.yaml
+```
+Example
+```bash
+ceph orch apply -i nfs.yaml
+```
+
+Verification
+List the service:
+
+Example
+```bash
+ceph orch ls
+```
+List the hosts, daemons, and processes:
+
+Syntax
+
+```bash
+ceph orch ps --daemon_type=DAEMON_NAME
+```
+Example
+```bash
+eph orch ps --daemon_type=nfs
+```
+
+### Implementing HA for CephFS/NFS service
+
+You can deploy NFS with a high-availability (HA) front-end, virtual IP, and load balancer, by using the --ingress flag and by specifying a virtual IP address. This deploys a combination of keepalived and haproxy and provides a high-availability NFS frontend for the NFS service.
+
+About this task
+When a cluster is created with --ingress flag, an ingress service is also deployed to provide load balancing and high-availability for the NFS servers. A virtual IP is used to provide a known, stable NFS endpoint that all NFS clients can use to mount. Ceph handles the details of redirecting NFS traffic on the virtual IP to the appropriate backend NFS servers and redeploys NFS servers when they fail.
+
+Deploying an ingress service for an existing service provides:
+* A stable, virtual IP that can be used to access the NFS server.
+* Load distribution across multiple NFS gateways.
+* Failover between hosts in the event of a host failure.
+
+Before you begin
+A running IBM Storage Ceph cluster.
+
+Hosts are added to the cluster.
+
+All the manager, monitor, and OSD daemons are deployed.
+
+Check that the NFS module is enabled.
+
+Procedure
+Log into the Cephadm shell.
+For example,
+```bash
+cephadm shell
+```
+Create the NFS cluster with the --ingress flag.
+```bash
+ceph nfs cluster create CLUSTER_ID [PLACEMENT] [--port PORT_NUMBER] [--ingress --virtual-ip IP_ADDRESS/CIDR_PREFIX]
+```
+Replace CLUSTER_ID with a unique string to name the NFS Ganesha cluster.
+Replace PLACEMENT with the number of NFS servers to deploy and the host or hosts that you want to deploy the NFS Ganesha daemon containers on.
+Use the --port PORT_NUMBER flag to deploy NFS on a port other than the default port of 12049.
+Note: With ingress mode, the high-availability proxy takes port 2049 and NFS services are deployed on 12049.
+The --ingress flag combined with the --virtual-ip flag, deploys NFS with a high-availability front-end (virtual IP and load balancer).
+Replace --virtual-ip IP_ADDRESS with an IP address to provide a known, stable NFS endpoint that all clients can use to mount NFS exports. The --virtual-ip must include a CIDR prefix length. The virtual IP will normally be configured on the first identified network interface that has an existing IP in the same subnet.
+Note: The number of hosts you allocate for the NFS service must be greater than the number of active NFS servers you request to deploy, specified by the placement: count parameter. In the following example, one active NFS server is requested and two hosts are allocated.
+For example,
+```bash
+ceph nfs cluster create mycephnfs "1 host02 host03" --ingress --virtual-ip 10.10.128.75/22
+```
+Note: Deployment of NFS daemons and the ingress service is asynchronous and the command might return before the services have completely started.
+Check that the services have successfully started.
+```bash
+ceph orch ls --service_name=nfs.CLUSTER_NAME
+ceph orch ls --service_name=ingress.nfs.CLUSTER_NAME
+```
+
+For example,
+```bash
+ceph orch ls --service_name=nfs.mycephnfs
+```
+```bash
+NAME           PORTS    RUNNING  REFRESHED  AGE  PLACEMENT
+nfs.mycephnfs  ?:12049      2/2  0s ago     20s  host02;host03
+```
+
+```bash
+ceph orch ls --service_name=ingress.nfs.mycephnfs
+```
+```bash
+NAME                   PORTS                  RUNNING  REFRESHED  AGE  PLACEMENT
+ingress.nfs.mycephnfs  10.10.128.75:2049,9049      4/4   46s ago    73s  count:2
+```
+##### What to do next
+To verify the services have been properly implemented, perform one or both of the following:
+View the IP endpoints, IPs for the individual NFS daemons, and the virtual IP for the ingress service.
+```bash
+ceph nfs cluster info CLUSTER_NAME
+```
+For example,
+```bash
+ceph nfs cluster info mycephnfs
+```
+```bash
+{
+    "mycephnfs": {
+        "virtual_ip": "10.10.128.75",
+        "backend": [
+            {
+                "hostname": "host02",
+                "ip": "10.10.128.69",
+                "port": 12049
+            },
+            {
+                "hostname": "host03",
+                "ip": "10.10.128.70",
+                "port": 12049
+            }
+        ],
+        "port": 2049,
+        "monitor_port": 9049
+    }
+}
+```
+List the hosts and processes, by using the ceph orch ps | grep nfs command.
+For example,
+```bash
+ceph orch ps | grep nfs
+```
+```bash
+haproxy.nfs.cephnfs.host01.rftylv     host01  *:2049,9000  running (11m)    10m ago  11m    23.2M        -  2.2.19-7ea3822   5e6a41d77b38  f8cc61dc827e
+haproxy.nfs.cephnfs.host02.zhtded     host02  *:2049,9000  running (11m)    53s ago  11m    21.3M        -  2.2.19-7ea3822   5e6a41d77b38  4cad324e0e23
+keepalived.nfs.cephnfs.host01.zktmsk  host01               running (11m)    10m ago  11m    2349k        -  2.1.5            18fa163ab18f  66bf39784993
+keepalived.nfs.cephnfs.host02.vyycvp  host02               running (11m)    53s ago  11m    2349k        -  2.1.5            18fa163ab18f  1ecc95a568b4
+nfs.cephnfs.0.0.host02.fescmw         host02  *:12049      running (14m)     3m ago  14m    76.9M        -  3.5              cef6e7959b0a  bb0e4ee9484e
+nfs.cephnfs.1.0.host03.avaddf         host03  *:12049      running (14m)     3m ago  14m    74.3M        -  3.5              cef6e7959b0a  ea02c0c50749
+```
+
+### Creating the NFS-Ganesha cluster
+
+You can create an NFS-Ganesha cluster using the mgr/nfs module of the Ceph Orchestrator. This module deploys the NFS cluster using Cephadm in the backend.
+
+This creates a common recovery pool for all NFS-Ganesha daemons, new user based on clusterid, and a common NFS-Ganesha config RADOS object.
+
+For each daemon, a new user and a common configuration is created in the pool. Although all the clusters have different namespaces with respect to the cluster names, they use the same recovery pool.
+
+
+Prerequisites
+A running IBM Storage Ceph cluster.
+
+Hosts are added to the cluster.
+
+All manager, monitor and OSD daemons are deployed.
+
+Procedure
+Log into the Cephadm shell:
+
+Example
+
+```bash
+cephadm shell
+```
+Enable the mgr/nfs module:
+
+Example
+
+```bash
+ceph mgr module enable nfs
+```
+Create the cluster:
+
+Syntax
+
+ceph nfs cluster create CLUSTER_NAME ["HOST_NAME_1 HOST_NAME_2 HOST_NAME_3"]
+
+The CLUSTER_NAME is an arbitrary string and HOST_NAME_1 is an optional string signifying the hosts to deploy NFS-Ganesha daemons.
+
+Example
+
+```bash
+ceph nfs cluster create nfsganesha "host01 host02"
+```
+NFS Cluster Created Successful
+
+This creates an NFS_Ganesha cluster nfsganesha with one daemon on host01 and host02.
+
+Verification
+List the cluster details:
+
+Example
+
+```bash
+ceph nfs cluster ls
+```
+
+Show NFS-Ganesha cluster information:
+
+Syntax
+
+```bash
+ceph nfs cluster info CLUSTER_NAME
+```
+Example
+```bash
+ceph nfs cluster info nfsganesha
+```
+
+
+
+
+
