@@ -1489,6 +1489,60 @@ ceph nfs cluster info nfsganesha
 ```
 
 
+#### deploying ganesha cluster and cephfs Manila cephfs
 
 
+```bash
 
+ceph mgr module enable nfs
+ceph nfs cluster create manila-ganesha "ceph1 ceph2 ceph2"
+ceph nfs cluster ls
+ceph nfs cluster info manila-ganesha
+ceph nfs cluster delete manila-ganesha
+ceph nfs cluster info manila-ganesha
+
+```
+
+```bash
+ceph orch ls
+ceph orch rm nfs.manila-ganesha --force
+ceph nfs cluster info manila-ganesha
+```
+```bash
+cat change_port.yml
+
+service_type: nfs
+service_id: manila-ganesha
+placement:
+  hosts:
+    - stg6-storage3001
+    - stg6-storage3002
+    - stg6-storage3003
+    - stg6-storage3004
+    - stg6-storage3005
+spec:
+  port: 2050
+```
+
+```bash
+service_type: ingress
+service_id: nfs.manila-ganesha
+placement:
+  count: 5
+spec:
+  backend_service: nfs.manila-ganesha
+  frontend_port: 2049
+  monitor_port: 9000
+  virtual_ip: 172.30.3.100/22
+  #enable_haproxy_protocol: true
+```
+
+```bash
+
+ceph orch apply -i nfs.yaml
+ 
+#adding in the horizone
+openstack share type create cephfsnativetype false
+openstack share type set cephfsnativetype --extra-specs vendor_name=Ceph storage_protocol=CEPHFS
+
+```

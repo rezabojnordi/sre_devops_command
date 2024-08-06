@@ -1,0 +1,10 @@
+vm.dirty_background_ratio=5
+vm.dirty_ratio=10
+kernel.panic=5
+kernel.sched_schedstats=1
+net.ipv4.ip_local_port_range=10240 65000
+vm.unprivileged_userfaultfd=1
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0

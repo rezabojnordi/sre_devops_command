@@ -1,0 +1,59 @@
+network:
+  version: 2
+
+  renderer: networkd
+
+  ethernets:
+    eno49:
+      dhcp4: no
+    eno50:
+      dhcp4: no
+
+  bonds:
+    bond0:
+      interfaces:
+        - eno49
+        - eno50
+      mtu: 9000
+      parameters:
+        mode: 802.3ad
+        lacp-rate: fast
+        mii-monitor-interval: 100
+        transmit-hash-policy: layer2+3
+        #        mode: active-backup
+        #        primary: eno49
+        #        mii-monitor-interval: 100
+#      addresses:
+#        - 172.29.64.13/22
+#      routes:
+#        - to: default
+#          via: 172.29.67.254
+#      nameservers:
+#        addresses: [8.8.8.8, 8.8.4.4]
+
+  vlans:
+    mgmt:
+      mtu: 9000 
+      id: 4
+      link: bond0
+      addresses:
+        - 172.29.64.13/22
+      routes:
+        - to: default
+          via: 172.29.67.254
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+
+    storage:
+      mtu: 9000
+      id: 5
+      link: bond0
+      addresses:
+        - 172.29.68.13/24
+
+    vxlan:
+      mtu: 9000
+      id: 6
+      link: bond0
+      addresses:
+        - 172.29.69.13/24

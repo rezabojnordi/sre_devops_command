@@ -1,0 +1,37 @@
+clouds:
+  kolla-admin:
+    auth:
+      auth_url: http://172.16.4.99:5000
+      project_domain_name: Default
+      user_domain_name: Default
+      project_name: admin
+      username: admin
+      password: yD8A7ZlWKflXDCQOPERDA0lCLYLkhN2c8MZD62Dw
+    region_name: RegionOne
+  kolla-admin-system:
+    auth:
+      auth_url: http://172.16.4.99:5000
+      user_domain_name: Default
+      system_scope: all
+      username: admin
+      password: yD8A7ZlWKflXDCQOPERDA0lCLYLkhN2c8MZD62Dw
+    region_name: RegionOne
+  kolla-admin-internal:
+    auth:
+      auth_url: http://172.16.4.99:5000
+      project_domain_name: Default
+      user_domain_name: Default
+      project_name: admin
+      username: admin
+      password: yD8A7ZlWKflXDCQOPERDA0lCLYLkhN2c8MZD62Dw
+    interface: internal
+    region_name: RegionOne
+  kolla-admin-system-internal:
+    auth:
+      auth_url: http://172.16.4.99:5000
+      user_domain_name: Default
+      system_scope: all
+      username: admin
+      password: yD8A7ZlWKflXDCQOPERDA0lCLYLkhN2c8MZD62Dw
+    interface: internal
+    region_name: RegionOne

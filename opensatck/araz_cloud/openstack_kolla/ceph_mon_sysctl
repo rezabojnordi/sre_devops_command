@@ -1,0 +1,4 @@
+vm.dirty_background_ratio=5
+vm.dirty_ratio=10
+kernel.panic=5
+kernel.sched_schedstats=1

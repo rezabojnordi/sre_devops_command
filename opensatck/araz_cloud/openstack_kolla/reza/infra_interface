@@ -1,0 +1,55 @@
+network:
+  version: 2
+  renderer: networkd
+
+  ethernets:
+    ens160:
+      dhcp4: no
+    ens192:
+      dhcp4: no
+
+  bonds:
+    bond0:
+      interfaces:
+        - ens160
+        - ens192
+      mtu: 9000
+      parameters:
+        mode: 802.3ad
+        lacp-rate: fast
+        mii-monitor-interval: 100
+        transmit-hash-policy: layer2+3
+
+  vlans:
+    mgmt:
+      mtu: 9000
+      id: 4
+      link: bond0
+      addresses:
+        - 172.20.45.7/24
+      routes:
+        - to: default
+          via: 172.29.45.6
+    dmz:
+      id: 7
+      link: bond0
+      mtu: 9000
+      addresses:
+        - 172.20.46.7/24
+
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+
+    storage:
+      id: 5
+      link: bond0
+      mtu: 9000
+      addresses:
+        - 172.20.47.7/24
+
+    vxlan:
+      id: 6
+      link: bond0
+      mtu: 9000
+      addresses:
+        - 172.20.48.7/24
