@@ -1529,12 +1529,32 @@ service_type: ingress
 service_id: nfs.manila-ganesha
 placement:
   count: 5
+  
 spec:
   backend_service: nfs.manila-ganesha
   frontend_port: 2049
   monitor_port: 9000
   virtual_ip: 172.30.3.100/22
   #enable_haproxy_protocol: true
+```
+
+```bash
+service_type: ingress
+service_id: nfs.manila-ganesha
+placement:
+  count: 5
+  hosts:
+    - stg6-storage3001
+    - stg6-storage3002
+    - stg6-storage3003
+    - stg6-storage3004
+    - stg6-storage3005
+spec:
+  backend_service: nfs.manila-ganesha
+  frontend_port: 2049
+  monitor_port: 9000
+  virtual_ip: 172.30.3.100/22
+  enable_haproxy_protocol: true
 ```
 
 ```bash
@@ -1545,4 +1565,42 @@ ceph orch apply -i nfs.yaml
 openstack share type create cephfsnativetype false
 openstack share type set cephfsnativetype --extra-specs vendor_name=Ceph storage_protocol=CEPHFS
 
+```
+
+
+
+``` bash
+ceph fs volume create cephfs --placement="3 ceph1 ceph2 ceph3"
+
+
+ceph osd crush rule create-replicated ssd default host ssd
+ 
+ceph osd crush rule ls
+
+
+ceph osd pool set cephfs.cephfs.meta crush_rule ssd
+ceph osd pool set cephfs.cephfs.meta size 3
+ceph fs ls
+
+ceph osd pool get cephfs_meta all
+```
+
+```bash
+
+vim mds.yaml
+ 
+service_type: mds
+service_id: cephfs
+placement:
+  count: 3
+
+```
+
+
+```bash
+ceph orch apply -i mds.yaml
+ceph fs set cephfs max_mds 2
+ceph fs set cephfs allow_standby_replay true
+ceph fs status cephfs
+ceph orch ps
 ```
