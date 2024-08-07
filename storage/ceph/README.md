@@ -1506,7 +1506,10 @@ ceph nfs cluster info manila-ganesha
 ```bash
 ceph orch ls
 ceph orch rm nfs.manila-ganesha --force
+ceph orch rm ingress.nfs.manila-ganesha --force
 ceph nfs cluster info manila-ganesha
+
+
 ```
 ```bash
 cat change_port.yml
@@ -1603,4 +1606,17 @@ ceph fs set cephfs max_mds 2
 ceph fs set cephfs allow_standby_replay true
 ceph fs status cephfs
 ceph orch ps
+```
+
+
+
+### mute for health
+
+```
+ceph health mute PG_NOT_DEEP_SCRUBBED 1w
+
+ceph health detail
+HEALTH_WARN 1 pgs not deep-scrubbed in time
+[WRN] PG_NOT_DEEP_SCRUBBED: 1 pgs not deep-scrubbed in time
+    pg 4.17f not deep-scrubbed since 2024-07-26T01:48:27.742657+0330
 ```
