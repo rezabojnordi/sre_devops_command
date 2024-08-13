@@ -1619,4 +1619,12 @@ ceph health detail
 HEALTH_WARN 1 pgs not deep-scrubbed in time
 [WRN] PG_NOT_DEEP_SCRUBBED: 1 pgs not deep-scrubbed in time
     pg 4.17f not deep-scrubbed since 2024-07-26T01:48:27.742657+0330
+
+ceph pg deep-scrub <PG_ID>
+ceph pg deep-scrub 4.1c
+ceph pg deep-scrub 4.a3
+ceph pg deep-scrub 4.c9
+
+ceph pg 4.1c query
+
 ```

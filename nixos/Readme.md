@@ -9,6 +9,25 @@ nixpkgs
 ```
 
 
+
+
+
+### Create a shell environment
+
+* Use nix-shell with the -p (--packages) option to specify that we need the cowsay and lolcat packages. The first invocation of nix-shell may take a while to download all dependencies.
+
+```bash
+nix-shell -p cowsay lolcat
+
+cowsay Hello, Nix! | lolcat
+
+
+
+
+```
+
+
+
 ### Imperative
 
 sudo apt install package1
