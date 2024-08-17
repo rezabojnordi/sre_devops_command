@@ -1612,7 +1612,7 @@ ceph orch ps
 
 ### mute for health
 
-```
+```bash
 ceph health mute PG_NOT_DEEP_SCRUBBED 1w
 
 ceph health detail
@@ -1627,4 +1627,14 @@ ceph pg deep-scrub 4.c9
 
 ceph pg 4.1c query
 
+```
+```bash
+#before shutdown
+ceph osd set noout
+ceph osd set norecover
+ceph osd set norebalance
+#after start
+ceph osd unset noout
+ceph osd unset norecover
+ceph osd unset norebalance
 ```
