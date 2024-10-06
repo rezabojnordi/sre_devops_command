@@ -259,3 +259,100 @@ kubectl get all
 
 
 ```
+
+#### create service file and deployment in the one command
+```
+kubectl expose deployment hello-world --port=80 --target=8080 --dry-run=client | more
+
+
+#### Write the Service yaml manifest to file
+
+kubectl expose deployment hello-world --port=80 --target-port=8080 --dry0run=client -o yaml > service.yaml
+
+more service.yaml
+```
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: hello-world
+status:
+  loadBalancer: {}
+```
+
+```bash
+kubectl apply -f service.yaml
+
+```
+
+** Deployment
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: hello-world
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - image: gcr.io/google-samples/hello-app:1.0
+        name: hello-app
+        resources: {}
+status: {}
+
+
+```
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+```bash
+kubectl get service
+NAME          TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+hello-world   ClusterIP   10.97.90.181   <none>        80/TCP    20m
+kubernetes    ClusterIP   10.96.0.1      <none>        443/TCP   4d22h
+root@master1:~# curl 10.97.90.181
+Hello, world!
+Version: 1.0.0
+Hostname: hello-world-7768b7869f-622dp
+
+```
+
+
+
+#### The deployment is scaled to  30 and we have 30 pods
+
+```bash
+kubectl get deployment hello-world
+```
+#### You can also scale a deployment using scale
+
+```bash
+kubectl scale deployment hello-world --replicas=40
+or
+kubectl scale deployment hello-world --replicas 40
+
+```
