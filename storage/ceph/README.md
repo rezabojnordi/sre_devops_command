@@ -1638,3 +1638,31 @@ ceph osd unset noout
 ceph osd unset norecover
 ceph osd unset norebalance
 ```
+
+
+### Remove Disck and change the disck
+```
+run and silent monitoring
+
+systemctl stop ceph-osd@X.service
+systemctl disable ceph-osd@X.service
+
+ceph osd destroy --force osd.X
+
+rm -rf /var/lib/ceph/osd/X
+rm -rf /var/run/ceph/X
+ls /etc/ceph
+
+ceph osd out X
+ceph osd crush remove osd.X
+ceph osd rm X
+ceph auth del osd.X
+
+ceph osd crush remove {host}
+
+##remove the server from inventory and make merge request
+
+ansible-playbook -i inventories/${AR_DC} monitoring.yml --ask-vault-pass
+
+suod shutdown now (on server)
+```
