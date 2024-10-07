@@ -1666,3 +1666,27 @@ ansible-playbook -i inventories/${AR_DC} monitoring.yml --ask-vault-pass
 
 suod shutdown now (on server)
 ```
+
+
+### Remove disck
+```
+ceph osd crush reweight osd.{osd-number} 0  ## step step decrise it
+ceph osd tree
+ceph osd df
+ceph osd out osd.{osd-number}
+systemctl stop ceph-osd@{osd-number}
+ceph osd purge osd.{osd-number} --yes-i-really-mean-it
+
+```
+
+### adding
+```
+ceph osd crush reweight osd.{new-osd-number} 0.1
+ceph osd crush reweight osd.{new-osd-number} 0.5
+ceph osd crush reweight osd.{new-osd-number} 1.0
+
+ceph-volume lvm create --data /dev/{disk-name}
+ceph osd in osd.{new-osd-number}
+ceph -s
+
+```
