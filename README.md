@@ -308,13 +308,13 @@ spec:
   replicas: 20
   selector:
     matchLabels:
-      app: hello-world
+      app: hello-world   #Match
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: hello-world
+        app: hello-world #Match
     spec:
       containers:
       - image: gcr.io/google-samples/hello-app:1.0
@@ -356,4 +356,159 @@ or
 kubectl scale deployment hello-world --replicas 40
 
 ```
+
+#### Clean up our deployment
+```bash
+kubectl delete deployment hello-world
+kubectl delete service hello-world
+kubectl get all
+
+
+```
+
+## Managing Kubernetes Controllers and Deployments
+
+* Maintainig Application with Deployments
+* Deploying and Maintaining Applications with DaemonSets and jobs
+
+```bash
+kubectl get --namespace kube-system deployment coredns
+
+kubectl get --namespace kube-system daemonset
+
+kubectl get nodes
+```
+
+* Decelrative
+```bash
+
+kubectl create deployment hello-wold --iamge=gcr.io/google-samples/hello-app:1.0
+kubectl scale deployment hello-world --replicas=5
+```
+
+
+* impractive
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: hello-world   #Match
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hello-world #Match
+    spec:
+      containers:
+      - name: hello-app
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+```
+
+```bash
+kubectl apply -f deployment2.yaml
+kubectl get replicasets.apps
+kubectl get deployment
+kubectl get pods
+kubectl delete -f deployment2.yaml
+```
+
+```yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: hello-world
+status:
+  loadBalancer: {}
+
+```
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: hello-world   #Match
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hello-world #Match
+    spec:
+      containers:
+      - name: hello-app
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+
+```
+
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+...
+spec:
+  replicas: 20
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - hello-world-pod-me
+  template:
+    metadata:
+      labels:
+        app: hello-world #Match
+    spec:
+      containers:
+      ...
+```
+
+
+#### Isolating a Pod from a ReplicaSet
+##### For more coverage on this see, Managing the kubernetes API
+```bash
+kubectl get pods --show-labels
+
+
+kubectl label pod hello-world-f597  app=hello-world-pod-me --overwrite
+
+kubectl get nodes --watch
+
+kubectl get nodes -o wide --watch
+
+kubectl get pods --watch
+
+```
+
+
 
