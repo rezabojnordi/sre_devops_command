@@ -356,3 +356,4 @@ or
 kubectl scale deployment hello-world --replicas 40
 
 ```
+
