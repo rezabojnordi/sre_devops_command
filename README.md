@@ -1067,6 +1067,14 @@ kubectl get job --watch
 kubectl get pods
 kubectl describe job hello-world-job
 
+### Get the logs from stdout from the job Pod
+
+kubectl get pods -l job-name=hello-world-job
+kubectl logs hello-world-job-258rj
+
+kubectl  delete job hello-world-job
+kubectl get jobs
+
 ```
 
 
