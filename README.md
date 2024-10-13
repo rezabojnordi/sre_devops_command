@@ -952,7 +952,122 @@ echo $MYPOD
 kubectl label pods $MYPOD app=not-hello-world --overwrite
 
 kubectl get pods --show-labels
+```
 
+#### We need a node that satisfies the Node Selector
+
+```bash
+kubectl label node worker1 node=hello-world-ns
+```
+
+
+
+#### What's going to happen if we remove the lable
+
+```bash
+kubectl label node worker1 node-
+
+kubectl describe daemonsets hello-world-ds
+
+kubectl delete daemonsets hello-world-ds
+
+## Examine what our update stategy is ...default to rollingUpdate
+kuecbtl get daemonSet hello-world -o yaml | more
+```
+
+#### Introducing jobs
+
+* Jobs create one or more Pods
+* Runs a program in a container to completion
+* Ensure that specified number of Pods complete successfully
+
+Ensuring Jobs Run to completion
+* Interrupted Execution
+* None-zero Exit code
+* Rescheduled
+* restartPolicy
+
+* NoteJobs: Lifecycle
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-world
+spec:
+  template:
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu
+        command:
+         - /bin/bash
+         - "-c"
+         - "/bin/echo Hello from Pod $(hostname) at $(date)"
+      restartPolicy: Never
 
 ```
 
+##### Controlling Job Execution
+* backoffLimit - number of Job retries
+* before it's marked failed
+* activeDeadlineSeconds - max execution time for the job
+* parallelism - max number of running pods in a Job at a point in time
+* completions - number of Pods that need to finish successfully
+
+
+##### Introducing Cronjobs
+* CronJob will run a Job on a given time based schedule
+* Conceptually similar to UNIX/LINUX cron Job
+* CronJob resource is created when the object is submitted to the Api server
+
+##### Controlling CronJobs Execution
+* schedule - a cron formatted schedule
+* suspend -suspends the CronJob
+* startingDeadlineSeconds the Job hasn't started in this amount of time mark it as failed
+* concurrencyPolicy - handles concurrent executions of a job. Allow, Forbid or Replice
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-world-cron
+spec:
+  schedule: "*1 * * * *"
+  jobTemplate:
+     spec:
+       template:
+          spec:
+            containers:
+            - name: ubuntu
+```
+
+### Jobs
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-world-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu
+        command:
+         - /bin/bash
+         - "-c"
+         - "/bin/echo Hello from Pod $(hostname) at $(date)"
+      restartPolicy: Never
+```
+
+```bash
+kubecl apply -f job.yaml
+kubectl get job --watch
+kubectl get pods
+kubectl describe job hello-world-job
+
+```
+
+
+       
