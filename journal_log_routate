@@ -1,0 +1,16 @@
+```
+root@rabbitmq-server:~# du -sh /var/log
+2.9G    /var/log
+root@rabbitmq-server:~# du -sh /var/log/journal
+2.9G    /var/log/journal
+root@rabbitmq-server:~# journalctl --disk-usage
+Archived and active journals take up 2.8G in the file system.
+root@rabbitmq-server:~# journalctl --rotate
+root@rabbitmq-server:~# journalctl --vacuum-time=7days
+Vacuuming done, freed 0B of archived journals from /run/log/journal.
+...
+Vacuuming done, freed 2.7G of archived journals from /var/log/journal/0611d5f1a21192768c1c9a033e573efa.
+Vacuuming done, freed 0B of archived journals from /var/log/journal.
+root@rabbitmq-server:~# journalctl --disk-usage
+Archived and active journals take up 104.0M in the file system.
+```
