@@ -511,4 +511,448 @@ kubectl get pods --watch
 ```
 
 
+### Updating a Deployment Object
+
+```bash
+kubectl set image deployment hello-world hello-world=hello-app:2.0
+
+kubectl set image deployment hello-world hello-world=hello-app:2.0 --record
+
+kubectl edit deployment hello-world
+
+kubectl apply -f hello-world-deployment.yaml --record
+
+if you change the deployment.v2.yaml I mean change the version then aplly again
+
+
+
+
+```
+
+
+### Checking Deployment status
+
+```bash
+kubectl rollout status deployment [name]
+kubectl descrive deployement [name]
+
+echo $?
+
+
+* show history
+kubectl rollout history deployment hello-world
+
+* bash to last version I mean v2 to v1
+kubectl rollout undo deployment hello-world
+
+* check it roull out work immediatly or not
+
+kubectl rollout status deployment hello-world
+
+* back to specific version
+kubectl rollout undo deployment hello-world --to-revision=2
+
+```yaml
+kubectl rollout history deployment hello-world --revision=1
+deployment.apps/hello-world with revision #1
+Pod Template:
+  Labels:	app=hello-world
+	pod-template-hash=84c65f5f46
+  Containers:
+   hello-app:
+    Image:	gcr.io/google-samples/hello-app:1.0
+    Port:	8080/TCP
+    Host Port:	0/TCP
+    Environment:	<none>
+    Mounts:	<none>
+  Volumes:	<none>
+  Node-Selectors:	<none>
+  Tolerations:	<none>
+```
+
+
+
+
+### Using Deployment to Change state
+
+* Update strategy
+* Pause to make corrctions
+* Rollback to an earlier version
+* Restart Deployment
+
+Controls Pods rollout
+RollingUpdate (default)
+
+A new ReplicaSet starts scalingh up and the old ReplicaSet starts scaling download
+
+Recreate
+Terminates all Pods in the current ReplicaSet
+set prior to scaling up the new ReplicaSet
+
+Used when applicationm don't suppot running diffrent versions cincurrently
+
+```yaml
+
+apiVersion: apps/v1
+kind: Deployment
+...
+spec:
+  replicas: 20
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 20%
+      maxSurge: 5
+...
+template:
+...
+   spec:
+     containers:
+...  
+      readinessProb:
+        httpGet:
+          path: /index.html
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 10
+
+````
+
+* Pausing and Resuming a Deployment.
+ * changes to the Deployment while paused are not rolled out
+ * Batch changes togetherm then resumes the rollout
+
+starts Up a new ReplicaSet with the new changes
+
+
+```bash
+
+
+kubectl rollout paused deployement my-deployment
+kubectl rollout resume my-deployment
+
+```
+
+
+#### rolling Back Deployment
+
+```bash
+kubectl rollout history deployment hello-world
+
+kubectl rollout history deployment hello-world --revision=1
+
+kubectl rollout undo deployment hello-world
+
+kubectl rollout undo deployment hello-world --to -revision=1
+
+
+```
+
+### REstarting a Deployment
+
+* Effectively restarts all the Pods
+But no Pod is ever "recreated"
+New ReplicaSet with the same Pod spec
+Uses Deployment's Update strategy
+
+* RollingUpdate  
+* Recreate
+
+```bash
+kubectl rollout restart deployement hello-world
+```
+
+
+
+#### Observe behavior since new image wasn't available, the ReplicaSet doesn't go below maxUnavailable
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  progressDeadlineSeconds: 10
+  replicas: 10
+  selector:
+    matchLabels:
+      app: hello-world   #Match
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hello-world #Match
+    spec:
+      containers:
+      - name: hello-app
+        image: gcr.io/google-samples/hello-ap:2.0
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: hello-world
+status:
+  loadBalancer: {}
+```
+
+```bash
+
+
+kubectl apply -f deployment2.yaml
+
+kubectl apply -f deployment.broken.yaml
+
+### why isn't this finisheing...? after progressDeadlineSeconds which we set to 10 seconds (default to 10 minutes)
+kubectl rollout status deployment hello-world
+
+
+
+```
+
+```json
+kubectl get pods
+NAME                           READY   STATUS             RESTARTS   AGE
+hello-world-66f5964f8c-6v7gb   0/1     ImagePullBackOff   0          99s
+hello-world-66f5964f8c-9bxhm   0/1     ImagePullBackOff   0          99s
+hello-world-66f5964f8c-blspc   0/1     ErrImagePull       0          99s
+hello-world-66f5964f8c-gvx6j   0/1     ImagePullBackOff   0          99s
+hello-world-66f5964f8c-mtvbw   0/1     ImagePullBackOff   0          99s
+hello-world-84c65f5f46-2bzlw   1/1     Running            0          108s
+hello-world-84c65f5f46-5n6j5   1/1     Running            0          109s
+hello-world-84c65f5f46-k74x9   1/1     Running            0          108s
+hello-world-84c65f5f46-qwbdc   1/1     Running            0          108s
+hello-world-84c65f5f46-sd4tz   1/1     Running            0          109s
+hello-world-84c65f5f46-trkg9   1/1     Running            0          109s
+hello-world-84c65f5f46-v2cfj   1/1     Running            0          109s
+hello-world-84c65f5f46-xm896   1/1     Running            0          108s
+
+```
+
+
+```bash
+kubectl describe deployments hello-world
+
+kubectl rollout history deployment hello-world
+
+kubectl describe deployments hello-world  | head
+## you can see Annotations:            deployment.kubernetes.io/revision: 2
+
+kubectl rollout history deployment hello-world --revision=2
+
+kubectl rollout history deployment hello-world --revision=1
+
+### Let's under out rollout to revision2, which is our v2 container.
+
+kubectl rollout undo deployment hello-world --to-revision=2
+
+kubectl rollout status deployment hello-world
+
+echo $?
+
+```
+
+####  Demo 3 Controlling the rate and update strategy of a Deployment update.
+##### Let's deploy a Deployment with Readliness Probes
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  progressDeadlineSeconds: 10
+  replicas: 10
+  selector:
+    matchLabels:
+      app: hello-world   #Match
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hello-world #Match
+    spec:
+      containers:
+      - name: hello-app
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hello-world
+  name: hello-world
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: hello-world
+status:
+  loadBalancer: {}
+```
+
+```bash
+kubectl apply -f deployment.probes-1.yaml --record
+kubectl describe deployment hello-world
+
+kubectl rollout status deployment hello-world
+
+kubectl get replicaset
+
+kubectl rollout history  deployment hello-world
+  deployment.apps/hello-world 
+  REVISION  CHANGE-CAUSE
+    1         kubectl apply --filename=deployment.probes-1.yaml --record=true
+    2         kubectl apply --filename=deployment.probes-2.yaml --record=true
+
+kubectl rollout history  deployment hello-world --revision=1
+kubectl rollout history  deployment hello-world --revision=2
+
+kubectl rollout undo deployment hello-world --to-revision=2
+```
+
+#### Let's restart deployment
+```bash
+kubectl rollout restart deployment hello-world
+kubectl describe deployment hello-world
+### clean test
+kubectl delete deployment hello-world 
+kubectl delete service hello-world 
+```
+#### Scaling Deployment
+
+```bash
+kubectl scale deployment hello-world --replicas=10
+
+kubectl apply -f deployment.yaml
+
+
+```
+
+#### Introducing Daemonset
+* Ensures that all or some Nodes run Pod
+* Effectively an init daemon inside your cluster
+* Example workloads
+* Kube-proxy for network services
+* Log cpllection
+* Metrics services
+* Resource monitoring agents
+* storage daemons
+
+
+```yaml
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: hello-world-app
+  name: hello-world-ds
+spec:
+  selector:
+    matchLabels:
+      app: hello-world-app   #Match
+  template:
+    metadata:
+      labels:
+        app: hello-world-app
+    spec:
+      nodeSelector:
+        node: hello-world-ns
+      containers:
+      - name: hello-wold
+        image: gcr.io/google-samples/hello-app:1.0
+```
+
+#### DaemonSet Update strategy
+
+* RollingUpdate
+* onDelete
+
+##### Creating a DaemonSet
+
+```bash
+
+kubectl get daemonsets --namespace kube-system kube-proxy
+
+kubectl apply -f DaemonSet.yaml
+
+kubectl get daemonsets
+
+kubectl get daemonsets -o wide
+
+kubectl describe daemonset hello-world  | more
+```
+
+```yaml
+#### no Selector
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: hello-world-app
+  name: hello-world-ds
+spec:
+  selector:
+    matchLabels:
+      app: hello-world-app   #Match
+  template:
+    metadata:
+      labels:
+        app: hello-world-app
+    spec:
+      # nodeSelector:
+      #   node: hello-world-ns
+      containers:
+      - name: hello-wold
+        image: gcr.io/google-samples/hello-app:1.0
+```
+
+#### Each Pods create with our label
+```bash
+
+kubectl get pods --show-labels
+
+```
+
+##### If we change the lable to one of our Pods
+```bash
+MYPOD=$(kubectl get pods -l app=hello-world-app | grep hello-world | head -n 1 | awk {'print $1'})
+echo $MYPOD
+
+kubectl label pods $MYPOD app=not-hello-world --overwrite
+
+kubectl get pods --show-labels
+
+
+```
 
