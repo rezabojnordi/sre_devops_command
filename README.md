@@ -1079,3 +1079,171 @@ kubectl get jobs
 
 
        
+
+
+### Job-failure-onfailure.yaml
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-world-job
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu
+        command:
+         - /bin/bash
+         - "-c"
+         - "/bin/echo Hello from Pod $(hostname) at $(date)"
+      restartPolicy: Never
+```
+
+```bash
+kubectl get pods --watch
+kubectl get jobs
+
+```
+
+#### Demo 3 Defining a Parallel Job
+```bash
+kubectl apply -f paralleljob.yaml
+```
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-world-job
+spec:
+  completions: 50
+  parallelism: 10
+  template:
+    spec:
+      containers:
+      - name: ubuntu
+        image: ubuntu
+        command:
+         - /bin/bash
+         - "-c"
+         - "/bin/echo Hello from Pod $(hostname) at $(date)"
+      restartPolicy: Never
+```
+
+```bash
+kubectl get pods
+watch 'kubectl describe job | head -n 11'
+kubectl delete -f paralleljob.yaml
+
+```
+
+#### Demo 5 scheduling tasks with CronJobs
+
+```bash
+kubectl apply -f cronjob.yaml
+```
+#### Cronjob samole
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-world-cron
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: ubuntu
+            image: ubuntu
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "/bin/echo Hello from Pod $(hostname) at $(date)"
+          restartPolicy: Never
+```
+
+```bash
+kubectl describe cronjobs | more
+kubectl get pods --watch
+kubectl get cronjob -o yaml
+```
+
+
+#### Statefulsets
+
+* Database workloads
+* Caching servers
+* Application state for web farms
+* Naming Storage Headless Service
+
+
+#### Dry run
+```bash
+kubectl apply -f  deployment --dry-run=server
+kubectl apply -f  deployment --dry-run=client
+kubectl create deployment nginx --image=nginx --dry-run=client -o yaml > deployment.new.yaml
+```
+
+##### Working with kubectl diff
+
+```bash
+kubectl diff -f newdeployment.yaml
+kubectl diff -f newdeployment.yaml | more
+
+```
+
+#### Api Discovery
+```bash
+#Get information anout our current cluster context
+kubectl config get-contexts
+
+### Change our context if needed by soecifying the Name
+kubectl config use-context kubernetes-admin@kubernetes
+
+kubectl cluster-info
+#Get a list of Api
+kubectl api-resources | more
+
+# Using kubectl explain to see the structure of a resource..specifically
+
+kubectl explain pods | more
+```
+
+### Api Group
+* Pod
+* Node
+* namespace
+* PersistentVolume
+* PersistantVolumeClaim
+
+#### Named Api Group
+* Apps - Deployment
+* Storage.k8s.io - StorageClass
+* rbac.authorization.k8s.io - Role
+
+#### Api Version
+
+* Api is versioned
+* Provide stability for existing implementions
+* Enable forward change
+
+Alpha -  Beta -> Stable
+
+No direct relation to release version
+
+```bash
+kubectl api-resources |more
+
+kubectl api-resources --api-group=apps
+
+kubectl explain deployment --api-version=apps/v1 | more
+
+kubectl api-versions | sort | more
+
+```
