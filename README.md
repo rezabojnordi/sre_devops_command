@@ -1247,3 +1247,177 @@ kubectl explain deployment --api-version=apps/v1 | more
 kubectl api-versions | sort | more
 
 ```
+
+##### Core API (Legacy)
+```h
+http://apiserver:port/api/$VERSION/$RESOURCE_TYPE
+http://apiserver:port/api/$VERSION/$NAMESPACE/$RESOURCE_TYPE/$RESOURCE_NAME
+```
+
+##### API Group
+```H
+http://apiserver:port/api/$GROUPNAME/$VERSION/namespaces/$NAMESPACE/$RESOURCE_TYPE/$RESOURCE_NAME
+
+```
+```bash
+Conaction-->Authentication-->Authorization-->Admission Control
+```
+
+
+```bash
+# we can use the -v option to increse the verbosity of out request
+kubectl get pod hello-world-64cfbbd96c-44ls6 -v 6
+#####################
+kubectl get pod hello-world-64cfbbd96c-44ls6 -v 7
+I1014 13:19:52.627860  797543 loader.go:395] Config loaded from file:  /etc/kubernetes/admin.conf
+I1014 13:19:52.632851  797543 round_trippers.go:463] GET https://172.20.45.20:6443/api/v1/namespaces/default/pods/hello-world-64cfbbd96c-44ls6
+I1014 13:19:52.632968  797543 round_trippers.go:469] Request Headers:
+I1014 13:19:52.633099  797543 round_trippers.go:473]     Accept: application/json;as=Table;v=v1;g=meta.k8s.io,application/json;as=Table;v=v1beta1;g=meta.k8s.io,application/json
+I1014 13:19:52.633236  797543 round_trippers.go:473]     User-Agent: kubectl/v1.30.5 (linux/amd64) kubernetes/74e84a9
+I1014 13:19:52.641417  797543 round_trippers.go:574] Response Status: 200 OK in 8 milliseconds
+NAME                           READY   STATUS    RESTARTS   AGE
+hello-world-64cfbbd96c-44ls6   1/1     Running   0          97s
+```
+
+##### Start up a kubectl proxy session, This will authenticate use to the API server
+
+```bash
+
+kubectl proxy &
+
+curl http://localhost:8001/api/v1/namespaces/default/pods/hello-world | head -n 20
+
+kubectl get pods --watch -v 6
+```
+
+
+##### Organizing Object in Kubernetes
+
+* namespace
+* Labels 
+* Annotations
+
+``` yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: playgroundinyaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+  labels:
+    app: hello-world
+  namespace: playgroundinyaml
+spec:
+  replicas: 4
+  selector:
+    matchLables:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world-app
+    spec:
+      # nodeSelector:
+      #   node: hello-world-ns
+      containers:
+      - name: hello-wold
+        image: gcr.io/google-samples/hello-app:1.0
+  
+```
+
+```bash
+kubectl get namespces
+
+kubectl api-resources --namespaces=true |head
+kubectl api-resource --namespaces=false | head
+
+kubectl describe namespaces
+
+kubectl get pods --all-namespaces
+
+kubectl get all --all-namespaces
+
+kubectl create namespace playgroupd1
+
+kubectl get pods -n playgroupd1
+
+kubectl delete pods -all --namespace playgroupd1
+
+
+```
+
+##### Labels
+
+* Used to organize resource - Pods,Nodes and more
+* Lables Selector are used to select/query Objects
+* Creating resource with Labels
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: v1
+    tier: PROD
+spec:
+  ...
+
+```
+
+```bash
+kubectl label pod nginx tier=PROD app=v1
+kubectl label pod nginx tier=DEBUG app=v1 --overwrite
+kuebctl label pod nignx app-
+
+kubectl get pods --show-labels
+kubectl get pods --selector tier=Prod
+kubectl get pods -l 'tier in (prod,qa)'
+kubectl get pods -l 'tier notin (prod,qa)'
+```
+
+* Controller and Services match pods using selector
+* Scheduling to specific Nodes
+* Special hardware (SSD or GPU)
+
+
+```yaml
+kind: Deployment
+...
+spec:
+ selector:
+   matchLabels:
+     run: hello-world ## mache
+...
+  template:
+    metadata:
+      labels:
+        run: hello-world ## mache
+    spec:
+      contaners:
+---
+
+kind: Service
+...
+spec:
+  selector:
+    run: hello-world ## mache
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+    
+
+
+
+
+```
+
+
+
+
+
+
