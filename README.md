@@ -1346,6 +1346,12 @@ kubectl get pods -n playgroupd1
 
 kubectl delete pods -all --namespace playgroupd1
 
+kubetcl exec -it POD1 --container Container1 -- /bin/bash
+
+kubectl logs POD1 --container Container1
+
+kubectl port-forward pod POD1 LOCALPORT:CONTAINERPORT
+
 
 ```
 
@@ -1409,15 +1415,224 @@ spec:
   - port: 80
     protocol: TCP
     targetPort: 8080
-    
+```
 
 
+### labels
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-1
+  labels:
+    tier: prod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-2
+  labels:
+    app: MyWebApp
+    deployment: v1.1
+    tier: prod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-3
+  labels:
+    app: MyWebApp
+    deployment: v1.1
+    tier: qa
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-4
+  labels:
+    app: MyAdminApp
+    deployment: v1
+    tier: prod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+
+```
+
+```bash
+kubectl apply -f createpodwithlabels.yaml
+kubectl get pods --show-labels
+
+### Query labels and selectors
+
+kubectl get pods --selector tier=prod
+kubectl get pods --selector tier=qa
+kubectl get pods -l tier=prod
+kubectl get pods -l tier=prod --show-labels
+
+#Output a particluar label in colume format
+kubectl get pods -L tier
+kubectl get pods -L tier,app
 
 
+### Edit an existing label
+kubectl label pod nginx-pod-1 tier=non-prod --overwrite
+kubectl get pod nginx-pod-1 --show-labels
+
+
+### ADding label pod nginx-pod-1 another=label
+kubectl get pod nginx-pod-1 --show-labels
+
+## Removing an operation on a collection of pods based on a label query
+kubectl label pod nginx-pod-1 another-
+
+kubectl get pod nginx-pod-1 --show-labels
+
+
+### Delete all pods matching our non-prod label
+
+kubectl delete pod -l tier=non-prod
+
+kubectl delete pod -l tier=prod
+  pod "nginx-pod-1" deleted
+  pod "nginx-pod-2" deleted
+  pod "nginx-pod-4" deleted
 ```
 
 
 
+```yaml
+### deployment-label.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+  labels:
+    app: hello-world
+spec:
+  replica:
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+```
+
+```bash
+kubectl describe service hello-world
+
+kubectl get pods --show-labels
+
+```
+
+##### labels our nodes with something descrive
 
 
+```bash
+kubectl label node worker1 disk=local_ssd
 
+kubectl label node worker2 hardware=local_gpu
+```
+
+##### Query our labels to confirm
+
+```bash
+kubectl get node -L disk,hardware
+
+kubectl get pods -o wide
+```
+
+```yaml
+###podstonodes.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-ssd
+spec:
+  nodeSelector:
+    disk: local_ssd  # Correct label key
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-ssd
+spec:
+  nodeSelector:
+    hardware: local_gpu
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+```
+
+#### Clean up when we're finished, delete our labels and pods
+
+```bash
+kubectl label node worker1 disck-
+kubectl label node worker2 hardware-
+kubectl delete pod nginx-pod
+kubectl delete pod nginx-pod-gpu
+kubectl delete pod nginx-pod-ssd
+```
+
+#### Annotations
+* Used to add additional information about your cluster resources
+* Mostly used by people or tooling to make decisions
+* None-hierarchical, key/value pair
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  annotation: owner: Anthony
+spec:
+  contaners:
+  - name: nginx
+    image: nginx
+```
+
+```bash
+
+kubectl annotate pod nginx-pod owner=Anthony
+
+kubectl annotate pod nginx-pod owner=NotAnthony --overwrite
+```
