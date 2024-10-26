@@ -1636,3 +1636,246 @@ kubectl annotate pod nginx-pod owner=Anthony
 
 kubectl annotate pod nginx-pod owner=NotAnthony --overwrite
 ```
+
+
+#### multi-pods 
+```bash
+###multicontainer-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multicontainer-pod
+spec:
+  containers:
+  - name: producer
+    image: ubuntu
+    command: ["/bin/bash"]
+    args: ["-c", "while true; do echo $(hostname) $(date) >> /var/log/index.html; sleep 10; done"]
+    volumeMounts:
+    - name: webcontent
+      mountPath: /var/log
+  - name: consumer
+    image: nginx
+    ports:
+      - containerPort: 80
+    volumeMounts:
+    - name: webcontent
+      mountPath: /usr/share/nginx/html
+  volumes:
+  - name: webcontent
+    emptyDir: {}
+```
+
+```bash
+kubectl exec -it multicontainer-pod -- /bin/bash
+ls -la /var/log
+tail /var/log/index.html
+
+#Let's specify a container name and access the consumer container in our Pod
+kubectl port-forward multicontainer-pod 8080:80
+curl http://localhost:8080
+```
+
+#### Pod with init containers
+
+```bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-containers
+spec:
+  initContainers:
+  - name: init-service
+    image: ubuntu
+    command: ['sh', '-c', "echo waiting for service; sleep 2"]
+  - name: init-database
+    image: ubuntu
+    command: ['sh', '-c', "echo waiting for database; sleep 2"]
+  containers:
+  - name: app-container
+    image: nginx
+
+````
+
+```bash
+## Froce Deletion - Immediately deletes records in api and etcd
+
+kubectl delete pod <name> --grace-period-0 --force
+```
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  restartPolicy: OnFailure
+
+```
+
+
+```bash
+### we still have our kubectl get events running in the background
+kubectl exec -it hello-world-pod -- /usr/bin/killall hello-app
+ 
+```
+
+
+#### Defining Pod Health
+
+* livenessProbes
+* readinessProbes
+*  startupProbrs
+
+* Note: Types of Diagnostic checks for probes
+   Exec      -->> Process exit code
+
+   tcpSocket  -->> successfully open a port
+
+   httpGet -->> Return Code 200 => and < 400
+
+
+  ```yaml
+  spec:
+    containers:
+      ...
+      livenessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 15
+        periodSeconds: 20
+
+  ```
+
+    ```yaml
+  spec:
+    containers:
+      ...
+      readinessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 10
+
+  ```
+
+    ```yaml
+  spec:
+    containers:
+      ...
+      startupProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 10
+
+  ```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          tcpSocket:
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 5    
+
+```
+
+
+### Storage on the Kubernetes
+
+#### Storage API objects in Kubernetes
+* Volumes
+* PersistantVolume
+* PersistantVolumeClaim
+* StorageClass
+
+##### Volumes (NFS)
+* Persistent storage deployed as part of the Pod spec
+* implemention details for your storage
+* This can be challenging..
+  
+  * Sharing code
+  * same lifecycle as Pod
+
+* We can do betther......
+
+
+
+##### Persistent Volumes
+* Administrator defined storage in the cluster
+* implemention details for your storage
+* Lifecycle independent of the Pod
+
+
+Managed by the kubelete
+ * Maps the storage in the Node
+ * Exposes PV as a mount insid the container
+
+
+
+##### Types of Persistent Volumes
+* Networked (NFS,AzureFile)
+* Block(Fibre Channel,Iscsi)
+* Cloud (awsElasticBlockStore,AzureDisck,GcePersistentDisk)
+
+
+##### Persistent Volumes Claims
+* A request for storage by a User
+  * Size
+  * Access Mode
+  * Storage Class
+  * Enable protabillity of your application configurations
+The cluster will map a PVC to a PV
+
+Note: Node level access, not Pod access
+
+# ------------------------------------------------------------------------
+
+#### Static Provisiong Workflow
+
+1. Create a PersistentVolume
+2. Create a persistentVolumeClaim
+3. Define Volume in Pod Spec
+
+
+### Storage Lifecycle
+1. Binding
+
+* PVC created
+* Control loop
+* Maches PVC->PV
+2. Using
+* Pod's Lifetime
+
+3. Reclaim
+* PVC Delete
+* Delete(default)
+* Retain

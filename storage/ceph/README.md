@@ -1690,3 +1690,8 @@ ceph osd in osd.{new-osd-number}
 ceph -s
 
 ```
+
+### hight speed recover on the ceph
+```bash
+ceph config set osd osd_mclock_profile high_recovery_ops
+```
