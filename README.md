@@ -1879,3 +1879,221 @@ Note: Node level access, not Pod access
 * PVC Delete
 * Delete(default)
 * Retain
+
+
+```yaml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-data
+spec:
+  capacity:
+   storgae: 100Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 172.16.94.5
+    path: "/exporter/volumes/pod"
+
+```
+
+Note:
+* accessModes
+* resources 
+* storageClassName
+* Selector
+
+#### Defining a Persistent Volume Claim
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+ name: pvc-nfs-data
+spec:
+  accessMode:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+      
+```
+
+
+###### Using Persistent Volume in Pods
+
+```yaml
+---
+spec:
+  Volumes:   #Volumes
+    - name: webcontent
+      persistentVolumeClaim:
+        claimName: pvc-nfs-data
+  containers:
+  - name: nginx
+    ....
+    volumeMounts: #persistentvolumeClaim
+    - name: webcontent
+      mountPath: "/sur/share/nginx/html/web-app" ### PersistentVolume
+```
+
+
+#### NFS for Kubernetes
+
+```bash
+sudo apt update
+sudo  apt full-upgrade
+sudo apt install nfs-kernel-server
+
+mkdir /exporter/volumes
+mkdir /exporter/volumes/pod
+
+sudo bash -c 'echo "/exporter/volumes *(rw,no_root_squash,no_subtree_check)" > /etc/exporters'
+
+cat /etc/exporters
+
+sudo systemctl restart nfs-kernel-server.service
+exit
+
+```
+
+##### On ech Nodes you cluster ..... install the NFS client
+
+```bash
+
+sudo apt install nfs-common -y
+
+ssh worker1
+
+sudo mount -t nfs4 c1-storage:/export/volumes /mnt/
+umount /mnt
+
+exit
+```
+
+
+
+
+#### nfs.pv.yaml
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-data
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 172.20.45.20
+    path: "/exporter/volumes/pod"
+
+
+```
+
+#### Create a PV
+```bash
+kubectl apply -f nfs.pv.yaml
+
+kubectl get persistentvolume pv-nfs-data
+
+kubectl describe persistentvolume pv-nfs-data 
+```
+
+#### Create a PVC on that PV
+
+nfs.pvc.yaml
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs-data
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+```
+
+
+```bash
+kubectl apply -f nfs.pvc.yaml
+
+kubectl get persistentvolume
+
+kubectl get PersistentvolumeClaim pvc-nfs-data
+kubectl describe PersistentvolumeClaim pvc-nfs-data
+```
+
+
+``` bash
+ssh nfs_server
+sudo bash -c 'echo "Hello from our NFS mount!!!!" >/exporter/volumes/pod/demo.html'
+
+```
+* Note: use this one
+```bash
+helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner     --set nfs.server=172.20.45.50 --set nfs.path=/exporter/volumes
+```
+
+* vim nfs.nginx.yaml
+```yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-nfs-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:  # اصلاح نام اشتباه 'macheLabels'
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: webcontent
+          mountPath: "/usr/share/nginx/html/web-app"
+      volumes:
+      - name: webcontent
+        persistentVolumeClaim:
+          claimName: pvc-nfs-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nfs-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+
+```
+
+```bash
+### Lets create pods ( in Deployment and add a service) with a PVC on pvc-nfs-data
+
+kubectl apply -f nfs.nginx.yaml
+
+kubectl get service nginx-nfs-servic
+
+SERVICEIP=$(kubectl get service | grep nginx-nfs-service | awk '{ print $3 }')
+
+
+```
