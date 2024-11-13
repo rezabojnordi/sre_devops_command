@@ -2042,6 +2042,30 @@ helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/
 helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner     --set nfs.server=172.20.45.50 --set nfs.path=/exporter/volumes
 ```
 
+```bash
+vim nfs.pvc.yaml
+```
+
+```bash
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs
+spec:
+  storageClassName: "nfs-client" # storageclass
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+
+```
+
+```
+kubectl apply -f nfs.pvc.yaml
+
+```
 * vim nfs.nginx.yaml
 ```yaml
 
@@ -2070,7 +2094,7 @@ spec:
       volumes:
       - name: webcontent
         persistentVolumeClaim:
-          claimName: pvc-nfs-data
+          claimName: pvc-nfs
 ---
 apiVersion: v1
 kind: Service
@@ -2082,8 +2106,7 @@ spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 80
-
+    targetPort:
 ```
 
 ```bash
@@ -2095,5 +2118,567 @@ kubectl get service nginx-nfs-servic
 
 SERVICEIP=$(kubectl get service | grep nginx-nfs-service | awk '{ print $3 }')
 
+curl http://$SERVICEIP/web-app/demo.html
+
+kubectl scale deployment nginx-nfs-deployment --replicas 4
+
+kubectl describe persistentvolumeclaims
+
+kubectl get persistentvolume
+
+kubectl get persistentvolumeclaims
+
+kubectl delete deployments.apps nginx-nfs-deployment
+
+kubectl get persistentvolumeclaims
+```
+
+#### My status is now Released...which means no one can claim this pv
+```
+kubectl get persistentvolume
+
+NAME          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM                  STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pv-nfs-data   10Gi       RWX            Retain           Released   default/pvc-nfs-data                  <unset>                          5d21h
+```
+
+
+##### Dynamic Provisiong Workflow
+
+* Create a StorageClass
+* Create a PersistentVolumeClaim
+* Define Volume in Pod Spec
+* Create a PersistentVolume
+
+
+
+#### Defining a StorageClass(optional)(Azure)
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: managed-premium
+parameters:
+  kind: Managed
+  storageaccounttype: Premium_LRS
+provisioner: Kubernetes.io/azure-disk
+```
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-azure-managed
+spec:
+  accessModes:
+  - ReadWriteOne
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 10Gi
+
 
 ```
+
+### Configure Data
+
+* Note: Using Environment
+
+Why Do we need configurations Data
+* Abstraction
+* Container Image are Immutable
+* Service Discovery
+* Sensitive information
+
+
+### DEfining Enviroment Variables
+
+```
+spec:
+  containers:
+  - name: hello-world
+    image: gcr.io/google-samples/hello-app:1.0
+    env:
+    - name: DATABASE_SERVERNAME
+      value:"sql.example.local"
+    - name: BACKEND_SERVERNAME
+      value: "be.example.local"
+‍‍‍
+```
+* vim deploy-alpha.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-alpha
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-alpha
+  template:
+    metadata:
+      labels:
+        app: hello-world-alpha
+    spec:
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        env:
+        - name: DATABASE_SERVERNAME
+          value: "sql.example.local"
+        - name: BACKEND_SERVERNAME
+          value: "be.example.local"
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-alpha
+spec:
+  selector:
+    app: hello-world-alpha
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  
+‍‍
+```
+
+
+* vim deployment-beta.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-beta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-beta
+  template:
+    metadata:
+      labels:
+        app: hello-world-beta
+    spec:
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        env:
+        - name: DATABASE_SERVERNAME
+          value: "sql.example.local"
+        - name: BACKEND_SERVERNAME
+          value: "be.example.local"
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-alpha
+spec:
+  selector:
+    app: hello-world-beta
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+
+      
+
+```
+
+```bash
+kubectl apply -f deployment-alpha.yaml
+
+sleep 5
+
+kubectl apply -f deployment-beta.yaml
+
+PODNAME=$(kubectl get pods | grep hello-world-alpha | awk '{print $1}' | head -n 1)
+
+echo $PODNAME
+```
+
+### Secret
+
+* Storage sensitive information as Objects
+* Retrieve for later use
+* Password, Api token, keys and certificates
+* Safe and more flexible configuration (Pods specs and Images)
+
+
+Note: Secret
+* base64 encoded
+* Encryption can be configured
+* Stored in etcd
+
+Namespcafce can only be refrenced by pods in the same Namespace
+
+
+
+#### Creating Secrets
+
+```bash
+kubectl create secret generic app1 --form-literal=USERNAME=app1login --from-literal=PASSWORD='reza@123'
+
+```
+
+#### Using Secrets in Pods
+```bash
+Enviroment Variables
+Volumes or Files
+Updatable
+can be marked Immutable
+Secret Must be accessible to the Pod at startup
+```
+
+#### uing Secrets in Enviroment Variables
+
+```yaml
+## Tehy keys and values qare case sensitive
+
+kubectl create secret generic app1 --from-literal=USERNAME=app1login  --from-literal=PASSWORD='reza@123'
+
+## get secret
+kubectl get secrets
+
+## app1 said it 
+kubectl describe secret app1
+
+#If we need to access those at the command line
+#These are wrapped in bash expansion to add a newline to output for readability
+
+echo $(kubectl get secret app1 --template={{..data.USERNAME}} )
+echo $(kubectl get secret app1 --template={{.data.USERNAME}} | base64 --decode)
+
+###
+
+echo $(kubectl get secret app1 --template={{..data.PASSWORD}} )
+echo $(kubectl get secret app1 --template={{.data.PASSWORD}} | base64 --decode)
+
+```
+
+
+### deployment-secret-env.yaml
+
+```yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-secret-env
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-secret-env
+  template:
+    metadata:
+      labels:
+        app: hello-world-secret-env
+    spec:
+      containers:  # Fixed typo here
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        env:
+        - name: app1username
+          valueFrom:
+            secretKeyRef:
+              name: app1
+              key: USERNAME
+        - name: app1password
+          valueFrom:
+            secretKeyRef:
+              name: app1
+              key: PASSWORD
+        ports:
+        - containerPort: 8080  # Fixed indentation here
+```
+
+
+```bash
+
+PODNAME=$(kubectl get pods | grep hello-world-secret-env | awk '{print $1}' | head -n 1)
+
+echo $PODNAME
+
+```
+
+### deployment-secret-files.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-secret-files
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-secrets-files
+  template:
+    metadata:
+      labels:
+        app: hello-world-secrets-files
+    spec:
+      volumes:
+        - name: appconfig
+          secret:
+            secretName: app1
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+           - name: appconfig
+             mountPath: "/etc/appconfig"
+```
+            
+``` yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-secret-files
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-secret-files
+  template:
+    metadata:
+      labels:
+        app: hello-world-secret-files
+    spec:
+      volumes:
+        - name: appconfig
+          secret:
+            secretName: app1
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          - name: appconfig
+            mountPath: "/etc/appconfig"
+      - name: debug-container
+        image: busybox
+        command: ["sleep", "3600"]
+
+
+
+
+
+```
+
+```bash
+
+kubectl apply -f deployment-secret-files.yaml
+
+PODNAME=$(kubectl get pods | grep hello-world-secret-env | awk '{print $1}' | head -n 1)
+
+echo $PODNAME
+```
+
+```bash
+
+## clean os
+
+kubectl delete deployment
+
+```
+
+
+### Pulling a container Image Using a secret
+
+# Demo 1 - pulling a container from a private container Registery
+
+# To create a Private repository in a container registery, follo the directions here
+
+
+```bash
+
+sudo ctr image pull gcr.io/google-samples/hello-app:1.0
+
+
+sudo ctr image list
+
+## Tagging our image in the format your registery, image and tag
+
+ctr images tag gcr.io/google-samples/hello-app:1.0 docker.io/rezabojnordi/hello-app:ps
+
+## check the result
+sudo ctr image list
+
+### Now push that locally tagged image into our private registery at docker hub
+#You'll be using your own repository, so update that information here and specify your $USERNAME
+#You will be prompted for the password to your repository
+
+sudo ctr images push docker.io/$USERNAME/hello-app:ps --user $USERNAME
+
+sudo ctr images push docker.io/rezabojnordi/hello-app:ps --user rezabojnordi
+
+
+## Create our secretg that we'll use for our image pull ....
+## Update the parameters to match the information for your repository including the servername, username, password and 
+
+kubectl create secret docker-registry private-reg-cared  --docker-server=http://index.docker.io/v2  --docker-username=rezabojnordi --docker-password=09368700813  --docker-email=rezabojnordi2012@gmail.com
+
+
+## Ensure the image doesn't exist on any of our nodes... or else we can get a false positivc since our image would
+
+sudo ctr --namespace k8s.io image ls  "name~=hello-app" -q | sudo xargs ctr --namespace k8s.io image ls "name~=hello-app" -q | sudo xargs ctr --namespace k8s.io image rm
+
+vim ~/.bashrc
+  alias ctr="ctr --namespace k8s.io"
+  
+## Create a deployment using ImagePullSecretg in the Pod spec
+kubectl apply -f deployment-private-registery.yaml
+
+
+```
+
+
+#### deployment-private-registery.yaml
+```yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-private-registery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-private-registery
+  template:
+    metadata:
+      labels:
+        app: hello-world-private-registery
+    spec:
+      containers:
+      - name: hello-world
+        image: rezabojnordi/hello-app:ps
+        ports:
+          - contanerPort: 8080
+      imagePullSecrets:
+      - name: private-reg-cred
+```
+
+```bash
+
+## Check out Containers and events section to ensure the container was actully pulled
+kubectl descrive pods hello-world
+
+kubectl delete -f deployment-private-registery.yaml
+
+kubectl delete secrets private-reg-cared
+
+
+```
+
+
+### ConfigMap
+
+
+```bash
+# Create A PROD  ConfigMap
+
+kubectl create configmap appconfigprod --from-literal=DATABASE=sql.example.local  --from-literal=BACKEND_SERVERNAME=be.example.local
+
+kubectl get configmaps
+
+
+## Create  QA ConfigMap
+
+more appconfigpa
+
+DATABASE_SERVERNAME="sqlqa.example.localhost"
+BACKEND_SERVERNAME="beqa.example.localhost"
+
+kubectl create configmap appconfigqa --from-file=appconfigpa
+
+### Each create method yeilded a different structure in the ConfigMap
+
+kubectl get configmap appconfprod -o yaml
+
+kubectl get configmap appconfigqa -o yaml
+
+```
+
+
+### deployment-configmap-env-prod.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-configmaps-env-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-configmaps-env-prod
+  template:
+    metadata:
+      labels:
+        app: hello-world-configmaps-env-prod
+    spec:
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        envFrom:
+          - configMapRef:
+              name: appconfigprod
+        ports:
+        - containerPort: 8080
+
+
+
+```
+
+### deployment-configmap-file-qa.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-configmaps-file-qa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-configmaps-file-qa
+  template:
+    metadata:
+      labels:
+        app: hello-world-configmaps-file-qa
+    spec:
+      volumes:
+        - name: appconfig
+          configMap:
+            name: appconfigqa
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          - name: appconfig
+            mountPath: "/etc/appconfig"
+```
+
+```bash
+
+kubectl apply -f  deployment-configmap-file-qa.yaml
+
+PODNAME=$(kubectl get pods | grep hello-world-configmap | awk '{print $1}' | head -n 1)
+
+echo $PODNAME
+```
+
