@@ -2680,5 +2680,753 @@ kubectl apply -f  deployment-configmap-file-qa.yaml
 PODNAME=$(kubectl get pods | grep hello-world-configmap | awk '{print $1}' | head -n 1)
 
 echo $PODNAME
+
+##Updating a Configmap
+kubectl edit configmap appconfigqa
 ```
 
+### request.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-requests
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-world-requests
+  template:
+    metadata:
+      labels:
+        app: hello-world-requests
+    spec:
+      containers:
+      - name: hello-world
+        image: gcr.io/google-samples/hello-app:1.0
+        resources:
+          requests:
+            cpu: "1"
+        ports:
+        - containerPort: 8080
+
+```
+
+```bash
+
+kubetcl apply -f request.yaml
+
+kubectl get pods -o wide
+
+kubectl scale deployment hello-world-requests --replicas 6  ## some pods is not ready becasue for limitiation on the resource
+
+kubectl delete -f requests.yaml
+```
+
+
+### Controlling Scheduling
+
+* Node Selector
+* Affinity
+* Taint and Tolerations
+* Node Cordoning 
+* Manual Scheduling
+
+* NodeSelector: assign to nodes using Labels and selectors
+
+simple key/ value check base on matchlabesl
+
+```bash
+kubectl label node worker1 hardware=local_gpu
+
+
+```
+
+```yaml
+spec:
+  containers:
+  - name: hello-world
+    image: gcr.io/google-samples/hello-app:1.0
+    ports:
+    - containerPort: 8080
+  nodeSelector:
+    hardware: local_gpu
+```
+
+
+### Affinity and Anti-Affinity
+* nodeAffinity: uses Labels on nodes to make a scheduling decision with matchExpressions
+* requiredDuringschedulingignoredDuringExecution
+* preferredDuringschedulingignoredDuringExecution
+
+* PodAffinity: schedulre pods onto same node, zone as some other pod
+
+* PodAntiAffinity: schedule pods onto the diffrent node, zone as some other pod
+
+
+``` yaml
+spec:
+  containers:
+  - name: hello-world-cache
+  ...
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          machExpression:
+          - key: app
+            operator: In
+            values:
+            - hello-world-web
+        topologyKey: "kubertnetes.io/hostname"
+```
+
+
+### Taints and Tolerations
+
+* Taints: ability to control which Pods are scheduled to Nodes
+* Tolerations: allows a Pod to Ignore a Taint and be scheduled as normal on Tainted Nodes
+* Useful in scenarios where the cluster Administrator need to influence scheduleing without depending on the user
+
+key=value:Effectively
+```bash
+
+### Adding a Taint to a Nodes and a Toleration to a Pod
+kubectl taint nodes worker1 key=MyTaint:NoSchedule
+
+spec:
+  containers:
+  - name: hello-world
+    image: gcr.io/google-samples/hello-app:1.0
+    ports:
+    - containerPort: 8080
+  tolerations:
+  - key: "key"
+    operator: "Equal"
+    value: "MyTaint"
+    effect: "NoSchedule
+```
+
+
+### deployment-affinity.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-world-web
+  template:
+    metadata:
+      labels:
+        app: hello-world-web
+    spec:
+      containers:
+      - name: hello-world-web
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-cache
+  template:
+    metadata:
+      labels:
+        app: hello-world-cache
+    spec:
+      containers:
+      - name: hello-world-cache
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - hello-world-web
+            topologyKey: "kubernetes.io/hostname"
+
+
+
+```
+```bash
+kubectl apply -f deployment-affinity.yaml
+
+kubectl describe nodes worker1 |head
+kubectl get nodes --show-labels
+#If we scale the web deployment
+#we will still get spread scross nodes in the replicaSet so we don't need to enforce that with affinity
+kubectl scale deployment hello-world-web --replicas 2
+
+kubectl get pods -o wide
+
+## Then when we scale the cache deployment, it will get scheduled to the same node as the other web server
+
+kubectl scale deplyment hello-world-cache --replicas 2
+
+
+```
+
+### deployment-antiaffinity.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-web
+  template:
+    metadata:
+      labels:
+        app: hello-world-web
+    spec:
+      containers:
+      - name: hello-world-web
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - hello-world-web
+            topologyKey: "kubernetes.io/hostname"
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-cache
+  template:
+    metadata:
+      labels:
+        app: hello-world-cache
+    spec:
+      containers:
+      - name: hello-world-cache
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - hello-world-web
+            topologyKey: "kubernetes.io/hostname"
+
+
+
+```
+
+
+```bash
+## One Pod will go pending because we can have oly 1 web Pod per node
+## when using requiredDuringSchedulingIgnoredDuringExecution in our antiaffinity rule
+kubectl get pods -o wide --selector app=hello-world-web
+
+```
+
+
+### Controlling Pods placement with Taints and Tolerations
+
+````bash
+kubectl taint nodes worker1 key=MyTaint:NoSchedule
+
+kubectl describe node worker1
+
+````
+
+### deployment.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-world-web
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+```
+
+
+### deployment-tolerations.yaml
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-world-web
+        image: gcr.io/google-samples/hello-app:1.0
+        ports:
+        - containerPort: 8080
+      tolerations:
+      - key: "key"
+        operator: "Equal"
+        value: "MyTaint"   # Taint
+        effect: "NoSchedule"
+
+```
+
+```bash
+kubectl apply -f deployment-tolerations.yaml
+
+kubectl get pods -o wide
+
+## REmove put Taint
+kubectl taint nodes worker1 key:NoSchedule-
+
+kubectl delete -f deployment-tolerations.yaml
+kubectl delete -f deployment.yaml
+
+Scheduling a pod to node 
+
+kubectl get pods --show-labels
+
+```
+
+
+### Node Cordoning
+
+* Marks Node as unschedulabe
+* Prevents new Pods from being scheduled to that Node
+Does not affect any existing Pods on the Node
+
+* Note: This is useful as a preparatory step befor a Node reboot or maintenance
+
+``` bash
+kubectl cordon worker1
+
+# if you want to gracefully evict your Pods from a Node
+
+kubectl drain worker --ignore-daemonsets
+
+```
+
+### Manually scheduling a Pod
+* Scheduler populates NodeName
+if you soecify nodeName in your Pod definitions the pod will be started on that Mode 
+
+Node's name must exist
+
+* implement your own scheduler
+* Run multi schedulers concurrently
+  Define your scheduler as a system Pod in the cluster
+
+```bash
+
+kubectl apply -f deployment.yaml
+
+kubectl get pods -o wide
+
+#Lets cordon worker3
+kubectl cordon worker3
+
+# That won't evict any pods
+kubectl get pods -o wide
+
+# But if I scale the deployment
+kubectl scale deployment hello-world --replicas 6
+## if you run scale pods don't run on the worker3
+
+# let's drain (remove) the pods from worker3
+kubectl drain worker3
+# if you got error run below command
+
+# Let's try that again since daemonset aren't daemonsets aren't scheduled we need to workd around them
+
+kubectl drain worker3 --ignore-daemonsets
+
+## We can uncordon worker3, but noting will get schedule ahere untill there's an event like scaling operations or 
+#Sometimes undordon worker3
+kubectl uncordon worker3
+
+
+# Can't remove the unmanaged Pod either since it's not manage by controller  and won't restated 
+
+kubectl drain worker --ignore--daemonsets
+
+or
+
+kubectl drain worker --ignore--daemonsets --force
+```
+
+
+## connect Kubernetes to Ceph 
+
+
+```
+
+cat <<EOF > csi-config-map.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+data:
+  config.json: |-
+    [
+      {
+        "clusterID": "93292be2-7362-11ef-ba02-a1f2872d353a",
+        "monitors": [
+          "172.20.47.12:6789",
+          "172.20.47.13:6789",
+          "172.20.47.14:6789"
+        ]
+      }
+    ]
+metadata:
+  name: ceph-csi-config
+EOF
+
+
+kubectl apply -f csi-config-map.yaml
+sleep 1
+
+
+cat <<EOF > csi-kms-config-map.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+data:
+  config.json: |-
+    {}
+metadata:
+  name: ceph-csi-encryption-kms-config
+EOF
+
+
+kubectl apply -f csi-kms-config-map.yaml
+sleep 1
+
+
+cat <<EOF > ceph-config-map.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+data:
+  ceph.conf: |
+    [global]
+    auth_cluster_required = cephx
+    auth_service_required = cephx
+    auth_client_required = cephx
+  # keyring is a required key and its value should be empty
+  keyring: |
+metadata:
+  name: ceph-config
+EOF
+
+
+kubectl apply -f ceph-config-map.yaml
+sleep 1
+
+cat <<EOF > csi-rbd-secret.yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: csi-rbd-secret
+  namespace: default
+stringData:
+  userID: kubernetes
+  userKey: AQA0Az9nHe3/LRAAHW2O18YdYCrhTMtwJ/Pjkw==
+EOF
+
+
+kubectl apply -f csi-rbd-secret.yaml
+sleep 1
+
+cat <<EOF > provisioner-serviceaccount.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rbd-csi-provisioner
+  # replace with non-default namespace name
+  namespace: default
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rbd-external-provisioner-runner
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "update", "delete", "patch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims/status"]
+    verbs: ["update", "patch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshots"]
+    verbs: ["get", "list", "watch", "update", "patch", "create"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshots/status"]
+    verbs: ["get", "list", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotcontents"]
+    verbs: ["create", "get", "list", "watch", "update", "delete", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["volumeattachments"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["volumeattachments/status"]
+    verbs: ["patch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["csinodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotcontents/status"]
+    verbs: ["update", "patch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts/token"]
+    verbs: ["create"]
+  - apiGroups: ["groupsnapshot.storage.k8s.io"]
+    resources: ["volumegroupsnapshotclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["groupsnapshot.storage.k8s.io"]
+    resources: ["volumegroupsnapshotcontents"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["groupsnapshot.storage.k8s.io"]
+    resources: ["volumegroupsnapshotcontents/status"]
+    verbs: ["update", "patch"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rbd-csi-provisioner-role
+subjects:
+  - kind: ServiceAccount
+    name: rbd-csi-provisioner
+    # replace with non-default namespace name
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: rbd-external-provisioner-runner
+  apiGroup: rbac.authorization.k8s.io
+
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  # replace with non-default namespace name
+  namespace: default
+  name: rbd-external-provisioner-cfg
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "watch", "list", "delete", "update", "create"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rbd-csi-provisioner-role-cfg
+  # replace with non-default namespace name
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: rbd-csi-provisioner
+    # replace with non-default namespace name
+    namespace: default
+roleRef:
+  kind: Role
+  name: rbd-external-provisioner-cfg
+  apiGroup: rbac.authorization.k8s.io
+EOF
+
+kubectl apply -f provisioner-serviceaccount.yaml
+sleep 1
+
+
+cat <<EOF > node-serviceaccount.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rbd-csi-nodeplugin
+  # replace with non-default namespace name
+  namespace: default
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rbd-csi-nodeplugin
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get"]
+  # allow to read Vault Token and connection options from the Tenants namespace
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["volumeattachments"]
+    verbs: ["list", "get"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts/token"]
+    verbs: ["create"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rbd-csi-nodeplugin
+subjects:
+  - kind: ServiceAccount
+    name: rbd-csi-nodeplugin
+    # replace with non-default namespace name
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: rbd-csi-nodeplugin
+  apiGroup: rbac.authorization.k8s.io
+EOF
+kubectl apply -f node-serviceaccount.yaml
+
+
+rm -f csi-rbdplugin-provisioner.yaml csi-rbdplugin.yaml
+
+wget https://raw.githubusercontent.com/ceph/ceph-csi/master/deploy/rbd/kubernetes/csi-rbdplugin-provisioner.yaml
+
+wget https://raw.githubusercontent.com/ceph/ceph-csi/master/deploy/rbd/kubernetes/csi-rbdplugin.yaml
+
+kubectl apply -f csi-rbdplugin-provisioner.yaml
+kubectl apply -f csi-rbdplugin.yaml
+sleep 20
+
+
+cat <<EOF > csi-rbd-sc.yaml
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: csi-rbd-sc
+provisioner: rbd.csi.ceph.com
+parameters:
+   clusterID: 93292be2-7362-11ef-ba02-a1f2872d353a
+   pool: k8s
+   imageFeatures: layering
+   csi.storage.k8s.io/provisioner-secret-name: csi-rbd-secret
+   csi.storage.k8s.io/provisioner-secret-namespace: default
+   csi.storage.k8s.io/controller-expand-secret-name: csi-rbd-secret
+   csi.storage.k8s.io/controller-expand-secret-namespace: default
+   csi.storage.k8s.io/node-stage-secret-name: csi-rbd-secret
+   csi.storage.k8s.io/node-stage-secret-namespace: default
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+mountOptions:
+   - discard
+EOF
+
+
+kubectl apply -f csi-rbd-sc.yaml
+
+```
+
+
+
+### testing io for DB
+
+```
+fio --name=database_test \
+    --ioengine=libaio \
+    --rw=randrw \
+    --bs=4k \
+    --direct=1 \
+    --size=1G \
+    --numjobs=4 \
+    --runtime=60 \
+    --group_reporting \
+    --iodepth=16 \
+    --filename=/path/to/testfile
+
+```
