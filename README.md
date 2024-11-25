@@ -3448,3 +3448,59 @@ fio --name=large_file_test \
 
 
 ```
+
+### argocd
+```bash
+kubectl create ns argocd
+helm repo add argo https://argoproj.github.io/argo-helm
+
+helm pull argo/argo-cd --version 7.7.5
+
+tar xvf 7.7.5.tar.gz
+
+#change namespace name
+helm install argocd .
+
+or
+## uninstall
+helm uninstall argocd 
+
+
+```
+
+
+### ingress
+
+```bash
+helm repo add traefik https://traefik.github.io/traefik-helm-chart
+helm repo update
+helm install traefik traefik/traefik
+kubectl apply -f traefik/crds
+
+## Exposing the Traefik dashboard
+
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+
+#Another way would be to apply your own configuration, for instance, by defining and applying an IngressRoute CRD (kubectl apply -f dashboard.yaml):
+
+
+```
+```bash
+vim dashboard.yaml
+
+# dashboard.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dashboard
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`traefik.localhost`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+
+```
