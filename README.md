@@ -3427,6 +3427,24 @@ fio --name=database_test \
     --runtime=60 \
     --group_reporting \
     --iodepth=16 \
-    --filename=/path/to/testfile
+    --filename=db.txt
+
+```
+
+
+```bash
+
+fio --name=large_file_test \
+    --ioengine=libaio \
+    --rw=write \
+    --bs=1M \
+    --direct=1 \
+    --size=10G \
+    --numjobs=1 \
+    --runtime=60 \
+    --group_reporting \
+    --filename=largefile.txt
+
+
 
 ```
