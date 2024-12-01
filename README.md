@@ -3449,6 +3449,237 @@ fio --name=large_file_test \
 
 ```
 
+## sERVICE AND Networked
+
+
+```bash
+route
+kubectl get nodes -o wide
+
+```
+
+#### cluster DNs service
+```bash
+kubectl get srvice --namespace kube-system
+kubectl describe deployment coredns --namespace kube-system |more
+
+kubectl get configmaps --namespace kube-system coredns -o yaml | more
+```
+
+#### vim corednsconfigurationcustome.yaml
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {
+        "apiVersion": "v1",
+        "data": {
+          "Corefile": ".:53 {\n  errors\n  health\n  kubernetes cluster.localhost in-addr.arpa ip6.arpa {\n    pods insecure\n    fallthrough in-addr.arpa ip6.arpa\n    ttl 30\n  }\n  prometheus :9153\n  forward . 1.1.1.1\n  cache 30\n  loop\n  reload\n  loadbalance\n}\ncentinosystems.com {\n  forward . 9.9.9.9\n}"
+        },
+        "kind": "ConfigMap",
+        "metadata": {
+          "name": "coredns",
+          "namespace": "kube-system"
+        }
+      }
+data:
+  Corefile: |
+    .:53 {
+      errors
+      health
+      kubernetes cluster.localhost in-addr.arpa ip6.arpa {
+        pods insecure
+        fallthrough in-addr.arpa ip6.arpa
+        ttl 30
+      }
+      prometheus :9153
+      forward . 1.1.1.1
+      cache 30
+      loop
+      reload
+      loadbalance    
+    }
+    centinosystems.com {
+      forward . 9.9.9.9
+    }
+
+
+```
+
+```bash
+kubectl apply -f corednsconfig.ap.yaml --namespace kube-system
+
+kubectl get events -n kube-system
+
+SERVICEIP=$(kubectl get service --namespace kube-system kube-dns -o jsonpath='{ .spec.clusterIp }')
+nslookup www.pluralsight.com $SERVICEIP
+
+
+```
+### How Service work
+* Service match Pods using Labels and selectors
+* create and registers Endpoints in the service (Pod Io and port pair)
+* Implemented in the kube-proxy on the Node in iptables
+* kube-proxy watched the Api server and the Endpoints
+
+
+### Service Types
+* Cluster IP
+* NodePort
+* loadBalancer
+
+
+### Defining Deploym,ent and services
+
+```bash
+kubectl create deployment hello-world --image=gcr.io/google-sample/hello-app:1.0
+kubectl expose deployment hello-world --port=80 --target-port=8080 --type NodePort
+
+
+```
+* Exposing and accessing applications with Services
+  * ClusterIP
+  * NodePort
+  * loadBalancer
+
+### clusterIp
+```bash
+kubectl create deployment hello-world-clusterip --image=gcr.io/google-samples/hello-app:1.0
+
+#when creating a service, you can define a type, if you don't define a type, the default is clusterIp
+kubectl expose deploymen hello-world-clusterip --port=80 --target-port=8080 --type ClusterIP
+
+kubectl get service
+
+#Get the service's clusterIP and store that for reuse
+SERVICEIP=$(kubectl get service hello-world-clusterip -o jsonpath='{ .spec.clusterIP}')
+
+echo $SERVICEIP
+#Access the servicec inside the cluster
+curl http://$SERVICEIP
+
+#Get a listing of the endpoints for a service, we see the one pod endpoint registered
+kubectl get endpoints hello-world-clusterip
+kubectl get pods -o wide
+PODIP=$(kubectl get endpoints hello-world-clusterip -o jsonpath='{ .subsets[].addresses[].ip }')
+curl http://$PODIP:8080
+
+## scale the deployment, new endpoint are registered automatically
+kubectl scale deployment hello-world-clusterip --replicas=6
+kubectl get endpoints hello-world-clusterip
+#Acess the service inside the cluster, this time our requests will be load balanced ... whoooo
+curl http://$SERVICEIP
+
+kubectl describe service hello-world-clusterip 
+
+kubectl get pods --show-labels
+
+kubectl delete deployments.apps hello-world-clusterip
+kubectl delete service hello-world-clusterip
+
+```
+
+### NodePort
+```bash
+kubectl create deployment hello-world-node-port --image=gcr.io/google-samples/hello-app:1.0
+
+#when createing a service, you can define a type, if you don't define a type, the default is clusterip
+kubectl expose deployment hello-world-node-port --port=80 --target-port=8080 --type NodePort
+
+kubectl get service
+
+kubectl get service hello-world-node-port -o yaml
+CLUSTERIP=$(kubectl get service hello-world-node-port -o jsonpath='{ .spec.clusterIP }')
+PORT=$(kubectl get service hello-world-node-port -o jsonpath='{ .spec.ports[].port }')
+NODEPORT=$(kubectl get service hello-world-node-port -o jsonpath='{ .spec.ports[].nodePort }')
+
+#we have only one pod online supporting our service
+kubectl get pods -o wide
+
+#And we can access the service bt hitting the node port on ANY node in the cluster on the Node's Real Ip or Name
+#This will forward to the cluster IP and get load balanced to a Pod. Even if there is only one pods
+curl http://172.20.45.20:$NODEPORT
+curl http://172.20.45.21:$NODEPORT
+
+
+# And a Node port Service is also listening on a cluster Ip, in fact the Node Port traffic is routed to the ClusterIP
+echo $CLUSTERIP:$PORT
+curl http://$CLUSTERIP:$PORT
+
+#clean 
+kubectl delete deployments.apps hello-world-node-port
+kubectl delete service hello-world-node-port 
+
+```
+
+### Loadbalancer on the cloud
+```bash
+kubectl config use-context 'k8s-cloud'
+
+kubectl create deployment hello-world-loadbalancer --image=gcr.io/google-samples/hello-world:1.0
+
+
+#when createing a service, you can define a type, if you don't define a type, the default is clusterip
+kubectl expose deployment hello-world-loadbalancer --port=80 --target-port=8080 --type LoadBalancer
+
+kubectl get service
+kubectl get service --watch
+
+LOADBALANCER=$(kubectl get service hello-world-loadbalancer -o jsonpath='{ .status.loadBalancer.ingress[].ip }')
+
+## clean
+
+kubectl delete deployments.apps hello-world-loadbalancer 
+
+kubectl delete service hello-world-loadbalancer
+
+```
+
+
+### Service Descovery
+* Infrastructure independence
+* static configuration
+* DNS
+* Enviroment Variables
+
+Note: Other Types of Services
+* ExternalName --> Service discovery for external service
+--> CNAME to resource
+* Headless  --> DNS but not ClusterIp
+--> Dns record for etch endpoint
+stateful application
+* without Selectors --> map to specific endpoint
+--> manually create endpoint objects
+-->point to any IP inside or outside cluster
+
+
+```bash
+kubectl create deployment hello-world-clusterip --image=gcr.io/google-samples/hello-app:1.0
+
+kubectl expose deployment hello-world-clusterip --port=80 --target-port=8080 --type ClusterIP
+y
+kubectl get service kube-dns --namespace kube-system
+
+nslookup hello-world-clutserip.default.svc.cluster.local 10.96.0.10
+```
+
+```bash
+kubectl create namespace ns1
+kubectl create deployment hello-world-clusterip --namespace ns1 --image=gcr.io/google-samples/hello-app:1.0
+
+kubectl expose deployment hello-world-clusterip --namespace ns1 --port=80 --target-port=8080 --type ClusterIP
+
+nslookup hello-world-clutserip.ns1.svc.cluster.local 10.96.0.10
+```
+
+
+
+
+
 ### argocd
 ```bash
 kubectl create ns argocd
@@ -3504,3 +3735,6 @@ spec:
           kind: TraefikService
 
 ```
+
+
+
