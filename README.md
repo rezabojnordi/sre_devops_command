@@ -3887,3 +3887,66 @@ wget https://github.com/snail007/goproxy/releases/download/v14.6/proxy-linux-amd
 
 
 
+* another example
+```yaml
+vim sample.yml
+
+---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    namespace: default
+    name: hello-app-deployment
+    labels:
+      app: hello-app
+  spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        app: hello-app
+    template:
+      metadata:
+        labels:
+          app: hello-app
+      spec:
+        containers:
+        - name: hello-app
+          image: gcr.io/google-samples/hello-app:1.0
+          ports:
+          - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: default
+  name: hello-app-service
+spec:
+  type: NodePort
+  selector:
+    app: hello-app
+  ports:
+    - protocol: TCP
+      port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: hello-app
+  namespace: default
+spec:
+  rules:
+    - host: ingress.softgrand.ir
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hello-app-service
+                port:
+                  number: 8080
+```
+
+
