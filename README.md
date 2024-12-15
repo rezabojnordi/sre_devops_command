@@ -3519,6 +3519,15 @@ SERVICEIP=$(kubectl get service --namespace kube-system kube-dns -o jsonpath='{ 
 nslookup www.pluralsight.com $SERVICEIP
 
 
+### solve error on the coredns and doesn't solve it
+
+```bash
+kubectl delete deployment coredns -n kube-system
+kubectl delete configmap coredns -n kube-system
+
+kubeadm init phase addon coredns
+```
+
 ```
 ### How Service work
 * Service match Pods using Labels and selectors
@@ -3674,13 +3683,94 @@ kubectl create deployment hello-world-clusterip --namespace ns1 --image=gcr.io/g
 kubectl expose deployment hello-world-clusterip --namespace ns1 --port=80 --target-port=8080 --type ClusterIP
 
 nslookup hello-world-clutserip.ns1.svc.cluster.local 10.96.0.10
+
+
+```
+
+### Ingress
+* Ingress Resource
+* Ingress controller
+* Ingress Class
+
+
+#### Ingress overview
+* Ingress Resource
+* Defines rules for external access to Services
+* Load balancing to Endpoints
+* Name-base virtual hosts
+* Path-based routing
+* TLS termination
+
+```bash
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-single
+spec:
+  ingressClassName: nginx
+  defaultBackend:
+    service:
+      name: hello-world-service-single
+      port:
+        number: 80
+```
+
+#### Expoing Multiple Service with ingress
+
+```
+path.example.com/red
+path.example.com/blue
+
+```
+```yaml
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: path.example.com
+      http:
+        paths:
+        - path: /red
+          pathtype: Prefix
+          backend:
+            service:
+              name: hello-world-service-red
+              port:
+                number: 4242
+        - path: /blue
+          pathType: Exact
+          backend:
+            service:
+              name: hello-world-service-blue
+              port:
+                number: 4343
+        defaultBackend:
+          service:
+            name: hello-world-service-single
+            port:
+              number: 80
+```
+
+
+### Name Based Virtual Hosts with Ingress
+
+```yaml
+
+
 ```
 
 
 
 
 
+
+
+
+
+
+
+
 ### argocd
+
 ```bash
 kubectl create ns argocd
 helm repo add argo https://argoproj.github.io/argo-helm
@@ -3703,36 +3793,95 @@ helm uninstall argocd
 ### ingress
 
 ```bash
-helm repo add traefik https://traefik.github.io/traefik-helm-chart
-helm repo update
-helm install traefik traefik/traefik
-kubectl apply -f traefik/crds
 
-## Exposing the Traefik dashboard
+kubectl create ns ingress-nginx
 
-kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+## Note: open the blow link and download values.yaml
 
-#Another way would be to apply your own configuration, for instance, by defining and applying an IngressRoute CRD (kubectl apply -f dashboard.yaml):
+https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
 
+helm install ingress-nginx ingress-nginx/ingress-nginx -f values.yml -n ingress-nginx
 
 ```
-```bash
-vim dashboard.yaml
 
-# dashboard.yaml
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
+* Note: connecting to the nginx pods I mean deployment
+
+```yaml
+
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: dashboard
+  name: nginx-nfs-deployment
 spec:
-  entryPoints:
-    - web
-  routes:
-    - match: Host(`traefik.localhost`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
-      kind: Rule
-      services:
-        - name: api@internal
-          kind: TraefikService
+  replicas: 1
+  selector:
+    matchLabels:  # اصلاح نام اشتباه 'macheLabels'
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: webcontent
+          mountPath: "/usr/share/nginx/html/web-app"
+      volumes:
+      - name: webcontent
+        persistentVolumeClaim:
+          claimName: pvc-nfs
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nfs-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort:
+```
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+        #annotations:
+          #kubernetes.io/ingress.class: nginx
+  name: hello-app-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: ingress.softgrand.ir
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-nfs-service  # nginx service name
+                port:
+                  number: 80
+~                             
+```
+
+* Note: if your service is private ip You must add below project to your server that server has public ip
+
+```bash
+
+wget https://github.com/snail007/goproxy/releases/download/v14.6/proxy-linux-amd64.tar.gz  
+
+# master ip (172.20.45.20)
+./proxy tcp -p ":80" -T tcp -P "172.20.45.20:31271"  
 
 ```
 
