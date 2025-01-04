@@ -3931,11 +3931,10 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
   name: hello-app
   namespace: default
 spec:
+  ingressClassName: nginx
   rules:
     - host: ingress.softgrand.ir
       http:

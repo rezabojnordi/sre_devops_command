@@ -1696,4 +1696,10 @@ ceph -s
 ceph config set osd osd_mclock_profile high_recovery_ops
 ```
 
+### Active autoscale pg
 
+```
+ceph osd pool autoscale-status
+
+sudo ceph osd pool set gnocchi-ssd-g1 pg_autoscale_mode on
+```
