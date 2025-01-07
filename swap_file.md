@@ -1,4 +1,4 @@
-```
+```bash
 sudo dd if=/dev/zero of=./swapfile bs=1M count=384000 status=progress
 or
 sudo fallocate -l 2G /swapfile
