@@ -148,3 +148,115 @@ To enforce stricter security:
 
 Ensure that the X-Wing cannot access the Death Star under any circumstances. By refining and applying targeted policies, the system's security can be enhanced.
 
+### -----------------------------------------------------------------------
+
+# Installing Cilium as the Kubernetes Network Driver
+
+## Prerequisites
+
+1. **Kubernetes Cluster**: Ensure you have a running Kubernetes cluster.
+   - Verify using:
+     ```bash
+     kubectl get nodes
+     ```
+
+2. **CLI Tools**: Install `kubectl` and `helm` on your machine.
+   - **Install Helm** (if not installed):
+     ```bash
+     curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+     ```
+
+3. **Networking Requirements**:
+   - Cilium supports various data planes like eBPF. Ensure your kernel supports eBPF.
+     ```bash
+     uname -r
+     ```
+     Kernel version should be 4.19 or later.
+
+## Installing Cilium Using Helm
+
+1. **Add the Cilium Helm Repository**:
+   ```bash
+   helm repo add cilium https://helm.cilium.io/
+   helm repo update
+   ```
+
+2. **Install Cilium**:
+   Use Helm to install Cilium with default configuration:
+   ```bash
+   helm install cilium cilium/cilium --namespace kube-system
+   ```
+
+   Alternatively, customize installation options:
+   ```bash
+   helm install cilium cilium/cilium --namespace kube-system \
+     --set kubeProxyReplacement=strict \
+     --set ipam.mode=cluster-pool \
+     --set tunnel=geneve
+   ```
+   - **`kubeProxyReplacement`**: Enables eBPF-based kube-proxy replacement.
+   - **`ipam.mode`**: Choose `cluster-pool` or `eni` based on your environment.
+   - **`tunnel`**: Choose the encapsulation mode (`vxlan`, `geneve`, or `disabled`).
+
+3. **Validate Installation**:
+   Confirm that Cilium is running:
+   ```bash
+   kubectl -n kube-system get pods -l k8s-app=cilium
+   ```
+
+   Check logs for any issues:
+   ```bash
+   kubectl -n kube-system logs -l k8s-app=cilium
+   ```
+
+4. **Enable Cilium CLI** (Optional):
+   Install the Cilium CLI for advanced management and troubleshooting:
+   ```bash
+   curl -L --remote-name https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
+   tar xzvf cilium-linux-amd64.tar.gz
+   sudo mv cilium /usr/local/bin/
+   ```
+
+   Validate connectivity:
+   ```bash
+   cilium status
+   ```
+
+## Post-Installation Configuration
+
+1. **Deploy a Sample Application**:
+   Deploy a test application to ensure connectivity:
+   ```bash
+   kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/v1.14/examples/kubernetes/connectivity-check/connectivity-check.yaml
+   ```
+
+   Monitor test results:
+   ```bash
+   kubectl get pods -n cilium-test
+   ```
+
+2. **Enable Hubble (Optional)**:
+   Hubble is Cilium's observability and monitoring tool.
+   - Install Hubble:
+     ```bash
+     helm upgrade --install cilium cilium/cilium --namespace kube-system \
+       --set hubble.relay.enabled=true \
+       --set hubble.ui.enabled=true
+     ```
+   - Access the Hubble UI:
+     ```bash
+     kubectl port-forward -n kube-system svc/hubble-ui 12000:80
+     ```
+
+## Verify Network Driver
+
+Check the CNI configuration on your cluster:
+```bash
+kubectl get pods -n kube-system
+```
+
+Ensure `cilium` pods are running without issues.
+
+---
+
+Follow these steps to install and configure Cilium as your Kubernetes network driver successfully. Let me know if you need further assistance!
