@@ -1703,3 +1703,19 @@ ceph osd pool autoscale-status
 
 sudo ceph osd pool set gnocchi-ssd-g1 pg_autoscale_mode on
 ```
+```
+
+
+
+sudo ceph osd pool set images-ssd-g1 pg_autoscale_mode on
+sudo ceph osd pool set backups-hdd-g1 pg_autoscale_mode on
+sudo ceph osd pool set gnocchi-ssd-g1 pg_autoscale_mode on
+sudo ceph osd pool set vms-ssd-g1 pg_autoscale_mode on
+
+
+sudo ceph osd pool get backups-hdd-g1 crush_rule
+sudo ceph osd pool get gnocchi-ssd-g1 crush_rule
+sudo ceph osd pool get vms-ssd-g1 crush_rule
+sudo ceph osd pool get images-ssd-g1 crush_rule
+sudo ceph osd pool get volumes-hdd-g1 crush_rule
+```
