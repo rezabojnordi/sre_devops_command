@@ -96,6 +96,46 @@ LZ4 compression is particularly effective for datasets with repetitive or compre
 
 #### Create a ZFS pool:
 
+### Debian12
+
+
+```
+deb http://deb.debian.org/debian bookworm main non-free non-free-firmware contrib
+deb http://deb.debian.org/debian bookworm-updates main non-free non-free-firmware contrib
+deb http://deb.debian.org/debian-security/ bookworm-security main non-free non-free-firmware contrib
+```
+
+
+```
+apt update
+
+```
+
+### Install zfs package on a Debian Linux 12:
+
+```
+apt install linux-headers-amd64 zfsutils-linux zfs-dkms zfs-zed
+```
+
+### Are you using a cloud server with cloud Linux kernel? Try:
+
+```
+apt install linux-headers-cloud-amd64 zfsutils-linux zfs-dkms zfs-zed
+
+```
+
+
+### Test it by running zfs version command:
+
+```
+modprobe zfs #<--load the module
+zfs version
+
+```
+
+
+
+
 ```bash
 sudo zpool create mypool /dev/sdb
 ```
