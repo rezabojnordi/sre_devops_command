@@ -171,6 +171,11 @@ cp -r application.db/ blockstore.db/ state.db/ /mnt/test_zfs
 sudo zfs get compressratio mypool
 ```
 
+**Note:** if you increse the block you can use below command to update zfs 
+
+```
+sudo zpool online -e mypool /dev/sdb
+```
 ### Suitability for Mantra Nodes:
 
 During the evaluation, enabling LZ4 compression on ZFS resulted in a **25% reduction in storage usage** for Mantra node data. This significant reduction demonstrates the advantages of using ZFS for blockchain nodes.
