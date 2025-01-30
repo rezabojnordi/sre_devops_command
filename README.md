@@ -4006,3 +4006,12 @@ spec:
                   number: 80
 
 ```
+
+
+## Shutdown worker node
+```bash
+kubectl cordon si1-kube7005
+kubectl drain si1-kube7005 --delete-local-data --ignore-daemonsets
+sudo kubectl uncordon si1-kube7005
+
+```
