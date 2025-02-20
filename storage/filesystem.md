@@ -132,7 +132,16 @@ modprobe zfs #<--load the module
 zfs version
 
 ```
+```bash
+sudo apt install build-essential libssl-dev libelf-dev linux-headers-$(uname -r)
+git clone https://github.com/openzfs/zfs.git
+cd zfs
+./autogen.sh
+./configure
+make
+sudo make install
 
+```
 
 
 
