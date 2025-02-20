@@ -4015,3 +4015,97 @@ kubectl drain si1-kube7005 --delete-local-data --ignore-daemonsets
 sudo kubectl uncordon si1-kube7005
 
 ```
+
+
+
+### How to deploy Kafka
+
+* Strimzi makes it easy to deploy and manage Kafka on Kubernetes.
+```
+kubectl create namespace kafka
+
+kubectl apply -f https://strimzi.io/install/latest?namespace=kafka -n kafka
+
+
+kubectl get pods -n kafka
+
+```
+
+
+#### Step 3: Deploy a Kafka Cluster
+Now, we define a Kafka cluster with Zookeeper.
+
+1. **Create** a kafka-cluster.yaml **file**:
+```
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: my-cluster
+  namespace: kafka
+spec:
+  kafka:
+    version: 3.8.1
+    replicas: 3
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      log.message.format.version: "3.5"
+    storage:
+      type: ephemeral
+  zookeeper:
+    replicas: 3
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+
+```
+
+```
+kubectl apply -f kafka-cluster.yaml -n kafka
+
+```
+
+```
+kubectl get pods -n kafka
+
+```
+
+#### Step 4: Deploy Kafka Client for Developers
+
+To allow developers to easily use Kafka, deploy a client pod.
+
+1. **Create** a client **pod YAML file** (kafka-client.yaml):
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kafka-client
+  namespace: kafka
+spec:
+  containers:
+  - name: kafka-client
+    image: bitnami/kafka:latest
+    command: ["/bin/sh"]
+    args: ["-c", "sleep infinity"]
+
+
+```
+
+```
+kubectl apply -f kafka-client.yaml -n kafka
+
+```
+
+```
+kubectl exec -it kafka-client -n kafka -- /bin/sh
+
+```
