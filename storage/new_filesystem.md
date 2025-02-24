@@ -24,3 +24,11 @@ resize2fs /dev/sdb1
 
 xfs_growfs /data
 ```
+
+### debian has problem on the growpart in cloud
+```
+sudo parted /dev/sda
+print
+resizepart 1 100%
+quit
+```
