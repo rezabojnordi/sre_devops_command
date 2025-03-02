@@ -1,3 +1,5 @@
+
+
 **vim sethup.sh**
 
 
@@ -62,4 +64,23 @@ chsh -s $(which zsh)
 
 # Restart terminal for changes to take effect
 echo "Setup complete! Please restart your terminal for all changes to take effect."
+```
+
+
+```bash
+autoload -Uz compinit
+compinit -u
+autoload -Uz _init_completion
+kubectl completion zsh | source /dev/stdin
+
+echo "source <(kubectl completion zsh)" >> ~/.zshrc
+
+
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+source ~/.zshrc
+or
+source ~/.bashrc
 ```

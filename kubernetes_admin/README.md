@@ -87,4 +87,46 @@ export ETCDCTL_ENDPOINTS="https://127.0.0.1:2379"
 
 etcdctl snapshot save /root/backup.db
 
+
+etcdctl member list
+
+
+
 ```
+
+
+```bash
+unset ETCDCTL_ENDPOINTS
+unset ETCDCTL_KEY
+unset ETCDCTL_CERT
+unset ETCDCTL_CACERT
+
+ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  endpoint status --write-out=table
+
+```
+
+
+## adding new Master and new worker use blow command
+
+```bash
+
+
+kubeadm token create --print-join-command --certificate-key $(kubeadm init phase upload-certs --upload-certs | tail -1)
+```
+
+```bash
+kubeadm token create --print-join-command
+
+```
+
+
+```bash
+kubectl run web12 --image nginx:alpine
+
+
+```
+
