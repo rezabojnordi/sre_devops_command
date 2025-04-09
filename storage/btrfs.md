@@ -102,3 +102,24 @@ To make the mount persistent across reboots, add the following lines to `/etc/fs
 - Replace `/mnt/snarkos` and `snarkos-data` with your preferred mount paths or subvolume names.
 - Use `-f` with `mkfs.btrfs` cautiously, as it will erase all data on the disk.
 ```
+
+-------------------------------------------------------------------------------------
+
+SNAPSHOT_DIR="/mnt/snarkos/snapshots"
+SUBVOLUME_DIR="/mnt/snarkos/snarkos-data"
+BUCKET_NAME="snarkos-mainnet"
+GCS_PATH="gs://$BUCKET_NAME/latest.tar.lz4"
+
+sudo mkdir -p "$SNAPSHOT_DIR"
+
+
+SNAPSHOT_NAME="$SNAPSHOT_DIR/block_storage_snapshot"
+sudo btrfs subvolume snapshot $SUBVOLUME_DIR $SNAPSHOT_NAME
+
+
+sudo tar -cf - "$SNAPSHOT_NAME" | lz4 -c | gsutil cp - "$GCS_PATH"
+
+
+
+
+
