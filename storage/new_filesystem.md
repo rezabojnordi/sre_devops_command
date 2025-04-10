@@ -32,3 +32,9 @@ print
 resizepart 1 100%
 quit
 ```
+
+
+##btrfs filesystem
+```
+sudo btrfs filesystem resize max /mnt/storage
+```
