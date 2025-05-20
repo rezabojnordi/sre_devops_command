@@ -38,3 +38,7 @@ quit
 ```
 sudo btrfs filesystem resize max /mnt/storage
 ```
+## zfs
+```
+sudo zpool online -e mypool /dev/sdb
+```
