@@ -16,9 +16,11 @@ sudo nano /etc/default/zramswap
 
 In this file, you can modify two key values:
 
-** ALGO: This specifies the compression algorithm. lz4 is the fastest, while zstd offers the best compression ratio. lz4 is generally a great choice for balancing speed and compression.
+### ALGO: 
+This specifies the compression algorithm. lz4 is the fastest, while zstd offers the best compression ratio. lz4 is generally a great choice for balancing speed and compression.
 
-** PERCENT: This determines what percentage of your total RAM will be allocated to ZRAM. The default value, typically 20 or 25, is usually a good starting point.
+### PERCENT: 
+This determines what percentage of your total RAM will be allocated to ZRAM. The default value, typically 20 or 25, is usually a good starting point.
 
 ## ▶️ Activation
 After installing and configuring the service, start and enable it to ensure it runs automatically on every system boot.
