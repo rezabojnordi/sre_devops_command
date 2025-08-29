@@ -1,0 +1,12 @@
+---
+apiVersion: v2
+appVersion: 17.60
+name: postgresql
+description: PostgreSQL (Postgres) is an open source object-relational database known for reliability and data integrity. ACID-compliant, it supports foreign keys, joins, views, triggers and stored procedures.
+sources:
+  - https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+version: 16.7.27
+dependencies:
+  - name: postgresql
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 16.7.27

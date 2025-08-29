@@ -1,0 +1,10 @@
+redis:
+  master:
+    persistence:
+      enabled: false
+  replica:
+    replicaCount: 0
+    persistence:
+      enabled: false
+  auth:
+    existingSecret: "redis"

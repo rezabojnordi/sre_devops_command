@@ -1,0 +1,24 @@
+postgresql:
+  auth:
+    database: tss
+    password: tss
+    postgresPassword: tss
+    username: tss
+  fullnameOverride: postgres
+  primary:
+    extendedConfiguration: huge_pages = off
+    initdb:
+      args: --set huge_pages=off
+    persistence:
+      enabled: true
+      storageClass: gp2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 2Gi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  shmVolume:
+    enabled: true
+    sizeLimit: 256Mi
