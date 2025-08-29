@@ -32,3 +32,13 @@ print
 resizepart 1 100%
 quit
 ```
+
+
+##btrfs filesystem
+```
+sudo btrfs filesystem resize max /mnt/storage
+```
+## zfs
+```
+sudo zpool online -e mypool /dev/sdb
+```
