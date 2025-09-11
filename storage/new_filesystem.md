@@ -27,6 +27,9 @@ xfs_growfs /data
 
 ### debian has problem on the growpart in cloud
 ```
+wsudo apt update
+sudo apt install -y cloud-guest-utils
+
 sudo parted /dev/sda
 print
 resizepart 1 100%
