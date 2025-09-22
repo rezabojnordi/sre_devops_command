@@ -1,7 +1,3 @@
-here’s a single, clean **README** your teammate can copy-paste end-to-end to stand up **k3s HA (3 masters + 2 workers) on dedicated/bare-metal** with a floating **VIP via keepalived (VRRP, unicast)**. it’s written so they can run the blocks as-is, only editing the IPs at the top of each “per-cluster” or “per-node” section if needed.
-
----
-
 # k3s HA on Bare Metal (3 masters + 2 workers) — with keepalived VIP
 
 ## Topology (adjust if needed)
