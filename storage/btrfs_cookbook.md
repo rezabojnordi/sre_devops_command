@@ -1,5 +1,46 @@
 Alright, let’s build you a **Btrfs command cheat sheet** that’s actually usable and as complete as we can get without dumping raw man pages.
 
+🔥 **Key Btrfs Features:**
+
+**Copy-on-Write (CoW)**
+When data changes, the old data is *not* overwritten. A new copy is written instead.
+Result:
+
+* “Free” snapshots
+* Less corruption
+* Stronger consistency
+
+---
+
+**Subvolume**
+Something between a partition and a folder.
+It’s not a normal directory; it’s a filesystem inside a filesystem.
+
+---
+
+**Snapshot**
+You “freeze” the current state of a subvolume.
+Cost = almost zero
+Time = instant
+Perfect for backups and rollbacks.
+
+---
+
+**Built-in RAID**
+No `mdadm`, no LVM.
+Btrfs itself can create RAID0, RAID1, RAID10, etc.
+
+---
+
+**Send/Receive**
+Turns a snapshot into a stream and sends it to a second server.
+Amazing for incremental backups.
+
+---
+
+**Checksums everywhere**
+Every data block and metadata block has a checksum → it detects silent corruption.
+
 You’ll mostly interact with Btrfs through:
 
 * `mkfs.btrfs` – create filesystem
