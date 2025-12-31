@@ -1,0 +1,1 @@
+kubectl create cm nginx-cm --from-file nginx-custome-config.conf
