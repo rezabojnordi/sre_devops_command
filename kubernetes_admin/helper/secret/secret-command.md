@@ -10,4 +10,5 @@ kubectl describe pod secretbx2
 kubectl exec -it secretbox2 /bin/sh
  cat /secretstuff/password
 
+kubectl create -f pod-secret-as-var.yaml
 ```
