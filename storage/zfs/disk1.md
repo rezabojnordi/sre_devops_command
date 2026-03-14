@@ -1,20 +1,32 @@
+
 ```
 modprobe zfs
 
+apt update
 apt install -y zfsutils-linux
 
-mkdir /data
+mkdir -p /data
 
 
-# 1. Create the pool with performance tunings enabled on the root
-zpool create -f -o ashift=12 \
+zpool create -f \
+  -o ashift=12 \
+  -o autotrim=on \
   -O compression=lz4 \
   -O atime=off \
+  -O relatime=off \
   -O xattr=sa \
   -O acltype=posixacl \
+  -O dnodesize=auto \
   -O mountpoint=none \
   mypool /dev/sdb
 
-# 2. Create the dataset and mount it to /data
-zfs create -o mountpoint=/data mypool/data
-
+# Dataset tuned for higher throughput
+zfs create \
+  -o mountpoint=/data \
+  -o recordsize=1M \
+  -o primarycache=all \
+  -o secondarycache=all \
+  -o logbias=throughput \
+  -o sync=standard \
+  mypool/data
+```
