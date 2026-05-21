@@ -392,11 +392,9 @@ install_plugins() {
   [[ "$MINIMAL" == "true" ]] && return
 
   # ── Extended ─────────────────────────────────────────────────
-  clone_plugin "zsh-completions"          "https://github.com/zsh-users/zsh-completions"
+  clone_plugin "zsh-completions"              "https://github.com/zsh-users/zsh-completions"
   clone_plugin "zsh-history-substring-search" "https://github.com/zsh-users/zsh-history-substring-search"
-  clone_plugin "fast-syntax-highlighting" "https://github.com/zdharma-continuum/fast-syntax-highlighting"
-  clone_plugin "zsh-you-should-use"       "https://github.com/MichaelAquilina/zsh-you-should-use"
-  clone_plugin "zsh-docker-aliases"       "https://github.com/akarzim/zsh-docker-aliases"
+  clone_plugin "fast-syntax-highlighting"     "https://github.com/zdharma-continuum/fast-syntax-highlighting"
 }
 
 # ─── Powerlevel10k ────────────────────────────────────────────────────────────
@@ -568,7 +566,7 @@ write_zshrc() {
 
   local PLUGIN_LIST="git docker kubectl sudo zsh-autosuggestions zsh-syntax-highlighting zsh-z"
   [[ "$MINIMAL" == "false" ]] && \
-    PLUGIN_LIST="$PLUGIN_LIST zsh-completions zsh-history-substring-search you-should-use"
+    PLUGIN_LIST="$PLUGIN_LIST zsh-completions zsh-history-substring-search"
 
   cat > "$ZSHRC" <<ZSHRC_EOF
 # ============================================================
@@ -668,9 +666,6 @@ ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=50
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 bindkey '^ ' autosuggest-accept           # Ctrl+Space to accept suggestion
-
-YSU_MESSAGE_POSITION="after"              # you-should-use: remind after output
-YSU_HARDCORE=0                            # Warn, not block
 
 # History substring search keybindings
 bindkey '^[[A' history-substring-search-up
@@ -981,28 +976,31 @@ alias ktonn="kubectl top nodes"
 alias kwatch="watch -n2 kubectl get pods"
 alias kwatchall="watch -n2 kubectl get pods --all-namespaces"
 
-alias kctx="kubectx 2>/dev/null || kubectl config use-context"
-alias kns="kubens  2>/dev/null || kubectl config set-context --current --namespace"
 alias kcurrent="kubectl config current-context"
 alias kcfg="kubectl config view --minify"
 alias kcontexts="kubectl config get-contexts"
 
-# fzf helpers (fallback if kubectx/kubens not installed)
-if ! command -v kubectx &>/dev/null; then
-  kctx() {
+# kctx: use kubectx if available, otherwise fzf fallback
+kctx() {
+  if command -v kubectx &>/dev/null; then
+    kubectx "$@"
+  else
     local ctx
     ctx=$(kubectl config get-contexts --no-headers -o name | fzf --prompt="Context> ")
     [[ -n "$ctx" ]] && kubectl config use-context "$ctx"
-  }
-fi
+  fi
+}
 
-if ! command -v kubens &>/dev/null; then
-  kns() {
+# kns: use kubens if available, otherwise fzf fallback
+kns() {
+  if command -v kubens &>/dev/null; then
+    kubens "$@"
+  else
     local ns
     ns=$(kubectl get ns --no-headers -o custom-columns=NAME:.metadata.name | fzf --prompt="Namespace> ")
     [[ -n "$ns" ]] && kubectl config set-context --current --namespace="$ns"
-  }
-fi
+  fi
+}
 
 kexec() {
   local pod ns="${KUBE_NAMESPACE:-default}"
@@ -1626,7 +1624,7 @@ print_summary() {
   echo -e "  • Oh My Zsh + Powerlevel10k"
   echo -e "  • Plugins: autosuggestions, syntax-highlighting, zsh-z"
   [[ "$MINIMAL" == "false" ]] && \
-    echo -e "  • Extra plugins: completions, history-search, fast-syntax, you-should-use, docker-aliases"
+    echo -e "  • Extra plugins: completions, history-search, fast-syntax-highlighting"
   [[ "$INSTALL_TOOLS" == "true" ]] && \
     echo -e "  • Tools: ${SELECTED_TOOLS[*]}"
   [[ "$NO_TMUX" != "true" ]] && echo -e "  • Tmux config (Catppuccin Mocha theme)"
