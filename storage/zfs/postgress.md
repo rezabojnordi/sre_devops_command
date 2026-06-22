@@ -43,3 +43,11 @@ zfs create \
   -o quota=100G \
   dbpool/postgres/logs
 ```
+
+## run below command
+```
+chown -R postgres:postgres /data/postgres
+chmod 700 /data/postgres/data
+chmod 700 /data/postgres/wal
+chmod 700 /data/postgres/temp
+```
