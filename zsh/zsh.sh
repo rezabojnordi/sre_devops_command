@@ -1,246 +1,459 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# mac_like_zsh_setup.sh
-# Ubuntu/Debian installer for a macOS-like Zsh terminal experience.
-# It installs Zsh, Oh My Zsh, Powerlevel10k, autosuggestions, syntax highlighting,
-# completions, fzf, eza, bat, zoxide, and writes an optimized ~/.zshrc.
+# ============================================================
+# macOS-like Zsh setup for Ubuntu / Debian
+#
+# - Clean macOS-style prompt
+# - No Nerd Font required
+# - No weird file/folder icons
+# - Real `cat` command (no bat alias)
+# - Oh My Zsh
+# - Autosuggestions
+# - Syntax highlighting
+# - Extra completions
+# - fzf
+# - zoxide
+# - eza if available
+# - Non-interactive installation
+# ============================================================
+
+export DEBIAN_FRONTEND=noninteractive
 
 if [[ $EUID -eq 0 ]]; then
-  TARGET_USER="${SUDO_USER:-root}"
-  TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
+    TARGET_USER="${SUDO_USER:-root}"
 else
-  TARGET_USER="$USER"
-  TARGET_HOME="$HOME"
+    TARGET_USER="$USER"
 fi
+
+TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 
 if [[ -z "$TARGET_HOME" || ! -d "$TARGET_HOME" ]]; then
-  echo "Could not detect target home directory."
-  exit 1
+    echo "ERROR: Could not determine home directory for $TARGET_USER"
+    exit 1
 fi
+
+echo
+echo "=============================================="
+echo " Installing macOS-like Zsh for: $TARGET_USER"
+echo " Home: $TARGET_HOME"
+echo "=============================================="
+echo
 
 run_as_user() {
-  if [[ $EUID -eq 0 && "$TARGET_USER" != "root" ]]; then
-    sudo -u "$TARGET_USER" HOME="$TARGET_HOME" bash -lc "$*"
-  else
-    HOME="$TARGET_HOME" bash -lc "$*"
-  fi
+    if [[ $EUID -eq 0 && "$TARGET_USER" != "root" ]]; then
+        sudo -u "$TARGET_USER" HOME="$TARGET_HOME" bash -c "$1"
+    else
+        HOME="$TARGET_HOME" bash -c "$1"
+    fi
 }
 
-echo "### Installing packages"
-export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get install -y zsh git curl wget ca-certificates unzip fzf zoxide
+# ------------------------------------------------------------
+# Packages
+# ------------------------------------------------------------
 
-# Nice replacements, package names differ by distro/version.
-apt-get install -y eza bat fd-find ripgrep 2>/dev/null || true
+echo ">>> Installing packages..."
 
-# Debian/Ubuntu often installs bat as batcat and fd as fdfind.
+apt-get update -y
+
+apt-get install -y \
+    zsh \
+    git \
+    curl \
+    wget \
+    ca-certificates \
+    unzip \
+    fzf \
+    ripgrep \
+    less \
+    nano \
+    command-not-found
+
+# zoxide
+apt-get install -y zoxide 2>/dev/null || true
+
+# eza
+apt-get install -y eza 2>/dev/null || true
+
+# bat
+apt-get install -y bat 2>/dev/null || true
+
+# fd
+apt-get install -y fd-find 2>/dev/null || true
+
+# Ubuntu/Debian compatibility
 if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
-  ln -sf /usr/bin/batcat /usr/local/bin/bat
+    ln -sf /usr/bin/batcat /usr/local/bin/bat
 fi
+
 if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
-  ln -sf /usr/bin/fdfind /usr/local/bin/fd
+    ln -sf /usr/bin/fdfind /usr/local/bin/fd
 fi
+
+# ------------------------------------------------------------
+# Oh My Zsh
+# ------------------------------------------------------------
 
 ZSH_DIR="$TARGET_HOME/.oh-my-zsh"
 CUSTOM_DIR="$ZSH_DIR/custom"
 
 if [[ ! -d "$ZSH_DIR" ]]; then
-  echo "### Installing Oh My Zsh"
-  run_as_user "git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git '$ZSH_DIR'"
+    echo ">>> Installing Oh My Zsh..."
+
+    run_as_user "
+        git clone --depth=1 \
+        https://github.com/ohmyzsh/ohmyzsh.git \
+        '$ZSH_DIR'
+    "
+else
+    echo ">>> Oh My Zsh already installed."
 fi
 
-echo "### Installing theme and plugins"
-run_as_user "mkdir -p '$CUSTOM_DIR/themes' '$CUSTOM_DIR/plugins'"
+mkdir -p "$CUSTOM_DIR/plugins"
+chown -R "$TARGET_USER:$TARGET_USER" "$ZSH_DIR" 2>/dev/null || true
 
-if [[ ! -d "$CUSTOM_DIR/themes/powerlevel10k" ]]; then
-  run_as_user "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git '$CUSTOM_DIR/themes/powerlevel10k'"
-fi
+# ------------------------------------------------------------
+# Plugins
+# ------------------------------------------------------------
+
+echo ">>> Installing Zsh plugins..."
+
 if [[ ! -d "$CUSTOM_DIR/plugins/zsh-autosuggestions" ]]; then
-  run_as_user "git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions '$CUSTOM_DIR/plugins/zsh-autosuggestions'"
-fi
-if [[ ! -d "$CUSTOM_DIR/plugins/zsh-syntax-highlighting" ]]; then
-  run_as_user "git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git '$CUSTOM_DIR/plugins/zsh-syntax-highlighting'"
-fi
-if [[ ! -d "$CUSTOM_DIR/plugins/zsh-completions" ]]; then
-  run_as_user "git clone --depth=1 https://github.com/zsh-users/zsh-completions '$CUSTOM_DIR/plugins/zsh-completions'"
+    run_as_user "
+        git clone --depth=1 \
+        https://github.com/zsh-users/zsh-autosuggestions.git \
+        '$CUSTOM_DIR/plugins/zsh-autosuggestions'
+    "
 fi
 
-BACKUP="$TARGET_HOME/.zshrc.backup.$(date +%Y%m%d-%H%M%S)"
-if [[ -f "$TARGET_HOME/.zshrc" ]]; then
-  cp "$TARGET_HOME/.zshrc" "$BACKUP"
-  chown "$TARGET_USER:$TARGET_USER" "$BACKUP" 2>/dev/null || true
-  echo "### Old ~/.zshrc backed up to $BACKUP"
+if [[ ! -d "$CUSTOM_DIR/plugins/zsh-syntax-highlighting" ]]; then
+    run_as_user "
+        git clone --depth=1 \
+        https://github.com/zsh-users/zsh-syntax-highlighting.git \
+        '$CUSTOM_DIR/plugins/zsh-syntax-highlighting'
+    "
 fi
+
+if [[ ! -d "$CUSTOM_DIR/plugins/zsh-completions" ]]; then
+    run_as_user "
+        git clone --depth=1 \
+        https://github.com/zsh-users/zsh-completions.git \
+        '$CUSTOM_DIR/plugins/zsh-completions'
+    "
+fi
+
+# ------------------------------------------------------------
+# Backup old config
+# ------------------------------------------------------------
+
+if [[ -f "$TARGET_HOME/.zshrc" ]]; then
+    BACKUP="$TARGET_HOME/.zshrc.backup.$(date +%Y%m%d-%H%M%S)"
+    cp "$TARGET_HOME/.zshrc" "$BACKUP"
+    chown "$TARGET_USER:$TARGET_USER" "$BACKUP" 2>/dev/null || true
+
+    echo ">>> Previous .zshrc backed up:"
+    echo "    $BACKUP"
+fi
+
+# Remove old Powerlevel10k config if present.
+# We don't need it for the macOS-like prompt.
+rm -f "$TARGET_HOME/.p10k.zsh" 2>/dev/null || true
+
+# ------------------------------------------------------------
+# New Zsh config
+# ------------------------------------------------------------
+
+echo ">>> Writing ~/.zshrc..."
 
 cat > "$TARGET_HOME/.zshrc" <<'ZSHRC'
-# ~/.zshrc - macOS-like optimized Zsh for Linux
-# Reload with: source ~/.zshrc
+# ============================================================
+# macOS-like Zsh configuration
+# ============================================================
 
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# Oh My Zsh behavior
+# Don't use a theme.
+# macOS Terminal uses a clean/simple Zsh prompt.
+ZSH_THEME=""
+
+# ------------------------------------------------------------
+# Oh My Zsh
+# ------------------------------------------------------------
+
+DISABLE_AUTO_UPDATE=true
+DISABLE_UPDATE_PROMPT=true
 DISABLE_MAGIC_FUNCTIONS=true
-COMPLETION_WAITING_DOTS=true
-HIST_STAMPS="yyyy-mm-dd"
 
 plugins=(
-  git
-  sudo
-  command-not-found
-  extract
-  colored-man-pages
-  history-substring-search
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  zsh-completions
+    git
+    sudo
+    extract
+    command-not-found
+    colored-man-pages
+    history-substring-search
+    zsh-autosuggestions
+    zsh-completions
 )
 
 source "$ZSH/oh-my-zsh.sh"
 
-# Powerlevel10k instant prompt. Keep this near the top of ~/.zshrc.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# Syntax highlighting must be loaded last.
+if [[ -f "$ZSH/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "$ZSH/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
-# macOS-like prompt settings using Powerlevel10k.
-# To customize visually later: p10k configure
-POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
-POWERLEVEL9K_MODE=nerdfont-complete
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX='╭─'
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX='╰─%F{blue}❯%f '
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
-POWERLEVEL9K_DIR_FOREGROUND=39
-POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=39
-POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=39
-POWERLEVEL9K_VCS_CLEAN_FOREGROUND=76
-POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=178
-POWERLEVEL9K_STATUS_OK=false
-POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=2
-POWERLEVEL9K_TIME_FORMAT='%D{%H:%M}'
+# ============================================================
+# macOS-like prompt
+# ============================================================
 
-# History: Mac-like useful persistent history
+# Example:
+#
+# reza@server ~/Downloads %
+#
+# root becomes red automatically.
+
+setopt PROMPT_SUBST
+
+if [[ "$EUID" -eq 0 ]]; then
+    PROMPT='%F{red}%n%f@%F{yellow}%m%f %F{cyan}%~%f %# '
+else
+    PROMPT='%F{green}%n%f@%F{yellow}%m%f %F{cyan}%~%f %# '
+fi
+
+RPROMPT=''
+
+# ------------------------------------------------------------
+# History
+# ------------------------------------------------------------
+
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=100000
 SAVEHIST=100000
+
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
+setopt INC_APPEND_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt HIST_VERIFY
 setopt EXTENDED_HISTORY
 
-# Better completion
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' verbose yes
+# ------------------------------------------------------------
+# Completion
+# ------------------------------------------------------------
+
 autoload -Uz compinit
 compinit
 
-# Keybindings similar to macOS/iTerm comfort
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list \
+    'm:{a-zA-Z}={A-Za-z}'
+
+# ------------------------------------------------------------
+# Key bindings
+# ------------------------------------------------------------
+
 bindkey -e
+
+# Up/down searches command history based on what you've typed.
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
+
+# Ctrl + arrow
 bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
+
+# Home / End
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+
+# Delete
 bindkey '^[[3~' delete-char
 
-# Autosuggestion style
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=244'
+# ------------------------------------------------------------
+# Autosuggestions
+# ------------------------------------------------------------
+
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
-# Syntax highlighting must be loaded near the end; plugin handles it.
+# ------------------------------------------------------------
+# fzf
+# ------------------------------------------------------------
 
-# fzf integration
 if command -v fzf >/dev/null 2>&1; then
-  source /usr/share/doc/fzf/examples/key-bindings.zsh 2>/dev/null || true
-  source /usr/share/doc/fzf/examples/completion.zsh 2>/dev/null || true
+
+    [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] && \
+        source /usr/share/doc/fzf/examples/key-bindings.zsh
+
+    [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && \
+        source /usr/share/doc/fzf/examples/completion.zsh
 fi
 
-# zoxide: smarter cd, use `z foldername`
+# ------------------------------------------------------------
+# zoxide
+# ------------------------------------------------------------
+
 if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh)"
+    eval "$(zoxide init zsh)"
 fi
 
-# eza/bat modern mac-like defaults
+# ============================================================
+# ls
+#
+# IMPORTANT:
+# No --icons here.
+#
+# This prevents the strange symbols beside files/directories.
+# ============================================================
+
 if command -v eza >/dev/null 2>&1; then
-  alias ls='eza --icons=auto --group-directories-first'
-  alias ll='eza -lah --icons=auto --group-directories-first --git'
-  alias la='eza -la --icons=auto --group-directories-first'
-  alias tree='eza --tree --icons=auto --group-directories-first'
+
+    alias ls='eza --group-directories-first'
+    alias ll='eza -lah --group-directories-first --git'
+    alias la='eza -la --group-directories-first'
+    alias l='eza -lh --group-directories-first'
+    alias tree='eza --tree --group-directories-first'
+
 else
-  alias ll='ls -lah --color=auto'
-  alias la='ls -la --color=auto'
+
+    alias ls='ls --color=auto'
+    alias ll='ls -lah --color=auto'
+    alias la='ls -la --color=auto'
+    alias l='ls -lh --color=auto'
+
 fi
 
-if command -v bat >/dev/null 2>&1; then
-  alias cat='bat --paging=never --style=plain'
-fi
+# ============================================================
+# CAT
+#
+# DO NOT alias cat to bat.
+#
+# `cat ~/.ssh/id_rsa.pub`
+# will now display the entire key normally.
+# ============================================================
 
-# Handy aliases
+unalias cat 2>/dev/null || true
+
+# Use bat explicitly when you WANT syntax highlighting:
+#
+#   bat file.txt
+#
+# Normal:
+#
+#   cat file.txt
+
+# ------------------------------------------------------------
+# macOS-like convenience aliases
+# ------------------------------------------------------------
+
 alias ..='cd ..'
 alias ...='cd ../..'
-alias c='clear'
-alias h='history'
-alias grep='grep --color=auto'
-alias ip='ip --color=auto'
-alias ports='ss -tulpn'
-alias myip='curl -4 ifconfig.me; echo'
-alias reload='source ~/.zshrc'
-alias zshconfig='${EDITOR:-nano} ~/.zshrc'
+alias ....='cd ../../..'
 
-# Git aliases
+alias c='clear'
+
+alias h='history'
+
+alias grep='grep --color=auto'
+
+alias ports='ss -tulpn'
+
+alias myip='curl -4 -s ifconfig.me; echo'
+
+alias reload='source ~/.zshrc'
+
+alias zshconfig='nano ~/.zshrc'
+
+# ------------------------------------------------------------
+# Git
+# ------------------------------------------------------------
+
 alias gs='git status -sb'
 alias ga='git add'
 alias gc='git commit'
 alias gp='git push'
-alias gl='git log --oneline --graph --decorate --all -20'
 
-# Docker aliases, harmless if Docker is not installed
-alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias gl='git log \
+--graph \
+--decorate \
+--pretty=oneline \
+--abbrev-commit \
+--all'
+
+# ------------------------------------------------------------
+# Docker
+# ------------------------------------------------------------
+
+alias dps='docker ps'
 alias dcu='docker compose up -d'
 alias dcd='docker compose down'
 alias dcl='docker compose logs -f --tail=100'
 
-# Linux helpers
+# ------------------------------------------------------------
+# Linux
+# ------------------------------------------------------------
+
 alias update='sudo apt update && sudo apt upgrade -y'
 alias install='sudo apt install -y'
-alias path='echo $PATH | tr ":" "\n"'
 
-# Editor default
-export EDITOR='nano'
-export VISUAL='nano'
+# ------------------------------------------------------------
+# Editor
+# ------------------------------------------------------------
 
-# Less colors for man pages
-export LESS_TERMCAP_mb=$'\e[1;31m'
-export LESS_TERMCAP_md=$'\e[1;36m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;44;33m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[1;32m'
+export EDITOR=nano
+export VISUAL=nano
 
-# Optional local overrides
+# ------------------------------------------------------------
+# Colors
+# ------------------------------------------------------------
+
+export CLICOLOR=1
+
+# GNU ls colors
+if command -v dircolors >/dev/null 2>&1; then
+    eval "$(dircolors -b)"
+fi
+
+# ------------------------------------------------------------
+# Local custom settings
+# ------------------------------------------------------------
+
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
 ZSHRC
 
-chown "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.zshrc" 2>/dev/null || true
+chown "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.zshrc"
+
+# ------------------------------------------------------------
+# Default shell
+# ------------------------------------------------------------
 
 ZSH_BIN="$(command -v zsh)"
+
 CURRENT_SHELL="$(getent passwd "$TARGET_USER" | cut -d: -f7)"
+
 if [[ "$CURRENT_SHELL" != "$ZSH_BIN" ]]; then
-  echo "### Changing default shell to zsh for $TARGET_USER"
-  chsh -s "$ZSH_BIN" "$TARGET_USER" || echo "Could not change shell automatically. Run: chsh -s $ZSH_BIN"
+
+    echo ">>> Changing default shell to Zsh..."
+
+    chsh -s "$ZSH_BIN" "$TARGET_USER" || true
 fi
 
 echo
- echo "DONE. Close and reopen terminal, or run: exec zsh"
- echo "For the best macOS-like icons, install a Nerd Font on your terminal and select it."
- echo "To customize the prompt later, run: p10k configure"
+echo "=============================================="
+echo " macOS-like Zsh installation complete"
+echo "=============================================="
+echo
+echo "User : $TARGET_USER"
+echo "Shell: $ZSH_BIN"
+echo
+echo "Starting Zsh..."
+echo
+
+if [[ "$EUID" -eq 0 && "$TARGET_USER" != "root" ]]; then
+    exec sudo -u "$TARGET_USER" HOME="$TARGET_HOME" "$ZSH_BIN" -l
+else
+    exec "$ZSH_BIN" -l
+fi
